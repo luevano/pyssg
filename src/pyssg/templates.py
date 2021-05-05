@@ -1,13 +1,19 @@
 import os
 
 
-def create_structure(directory: str):
+def create_templates(src: str, dst: str):
     # get initial working directory
     iwd = os.getcwd()
+    print('creating dir structure...')
 
-    # create main dir
-    os.mkdir(directory)
-    os.chdir(directory)
+    # create main dirs
+    try:
+        os.mkdir(src)
+        os.mkdir(dst)
+    except FileExistsError:
+        pass
+
+    os.chdir(src)
 
     # create templates dir
     os.mkdir('templates')
@@ -74,3 +80,4 @@ def create_structure(directory: str):
 
     # return to initial working directory
     os.chdir(iwd)
+    print('done creating dir structure...')

@@ -1,34 +1,45 @@
 import os
 from argparse import ArgumentParser, Namespace
 
-from .file_discovery import get_md_files
-from .file_structure import create_structure
+from .templates import create_templates
+from .parser import generate_static_site
 
 
 def get_options() -> Namespace:
     parser = ArgumentParser(prog='pyssg',
                             description='''Static Site Generator that reads
                             Markdown files and creates HTML files.''')
-    parser.add_argument('-d', '--directory',
-                        default='.',
+    parser.add_argument('-s', '--src',
+                        default='src',
                         type=str,
-                        help='''root directory for all site files,
-                        defaults to "." (cwd), uses relative or absolute
-                        resolution''')
+                        help='''src directory; handmade files, templates and
+                        metadata directory; defaults to 'src' ''')
+    parser.add_argument('-d', '--dst',
+                        default='dst',
+                        type=str,
+                        help='''dst directory; generated (and transfered html)
+                        files; defaults to 'dst' ''')
     parser.add_argument('-i', '--init',
                         action='store_true',
-                        help='''initialize the directory structure where -d
-                        specifies''')
+                        help='''initializes the dir structure, templates,
+                        as well as the 'src' and 'dst' directories''')
+    parser.add_argument('-b', '--build',
+                        action='store_true',
+                        help='''generates all html files and passes over
+                        existing (handmade) ones''')
 
     return parser.parse_args()
 
 
 def main():
     opts = vars(get_options())
-    directory = opts['directory']
+    src = opts['src']
+    dst = opts['dst']
 
     if opts['init']:
-        create_structure(directory)
+        create_templates(src, dst)
+        return
 
-    os.chdir(directory)
-    root_dir = os.getcwd()
+    if opts['build']:
+        generate_static_site(src, dst)
+        return

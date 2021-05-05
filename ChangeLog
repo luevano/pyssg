@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* initial template creation, barebones arg parser
 * Prepare barebones package info
 * Update readme
 * Initial commit
