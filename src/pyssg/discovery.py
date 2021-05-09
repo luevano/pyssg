@@ -11,7 +11,7 @@ def get_file_list(extensions: list[str], exclude: list[str]=None) -> list[str]:
 
         for f in files:
             if f.endswith(tuple(extensions)):
-                out.append(os.path.join(root, f))
+                out.append(os.path.join(root, f).replace(cwd, '')[1:])
 
     return out
 
@@ -27,14 +27,19 @@ def get_dir_structure(exclude: list[str]=None) -> list[str]:
         for d in dirs:
             if root in out:
                 out.remove(root)
-            out.append(os.path.join(root, d).replace(cwd, ''))
+            out.append(os.path.join(root, d))
 
-    return out
+    return [o.replace(cwd, '')[1:] for o in out]
 
 
-def get_all_files():
+def get_all_files(src: str) -> tuple[list[str], list[str], list[str]]:
+    iwd = os.getcwd()
+    os.chdir(src)
+
     md_files = get_file_list(['.md', '.markdown'], ['templates'])
     html_files = get_file_list(['.html'], ['templates'])
     dirs = get_dir_structure(['templates'])
+
+    os.chdir(iwd)
 
     return (dirs, md_files, html_files)

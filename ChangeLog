@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* Add working file discovery and destination file structure creation
 * initial template creation, barebones arg parser
 * Prepare barebones package info
 * Update readme

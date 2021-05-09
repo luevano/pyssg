@@ -1,8 +1,8 @@
 import os
 from argparse import ArgumentParser, Namespace
 
-from .templates import create_templates
-from .parser import generate_static_site
+from .template import Template
+from .generator import generate_static_site
 
 
 def get_options() -> Namespace:
@@ -31,13 +31,20 @@ def get_options() -> Namespace:
     return parser.parse_args()
 
 
-def main():
+def main() -> None:
     opts = vars(get_options())
     src = opts['src']
     dst = opts['dst']
 
     if opts['init']:
-        create_templates(src, dst)
+        try:
+            os.mkdir(src)
+            os.makedirs(os.path.join(dst, 'tag'))
+        except FileExistsError:
+            pass
+
+        template = Template()
+        template.write_templates(src)
         return
 
     if opts['build']:
