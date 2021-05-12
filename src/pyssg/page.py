@@ -3,47 +3,61 @@ from datetime import datetime, timezone
 
 class Page:
     def __init__(self,
-                 f_name: str,
-                 f_time: float,
-                 c_html: str,
-                 c_meta: dict):
-        self.f_name: str = f_name
-        self.f_time: float = f_time
-        self.c_html: str = c_html
-        self.c_meta: dict = c_meta
+                 name: str,
+                 c_time: float,
+                 m_time: float,
+                 html: str,
+                 meta: dict):
+        self.name: str = name
+        self.c_time: float = c_time
+        self.m_time: float = m_time
+        self.html: str = html
+        self.meta: dict = meta
 
+        # data from self.meta
         self.title: str = None
         self.author: str = None
-        self.timestamp: str = None
+        self.c_datetime: datetime = None
+        self.m_datetime: datetime = None
         self.summary: str = None
         self.lang: str = None
         self.tags: list = None
 
+        self.__parse_meta()
 
-    def parse_meta(self):
+    def __lt__(self, other):
+        return self.c_time < other.c_time
+
+
+    def __parse_meta(self):
         try:
-            self.title = self.c_meta['title'][0]
+            self.title = self.meta['title'][0]
         except KeyError:
             pass
 
         try:
-            self.author = self.c_meta['author'][0]
+            self.author = self.meta['author'][0]
         except KeyError:
             pass
 
-        self.timestamp = datetime.fromtimestamp(self.f_time, tz=timezone.utc)
+        self.c_datetime = datetime.fromtimestamp(self.c_time,
+                                                 tz=timezone.utc)
+
+        if self.m_time != 0.0:
+            self.m_datetime = datetime.fromtimestamp(self.m_time,
+                                                     tz=timezone.utc)
 
         try:
-            self.summary = self.c_meta['summary'][0]
+            self.summary = self.meta['summary'][0]
         except KeyError:
             pass
 
         try:
-            self.lang = self.c_meta['lang'][0]
+            self.lang = self.meta['lang'][0]
         except KeyError:
             pass
 
         try:
-            self.tags = self.c_meta['tags']
+            self.tags = self.meta['tags']
         except KeyError:
             pass

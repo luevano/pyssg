@@ -3,8 +3,9 @@ author: David Luévano
 summary: Small summary
 lang: en
 tags: test
-	small
 	archive
+	another-test
+	123
 
 This is an article test, again
 

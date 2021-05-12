@@ -16,16 +16,17 @@ class Common(HF):
 
 
 class Template(HF):
-    def __init__(self):
+    def __init__(self, src: str):
+        self.src: str = src
         self.article: HF = HF()
         self.articles: Common = Common()
         self.tags: Common = Common()
 
 
-    def write_templates(self, src: str) -> None:
+    def write(self) -> None:
         # get initial working directory
         iwd = os.getcwd()
-        os.chdir(src)
+        os.chdir(self.src)
 
         # create templates dir
         os.mkdir('templates')
@@ -101,10 +102,10 @@ class Template(HF):
         os.chdir(iwd)
 
 
-    def read_templates(self, src: str) -> None:
+    def read(self) -> None:
         # get initial working directory
         iwd = os.getcwd()
-        os.chdir(os.path.join(src, 'templates'))
+        os.chdir(os.path.join(self.src, 'templates'))
 
         # common
         os.chdir('common')

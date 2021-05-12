@@ -1,8 +1,9 @@
 import os
 from argparse import ArgumentParser, Namespace
 
+from .database import Database
 from .template import Template
-from .generator import generate_static_site
+from .builder import build_static_site
 
 
 def get_options() -> Namespace:
@@ -32,9 +33,9 @@ def get_options() -> Namespace:
 
 
 def main() -> None:
-    opts = vars(get_options())
-    src = opts['src']
-    dst = opts['dst']
+    opts: dict[str] = vars(get_options())
+    src: str = opts['src']
+    dst: str = opts['dst']
 
     if opts['init']:
         try:
@@ -43,10 +44,14 @@ def main() -> None:
         except FileExistsError:
             pass
 
-        template = Template()
-        template.write_templates(src)
+        template: Template = Template(src)
+        template.write()
         return
 
     if opts['build']:
-        generate_static_site(src, dst)
+        db: Database = Database(os.path.join(src, '.files'))
+
+        build_static_site(src, dst, db)
+
+        db.write()
         return
