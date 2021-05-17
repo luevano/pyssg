@@ -7,9 +7,8 @@ class Database:
         self.db_path: str = db_path
         self.e: dict[str, tuple[float, float, list[str]]] = dict()
 
-        self.__read()
 
-
+    # updates the tags for a specific entry (file)
     def update_tags(self, file_name: str,
                     tags: list[str]) -> None:
         if file_name in self.e:
@@ -68,7 +67,7 @@ class Database:
                 file.write(f'{k} {v[0]} {v[1]} {t}\n')
 
 
-    def __read(self) -> None:
+    def read(self) -> None:
         # only if the path exists and it is a file
         if os.path.exists(self.db_path) and os.path.isfile(self.db_path):
             # get all db file lines

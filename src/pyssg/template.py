@@ -1,12 +1,16 @@
 import os
 
+from .page import Page
 
+
+# all objects here require a header and footer as minimum
 class HF:
     def __init__(self):
         self.header: str = None
         self.footer: str = None
 
 
+# some objects require a "list-like" set of attributes
 class Common(HF):
     def __init__(self):
         self.list_header: str = None
@@ -15,6 +19,7 @@ class Common(HF):
         self.list_separator: str = None
 
 
+# main class
 class Template(HF):
     def __init__(self, src: str):
         self.src: str = src
@@ -22,7 +27,10 @@ class Template(HF):
         self.articles: Common = Common()
         self.tags: Common = Common()
 
+        self.is_read: bool = False
 
+
+    # writes default templates
     def write(self) -> None:
         # get initial working directory
         iwd = os.getcwd()
@@ -41,7 +49,6 @@ class Template(HF):
                                '<head>\n',
                                '<meta charset="utf-8">\n',
                                '<title>$$TITLE</title>\n',
-                               '$$EXTRAHEAD\n',
                                '</head>\n',
                                '<body>\n'])
         self.__write_template('footer.html',
@@ -102,7 +109,14 @@ class Template(HF):
         os.chdir(iwd)
 
 
+    # reads templates and stores them into class attributes
     def read(self) -> None:
+        # only read templates if not read already
+        # (might want to change this behaviour)
+        if self.is_read:
+            return
+        self.is_read = True
+
         # get initial working directory
         iwd = os.getcwd()
         os.chdir(os.path.join(self.src, 'templates'))

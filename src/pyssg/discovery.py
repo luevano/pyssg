@@ -29,16 +29,3 @@ def get_dir_structure(directory: str,
                 out.append(os.path.join(root, d))
 
     return [o.replace(directory, '')[1:] for o in out]
-
-
-def get_all_files(src: str) -> tuple[list[str], list[str], list[str]]:
-    md_files: list[str] = get_file_list(src,
-                                        ['.md', '.markdown'],
-                                        ['templates'])
-    html_files: list[str] = get_file_list(src,
-                                          ['.html'],
-                                          ['templates'])
-    dirs: list[str] = get_dir_structure(src,
-                                        ['templates'])
-
-    return (dirs, md_files, html_files)

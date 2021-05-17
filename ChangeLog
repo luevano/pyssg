@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+v0.1.0
+------
+
+* refactor code and almost finish main functionality
 * semiworking program, still very alpha
 * Add working file discovery and destination file structure creation
 * initial template creation, barebones arg parser

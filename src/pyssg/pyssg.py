@@ -3,7 +3,7 @@ from argparse import ArgumentParser, Namespace
 
 from .database import Database
 from .template import Template
-from .builder import build_static_site
+from .builder import HTMLBuilder
 
 
 def get_options() -> Namespace:
@@ -20,6 +20,10 @@ def get_options() -> Namespace:
                         type=str,
                         help='''dst directory; generated (and transfered html)
                         files; defaults to 'dst' ''')
+    parser.add_argument('-u', '--url',
+                        required=True,
+                        type=str,
+                        help='''base url without trailing slash''')
     parser.add_argument('-i', '--init',
                         action='store_true',
                         help='''initializes the dir structure, templates,
@@ -36,6 +40,7 @@ def main() -> None:
     opts: dict[str] = vars(get_options())
     src: str = opts['src']
     dst: str = opts['dst']
+    base_url: str = opts['url']
 
     if opts['init']:
         try:
@@ -44,14 +49,22 @@ def main() -> None:
         except FileExistsError:
             pass
 
+        # write default templates
         template: Template = Template(src)
         template.write()
         return
 
     if opts['build']:
+        # start the db
         db: Database = Database(os.path.join(src, '.files'))
+        db.read()
 
-        build_static_site(src, dst, db)
+        # read templates
+        template: Template = Template(src)
+        template.read()
+
+        builder: HTMLBuilder = HTMLBuilder(src, dst, base_url, template, db)
+        builder.build()
 
         db.write()
         return
