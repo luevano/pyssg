@@ -62,7 +62,9 @@ class Template(HF):
         os.mkdir('article')
         os.chdir('article')
         self.__write_template('header.html',
-                              ['<h1>$$TITLE</h1>'])
+                              ['<h1>$$TITLE</h1>\n',
+                               '<p>$$AUTHOR</p>\n',
+                               '<p>Created: $$CTIME, modified: $$MTIME</p>\n'])
         self.__write_template('footer.html',
                               [''])
 
@@ -78,9 +80,9 @@ class Template(HF):
                               ['<h2>Articles</h2>\n',
                                '<ul>\n'])
         self.__write_template('list_entry.html',
-                              ['<li><a href="$$URL">$$DATE - $$TITLE</a></li>\n'])
+                              ['<li>$$DATE - <a href="$$URL">$$TITLE</a></li>\n'])
         self.__write_template('list_separator.html',
-                              [''])
+                              ['<h3>$$SEP</h3>\n'])
         self.__write_template('list_footer.html',
                               ['</ul>\n'])
         self.__write_template('footer.html',

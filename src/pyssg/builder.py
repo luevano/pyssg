@@ -207,12 +207,10 @@ class HTMLBuilder:
                       pages: list[Page]) -> None:
         for t in tags:
             # get a list of all pages that have current tag
-            # and sort them (by time)
             tag_pages: list[Page] = []
             for p in pages:
                 if p.tags is not None and t in p.tags:
                     tag_pages.append(p)
-            tag_pages.sort(reverse=True)
 
             # build tag page
             self.__create_tag(t, tag_pages)

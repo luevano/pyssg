@@ -55,4 +55,5 @@ class MDParser:
 
         # sort list of tags for consistency
         self.all_tags.sort()
-        self.updated_pages.sort()
+        self.updated_pages.sort(reverse=True)
+        self.all_pages.sort(reverse=True)
