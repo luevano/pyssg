@@ -39,7 +39,7 @@ That creates the desired directories with the basic templates that can be edited
 Build the site with:
 
 ```sh
-pyssg -s src_dir -d dst_dir -u https://baseurl.com -b
+pyssg -s src_dir -d dst_dir -b
 ```
 
-Without a trailing slash `/` at the end of the base URL. That creates all `*.html` for the site and can be easily moved to the server.
+That creates all `*.html` for the site and can be easily moved to the server. Where an optional `-u` flag can be provided for the base URL (don't include the trailing slash `/`)

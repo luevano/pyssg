@@ -238,7 +238,6 @@ class HTMLBuilder:
         # tag header
         tag_url: str = f'{self.base_url}/tag/@{tag}.html'
         t.tags.header = t.tags.header.replace('$$NAME', tag)
-        t.tags.header = t.tags.header.replace('$$URL', tag_url)
 
         with open(os.path.join(self.dst, f'tag/@{tag}.html'), 'w') as f:
             f.write(t.header)

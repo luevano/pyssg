@@ -21,7 +21,7 @@ def get_options() -> Namespace:
                         help='''dst directory; generated (and transfered html)
                         files; defaults to 'dst' ''')
     parser.add_argument('-u', '--url',
-                        required=True,
+                        default='',
                         type=str,
                         help='''base url without trailing slash''')
     parser.add_argument('-i', '--init',
