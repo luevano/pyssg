@@ -71,6 +71,9 @@ def get_options() -> Namespace:
 
 def main() -> None:
     opts: dict[str, Union[str, bool]] = vars(get_options())
+    for k, v in opts.items():
+        print(k, v)
+
     conf_path: str = opts['config']
     conf_path = os.path.expandvars(conf_path)
 
