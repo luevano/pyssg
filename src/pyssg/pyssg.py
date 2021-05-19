@@ -1,5 +1,6 @@
 import os
 from argparse import ArgumentParser, Namespace
+from typing import Union
 
 from .configuration import Configuration
 from .database import Database
