@@ -1,6 +1,7 @@
 import os
 from argparse import ArgumentParser, Namespace
 
+from .configuration import Configuration
 from .database import Database
 from .template import Template
 from .builder import HTMLBuilder
@@ -9,7 +10,16 @@ from .builder import HTMLBuilder
 def get_options() -> Namespace:
     parser = ArgumentParser(prog='pyssg',
                             description='''Static Site Generator that reads
-                            Markdown files and creates HTML files.''')
+                            Markdown files and creates HTML files.\nIf
+                            [-c]onfig file is provided (or exists in default
+                            location) all other options are ignored.\nFor
+                            datetime formats see:
+                            https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes''')
+    parser.add_argument('-c', '--config',
+                        default='$XDG_CONFIG_HOME/pyssg/pyssgrc',
+                        type=str,
+                        help='''config file (path) to read from; defaults to
+                        '$XDG_CONFIG_HOME/pyssg/pyssgrc' ''')
     parser.add_argument('-s', '--src',
                         default='src',
                         type=str,
@@ -24,6 +34,24 @@ def get_options() -> Namespace:
                         default='',
                         type=str,
                         help='''base url without trailing slash''')
+    parser.add_argument('--date-format',
+                        default='%a, %b %d, %Y @ %H:%M %Z',
+                        type=str,
+                        help='''date format used inside pages (for creation and
+                        modification times, for example); defaults to '%a, %b
+                        %d, %Y @ %H:%M %Z' ('Tue, Mar 16, 2021 @ 02:46 UTC',
+                        for example)''')
+    parser.add_argument('--list-date-format',
+                        default='%b %d',
+                        type=str,
+                        help='''date format used for page entries in a list;
+                        defaults to '%b %d' ('Mar 16', for example)''')
+    parser.add_argument('--list-sep-date-format',
+                        default='%B %Y',
+                        type=str,
+                        help='''date format used for the separator between page
+                        entries in a list; defaults to '%B %Y' ('March 2021',
+                        for example)''')
     parser.add_argument('-i', '--init',
                         action='store_true',
                         help='''initializes the dir structure, templates,
@@ -32,38 +60,45 @@ def get_options() -> Namespace:
                         action='store_true',
                         help='''generates all html files and passes over
                         existing (handmade) ones''')
+    parser.add_argument('-f', '--force',
+                        action='store_true',
+                        help='''force building all pages and not only the
+                        updated ones''')
 
     return parser.parse_args()
 
 
 def main() -> None:
-    opts: dict[str] = vars(get_options())
-    src: str = opts['src']
-    dst: str = opts['dst']
-    base_url: str = opts['url']
+    opts: dict[str, Union[str, bool]] = vars(get_options())
+    conf_path: str = opts['config']
+    conf_path = os.path.expandvars(conf_path)
+
+    config: Configuration = Configuration(conf_path)
+    config.read()
+    config.fill_missing(opts)
 
     if opts['init']:
         try:
-            os.mkdir(src)
-            os.makedirs(os.path.join(dst, 'tag'))
+            os.mkdir(config.src)
+            os.makedirs(os.path.join(config.dst, 'tag'))
         except FileExistsError:
             pass
 
         # write default templates
-        template: Template = Template(src)
+        template: Template = Template(config.src)
         template.write()
         return
 
     if opts['build']:
         # start the db
-        db: Database = Database(os.path.join(src, '.files'))
+        db: Database = Database(os.path.join(config.src, '.files'))
         db.read()
 
         # read templates
-        template: Template = Template(src)
+        template: Template = Template(config.src)
         template.read()
 
-        builder: HTMLBuilder = HTMLBuilder(src, dst, base_url, template, db)
+        builder: HTMLBuilder = HTMLBuilder(config, template, db)
         builder.build()
 
         db.write()

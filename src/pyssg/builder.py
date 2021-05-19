@@ -2,6 +2,7 @@ import os
 import shutil
 from copy import deepcopy
 
+from .configuration import Configuration
 from .template import Template
 from .database import Database
 from .parser import MDParser
@@ -9,37 +10,19 @@ from .page import Page
 from .discovery import get_file_list, get_dir_structure
 
 class HTMLBuilder:
-    def __init__(self, src: str,
-                 dst: str,
-                 base_url: str,
+    def __init__(self, config: Configuration,
                  template: Template,
-                 db: Database,
-                 dformat: str=None,
-                 l_dformat: str=None,
-                 lsep_dformat: str=None):
-        self.src: str = src
-        self.dst: str = dst
-        self.base_url: str = base_url
+                 db: Database):
+        self.src: str = config.src
+        self.dst: str = config.dst
+        self.base_url: str = config.base_url
+        self.dformat: str = config.dformat
+        self.l_dformat: str = config.l_dformat
+        self.lsep_dformat: str = config.lsep_dformat
+        self.force: bool = config.force
+
         self.template: Template = template
         self.db: Database = db
-        self.dformat: str = None
-        self.l_dformat: str = None
-        self.lsep_dformat: str = None
-
-        if dformat is not None:
-            self.dformat = dformat
-        else:
-            self.dformat = "%a, %d %b, %Y @ %H:%M %Z"
-
-        if l_dformat is not None:
-            self.l_dformat = l_dformat
-        else:
-            self.l_dformat = "%b %d"
-
-        if lsep_dformat is not None:
-            self.lsep_dformat = lsep_dformat
-        else:
-            self.lsep_dformat = "%B %Y"
 
         self.dirs: list[str] = None
         self.md_files: list[str] = None
@@ -61,7 +44,11 @@ class HTMLBuilder:
         self.__create_article_index(parser.all_tags, parser.all_pages)
 
         # create each category of html pages
-        self.__create_articles(parser.updated_pages)
+        # check if all pages should be created
+        if self.force:
+            self.__create_articles(parser.all_pages)
+        else:
+            self.__create_articles(parser.updated_pages)
         self.__create_tags(parser.all_tags, parser.all_pages)
 
 
