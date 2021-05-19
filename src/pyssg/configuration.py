@@ -40,7 +40,7 @@ class Configuration:
             except KeyError: pass
 
             try:
-                self.dst = opts['SRC_PATH']
+                self.dst = opts['DST_PATH']
             except KeyError: pass
 
             try:

@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* fix error on parsing config file
 * finally fix argparse error, questionmark
 * checking argparse errors
 * fix missing import
