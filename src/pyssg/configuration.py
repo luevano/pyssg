@@ -27,10 +27,10 @@ class Configuration:
                     raise Exception('wrong config syntax')
 
                 k: str = kv[0].strip()
-                k_temp: str = kv[0].strip()
+                v_temp: str = kv[1].strip()
                 # check if value should be a boolean true
-                v: Union[str, bool] = k_temp\
-                    if k_temp.lower() not in ['true', '1', 'yes']\
+                v: Union[str, bool] = v_temp\
+                    if v_temp.lower() not in ['true', '1', 'yes']\
                     else True
 
                 opts[k] = v
