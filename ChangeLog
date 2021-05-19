@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* checking argparse errors
 * fix missing import
 
 v0.2.3

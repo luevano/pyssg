@@ -39,19 +39,19 @@ def get_options() -> Namespace:
                         default='%a, %b %d, %Y @ %H:%M %Z',
                         type=str,
                         help='''date format used inside pages (for creation and
-                        modification times, for example); defaults to '%a, %b
-                        %d, %Y @ %H:%M %Z' ('Tue, Mar 16, 2021 @ 02:46 UTC',
+                        modification times, for example); defaults to '%%a, %%b
+                        %%d, %%Y @ %%H:%%M %%Z' ('Tue, Mar 16, 2021 @ 02:46 UTC',
                         for example)''')
     parser.add_argument('--list-date-format',
                         default='%b %d',
                         type=str,
                         help='''date format used for page entries in a list;
-                        defaults to '%b %d' ('Mar 16', for example)''')
+                        defaults to '%%b %%d' ('Mar 16', for example)''')
     parser.add_argument('--list-sep-date-format',
                         default='%B %Y',
                         type=str,
                         help='''date format used for the separator between page
-                        entries in a list; defaults to '%B %Y' ('March 2021',
+                        entries in a list; defaults to '%%B %%Y' ('March 2021',
                         for example)''')
     parser.add_argument('-i', '--init',
                         action='store_true',
@@ -71,9 +71,6 @@ def get_options() -> Namespace:
 
 def main() -> None:
     opts: dict[str, Union[str, bool]] = vars(get_options())
-    for k, v in opts.items():
-        print(k, v)
-
     conf_path: str = opts['config']
     conf_path = os.path.expandvars(conf_path)
 

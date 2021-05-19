@@ -79,13 +79,13 @@ class Configuration:
             self.base_url = opts['url']
 
         if self.dformat is None:
-            self.dformat = opts['date-format']
+            self.dformat = opts['date_format']
 
         if self.l_dformat is None:
-            self.l_dformat = opts['list-date-format']
+            self.l_dformat = opts['list_date_format']
 
         if self.lsep_dformat is None:
-            self.lsep_dformat = opts['list-sep-date-format']
+            self.lsep_dformat = opts['list_sep_date_format']
 
         if self.force is None:
             self.force = opts['force']
