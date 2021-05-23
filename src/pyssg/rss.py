@@ -37,7 +37,7 @@ class RSSBuilder:
     def __get_items_formatted(self) -> str:
         # i_f=items formatted for short
         i_f: str = ''
-        for p in pages:
+        for p in self.pages:
             url: str = f'{self.config.base_url}/{p.name.replace(".md", ".html")}'
             date: str = p.c_datetime.strftime(DFORMAT)
 
