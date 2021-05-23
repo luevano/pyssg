@@ -23,7 +23,7 @@ class RSSBuilder:
         # initial base replacements
         self.rss = self.rss.replace('$$TITLE', self.config.title)
         self.rss = self.rss.replace('$$LINK', self.config.base_url)
-        self.rss = self.rss.replace('$$PYSSGVERSION', VERSION)
+        self.rss = self.rss.replace('$$PYSSGVERSION', f'pyssg v{VERSION}')
         items_formatted: str = self.__get_items_formatted()
         self.rss = self.rss.replace('$$ITEMS', items_formatted)
 

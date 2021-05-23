@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* fix timezone
 * fix missing ref to obj
 * fix bad method call
 * ... literally 3 commits to fix a missing obj
