@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* ACTUALLY add missing config obj lol
 * fix missing config obj
 * add rss support
 

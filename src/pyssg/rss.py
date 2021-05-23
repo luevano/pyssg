@@ -21,8 +21,8 @@ class RSSBuilder:
 
     def build(self):
         # initial base replacements
-        self.rss = self.rss.replace('$$TITLE', config.title)
-        self.rss = self.rss.replace('$$LINK', config.base_url)
+        self.rss = self.rss.replace('$$TITLE', self.config.title)
+        self.rss = self.rss.replace('$$LINK', self.config.base_url)
         self.rss = self.rss.replace('$$PYSSGVERSION', VERSION)
         items_formatted: str = __get_items_formatted()
         self.rss = self.rss.replace('$$ITEMS', items_formatted)
@@ -30,7 +30,7 @@ class RSSBuilder:
         current_date: str = datetime.now(tz=timezone.utc).strftime(DFORMAT)
         self.rss = self.rss.replace('$$CURRENTDATE', current_date)
 
-        with open(os.path.join(config.dst, 'rss.xml'), 'w') as f:
+        with open(os.path.join(self.config.dst, 'rss.xml'), 'w') as f:
             f.write(self.rss)
 
 
@@ -38,7 +38,7 @@ class RSSBuilder:
         # i_f=items formatted for short
         i_f: str = ''
         for p in pages:
-            url: str = f'{config.base_url}/{p.name.replace(".md", ".html")}'
+            url: str = f'{self.config.base_url}/{p.name.replace(".md", ".html")}'
             date: str = p.c_datetime.strftime(DFORMAT)
 
             i_f = f'{i_f}    <item>\n'
