@@ -111,7 +111,7 @@ def main() -> None:
 
         # get all parsed pages for rss construction
         all_pages: list[Page] = builder.get_pages()
-        rss_builder: RSSBuilder = RSSBuilder(template.rss, all_pages)
+        rss_builder: RSSBuilder = RSSBuilder(config, template.rss, all_pages)
         rss_builder.build()
 
         db.write()
