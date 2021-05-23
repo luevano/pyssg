@@ -8,6 +8,7 @@ class Configuration:
         self.src: str = None
         self.dst: str = None
         self.base_url: str = None
+        self.title: str = None
         self.dformat: str = None
         self.l_dformat: str = None
         self.lsep_dformat: str = None
@@ -48,6 +49,10 @@ class Configuration:
             except KeyError: pass
 
             try:
+                self.title = opts['TITLE']
+            except KeyError: pass
+
+            try:
                 self.dformat = opts['DATE_FORMAT']
             except KeyError: pass
 
@@ -77,6 +82,9 @@ class Configuration:
 
         if self.base_url is None:
             self.base_url = opts['url']
+
+        if self.title is None:
+            self.title = opts['title']
 
         if self.dformat is None:
             self.dformat = opts['date_format']

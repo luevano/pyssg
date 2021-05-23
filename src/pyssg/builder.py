@@ -28,6 +28,8 @@ class HTMLBuilder:
         self.md_files: list[str] = None
         self.html_files: list[str] = None
 
+        self.all_pages: list[Page] = None
+
 
     def build(self) -> None:
         self.dirs = get_dir_structure(self.src, ['templates'])
@@ -40,6 +42,9 @@ class HTMLBuilder:
         parser: MDParser = MDParser(self.src, self.md_files, self.db)
         parser.parse()
 
+        # just to be able to extract all pages out of this class
+        self.all_pages = parser.all_pages
+
         # create the article index
         self.__create_article_index(parser.all_tags, parser.all_pages)
 
@@ -50,6 +55,10 @@ class HTMLBuilder:
         else:
             self.__create_articles(parser.updated_pages)
         self.__create_tags(parser.all_tags, parser.all_pages)
+
+
+    def get_pages(self) -> list[Page]:
+        return self.all_pages
 
 
     def __create_dir_structure(self) -> None:

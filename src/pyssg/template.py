@@ -26,6 +26,7 @@ class Template(HF):
         self.article: HF = HF()
         self.articles: Common = Common()
         self.tags: Common = Common()
+        self.rss: str = None
 
         self.is_read: bool = False
 
@@ -107,6 +108,37 @@ class Template(HF):
         self.__write_template('footer.html',
                               [''])
 
+        # go back to templates
+        os.chdir('..')
+
+        os.mkdir('rss')
+        os.chdir('rss')
+        self.__write_template('rss.xml',
+                              ['<?xml version="1.0" encoding="UTF-8" ?>\n',
+                               '<rss version="2.0">\n',
+                               '  <channel>\n',
+                               '    <title>$$TITLE</title>\n',
+                               '    <link>$$LINK</link>\n',
+                               '    <atom:link href="EXAMPLE.ORG/RSS.XML" rel="self" type="application/rss+xml"/>\n',
+                               '    <description>SHORT DESCRIPTION.</description>\n',
+                               '    <language>en-us</language>\n',
+                               '    <copyright>COPYRIGHT NOTICE.</copyright>\n',
+                               '    <managingEditor>EMAIL@EXAMPLE.ORG</managingEditor>\n',
+                               '    <webMaster>EMAIL@EXAMPLE.ORG</webMaster>\n',
+                               '    <pubDate>$$CURRENTDATE</pubDate>\n',
+                               '    <lastBuildDate>$$CURRENTDATE</lastBuildDate>\n',
+                               '    <generator>$$PYSSGVERSION</generator>\n',
+                               '    <docs>https://validator.w3.org/feed/docs/rss2.html</docs>\n',
+                               '    <ttl>30</ttl>\n',
+                               '    <image>\n',
+                               '      <url>EXAMPLE.ORG/IMAGE.PNG</url>\n',
+                               '      <title>$$TITLE</title>\n',
+                               '      <link>$$LINK</link>\n',
+                               '    </image>\n',
+                               '$$ITEMS\n',
+                               '  </channel>\n',
+                               '</rss>'])
+
         # return to initial working directory
         os.chdir(iwd)
 
@@ -163,6 +195,13 @@ class Template(HF):
         self.tags.list_separator = self.__read_template('list_separator.html')
         self.tags.list_footer = self.__read_template('list_footer.html')
         self.tags.footer = self.__read_template('footer.html')
+
+        # go back to templates
+        os.chdir('..')
+
+        # tag
+        os.chdir('rss')
+        self.rss = self.__read_template('rss.xml')
 
         # return to initial working directory
         os.chdir(iwd)

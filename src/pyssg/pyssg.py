@@ -6,6 +6,8 @@ from .configuration import Configuration
 from .database import Database
 from .template import Template
 from .builder import HTMLBuilder
+from .page import Page
+from .rss import RSSBuilder
 
 
 def get_options() -> Namespace:
@@ -35,6 +37,11 @@ def get_options() -> Namespace:
                         default='',
                         type=str,
                         help='''base url without trailing slash''')
+    parser.add_argument('-t', '--title',
+                        default='Blog',
+                        type=str,
+                        help='''general title for the website; defaults to
+                        'Blog' ''')
     parser.add_argument('--date-format',
                         default='%a, %b %d, %Y @ %H:%M %Z',
                         type=str,
@@ -101,6 +108,11 @@ def main() -> None:
 
         builder: HTMLBuilder = HTMLBuilder(config, template, db)
         builder.build()
+
+        # get all parsed pages for rss construction
+        all_pages: list[Page] = builder.get_pages()
+        rss_builder: RSSBuilder = RSSBuilder(template.rss, all_pages)
+        rss_builder.build()
 
         db.write()
         return

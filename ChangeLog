@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+v0.2.4
+------
+
+* lol wrong src and dst variables read
 * fix error on parsing config file
 * finally fix argparse error, questionmark
 * checking argparse errors
