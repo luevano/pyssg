@@ -1,6 +1,7 @@
 CHANGES
 =======
 
+* fix missing ref to obj
 * fix bad method call
 * ... literally 3 commits to fix a missing obj
 * ACTUALLY add missing config obj lol

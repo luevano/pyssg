@@ -7,7 +7,7 @@ from .configuration import Configuration
 
 
 VERSION = importlib.metadata.version('pyssg')
-DFORMAT = '%a, %d %b %Y %H:%M:%S %Z'
+DFORMAT = '%a, %d %b %Y %H:%M:%S GMT'
 
 
 class RSSBuilder:
