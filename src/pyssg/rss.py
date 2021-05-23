@@ -24,7 +24,7 @@ class RSSBuilder:
         self.rss = self.rss.replace('$$TITLE', self.config.title)
         self.rss = self.rss.replace('$$LINK', self.config.base_url)
         self.rss = self.rss.replace('$$PYSSGVERSION', VERSION)
-        items_formatted: str = __get_items_formatted()
+        items_formatted: str = self.__get_items_formatted()
         self.rss = self.rss.replace('$$ITEMS', items_formatted)
 
         current_date: str = datetime.now(tz=timezone.utc).strftime(DFORMAT)
