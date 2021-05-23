@@ -14,6 +14,7 @@ class RSSBuilder:
     def __init__(self, config: Configuration,
                  template: str,
                  pages: list[Page]):
+        self.config: Configuration = config
         self.rss: str = template
         self.pages: list[Page] = pages
 
