@@ -115,7 +115,9 @@ class Template(HF):
         os.chdir('rss')
         self.__write_template('rss.xml',
                               ['<?xml version="1.0" encoding="UTF-8" ?>\n',
-                               '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n',
+                               '<rss version="2.0"\n',
+                               '  xmlns:atom="http://www.w3.org/2005/Atom"\n',
+                               '  xmlns:content="http://purl.org/rss/1.0/modules/content/">\n',
                                '  <channel>\n',
                                '    <title>$$TITLE</title>\n',
                                '    <link>$$LINK</link>\n',

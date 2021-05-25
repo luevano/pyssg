@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+v0.3.0
+------
+
+* add better version printing
 * fix timezone
 * fix missing ref to obj
 * fix bad method call

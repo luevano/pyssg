@@ -15,7 +15,7 @@ I'm writing this in *pYtHoN* (thought about doing it in Go, but I'm most comfort
 	- [x] Tag functionality.
 	- [ ] Open Graph (and similar) support.
 - [ ] Build `sitemap.xml` file.
-- [ ] Build `rss.xml` file.
+- [x] Build `rss.xml` file.
 - [x] Only build page if `*.md` is new or updated.
 	- [ ] Extend this to tag pages and index (right now all tags and index is built no matter if no new/updated file is present).
 - [x] Configuration file as an alternative to using command line flags (configuration file options are prioritized).
@@ -53,6 +53,8 @@ pyssg -s src_dir -d dst_dir -i
 
 That creates the desired directories with the basic templates that can be edited as desired. Place your `*.md` files somewhere inside the source directory (`src_dir` in the command above), but outside of the `templates` directory. It accepts sub-directories.
 
+Strongly recommended to edit `rss.xml` template under `rss` directory, since it has a lot of placeholder values.
+
 Build the site with:
 
 ```sh
@@ -60,3 +62,5 @@ pyssg -s src_dir -d dst_dir -u https://base.url -b
 ```
 
 That creates all `*.html` for the site and can be easily moved to the server. Here, the `-u` flag is technically optional in the sense that you'll not receive a warning/error, but it's used to prepend links with this URL (not strictly required everywhere), so don't ignore it; also don't include the trailing `/`.
+
+For now, the `-b`uild tag also creates a `rss.xml` file based on a template (created when initializing the directories/templates) adding all converted `*.md` files, meaning that separate `*.html` files should be included manually in the template.

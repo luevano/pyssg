@@ -44,9 +44,10 @@ class RSSBuilder:
             i_f = f'{i_f}    <item>\n'
             i_f = f'{i_f}      <title>{p.title}</title>\n'
             i_f = f'{i_f}      <link>{url}</link>\n'
-            i_f = f'{i_f}      <description>{p.summary}</description>\n'
             i_f = f'{i_f}      <guid isPermaLink="true">{url}</guid>\n'
             i_f = f'{i_f}      <pubDate>{date}</pubDate>\n'
+            i_f = f'{i_f}      <description>{p.summary}</description>\n'
+            i_f = f'{i_f}      <content:encoded><![CDATA[{p.html}]]></content:encoded>\n'
             i_f = f'{i_f}    </item>\n'
 
         return i_f
