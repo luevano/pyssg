@@ -10,7 +10,7 @@ I'm writing this in *pYtHoN* (thought about doing it in Go, but I'm most comfort
 
 - [x] Build static site parsing `markdown` files ( `*.md` -> `*.html`)
 	- [x] Using plain `*.html` files for templates.
-		- [ ] Would like to change to something more flexible and easier to manage ([`jinja`](), for example).
+		- [ ] Would like to change to something more flexible and easier to manage ([`jinja`](https://jinja.palletsprojects.com/en/3.0.x/), for example).
 	- [x] Preserves hand-made `*.html` files.
 	- [x] Tag functionality.
 	- [ ] Open Graph (and similar) support.
@@ -22,7 +22,7 @@ I'm writing this in *pYtHoN* (thought about doing it in Go, but I'm most comfort
 
 ### Markdown features
 
-This program uses the base [`markdown` syntax]() plus additional syntax, all thanks to [`python-markdown`](https://python-markdown.github.io/) that provides [extensions](https://python-markdown.github.io/extensions/). The following extensions are used:
+This program uses the base [`markdown` syntax](https://daringfireball.net/projects/markdown/syntax) plus additional syntax, all thanks to [`python-markdown`](https://python-markdown.github.io/) that provides [extensions](https://python-markdown.github.io/extensions/). The following extensions are used:
 
 - Extra (collection of QoL extensions).
 - Meta-Data.
