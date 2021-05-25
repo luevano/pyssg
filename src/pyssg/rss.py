@@ -7,6 +7,8 @@ from .configuration import Configuration
 
 
 VERSION = importlib.metadata.version('pyssg')
+# This is static right here since an rss feed
+# requires very specific date format
 DFORMAT = '%a, %d %b %Y %H:%M:%S GMT'
 
 
@@ -46,6 +48,11 @@ class RSSBuilder:
             i_f = f'{i_f}      <link>{url}</link>\n'
             i_f = f'{i_f}      <guid isPermaLink="true">{url}</guid>\n'
             i_f = f'{i_f}      <pubDate>{date}</pubDate>\n'
+            # TODO: maybe make this optional?
+            # add the tags as categories
+            if p.tags is not None:
+                for t in p.tags:
+                    i_f = f'{i_f}      <category>{t.capitalize()}</category>\n'
             i_f = f'{i_f}      <description>{p.summary}</description>\n'
             i_f = f'{i_f}      <content:encoded><![CDATA[{p.html}]]></content:encoded>\n'
             i_f = f'{i_f}    </item>\n'

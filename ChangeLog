@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* add content:encoded tag in rss and update readme
+
 v0.3.0
 ------
 
