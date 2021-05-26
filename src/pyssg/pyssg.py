@@ -8,6 +8,7 @@ from .template import Template
 from .builder import HTMLBuilder
 from .page import Page
 from .rss import RSSBuilder
+from .sitemap import SitemapBuilder
 
 
 def get_options() -> Namespace:
