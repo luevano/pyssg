@@ -114,5 +114,12 @@ def main() -> None:
         rss_builder: RSSBuilder = RSSBuilder(config, template.rss, all_pages)
         rss_builder.build()
 
+        # get all tags for sitemap construction
+        all_tags: list[str] = builder.get_tags()
+        sitemap_builder: SitemapBuilder = SitemapBuilder(config,
+                                                         template.sitemap,
+                                                         all_tags)
+        sitemap_builder.build()
+
         db.write()
         return

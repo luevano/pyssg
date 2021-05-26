@@ -29,6 +29,7 @@ class HTMLBuilder:
         self.html_files: list[str] = None
 
         self.all_pages: list[Page] = None
+        self.all_tags: list[str] = None
 
 
     def build(self) -> None:
@@ -44,6 +45,7 @@ class HTMLBuilder:
 
         # just to be able to extract all pages out of this class
         self.all_pages = parser.all_pages
+        self.all_tags = parser.all_tags
 
         # create the article index
         self.__create_article_index(parser.all_tags, parser.all_pages)
@@ -59,6 +61,10 @@ class HTMLBuilder:
 
     def get_pages(self) -> list[Page]:
         return self.all_pages
+
+
+    def get_tags(self) -> list[str]:
+        return self.all_tags
 
 
     def __create_dir_structure(self) -> None:

@@ -27,6 +27,7 @@ class Template(HF):
         self.articles: Common = Common()
         self.tags: Common = Common()
         self.rss: str = None
+        self.sitemap: str = None
 
         self.is_read: bool = False
 
@@ -141,6 +142,19 @@ class Template(HF):
                                '  </channel>\n',
                                '</rss>'])
 
+        # go back to templates
+        os.chdir('..')
+
+        os.mkdir('sitemap')
+        os.chdir('sitemap')
+        self.__write_template('sitemap.xml',
+                              ['<?xml version="1.0" encoding="utf-8"?>\n',
+                               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n',
+                               '  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n',
+                               '  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9\n',
+                               'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n',
+                               '$$URLS\n',
+                               '</urlset>'])
         # return to initial working directory
         os.chdir(iwd)
 
@@ -201,9 +215,13 @@ class Template(HF):
         # go back to templates
         os.chdir('..')
 
-        # tag
+        # rss
         os.chdir('rss')
         self.rss = self.__read_template('rss.xml')
+
+        # sitemap
+        os.chdir('sitemap')
+        self.sitemap = self.__read_template('sitemap.xml')
 
         # return to initial working directory
         os.chdir(iwd)

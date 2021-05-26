@@ -14,7 +14,7 @@ I'm writing this in *pYtHoN* (thought about doing it in Go, but I'm most comfort
 	- [x] Preserves hand-made `*.html` files.
 	- [x] Tag functionality.
 	- [ ] Open Graph (and similar) support.
-- [ ] Build `sitemap.xml` file.
+- [x] Build `sitemap.xml` file.
 - [x] Build `rss.xml` file.
 - [x] Only build page if `*.md` is new or updated.
 	- [ ] Extend this to tag pages and index (right now all tags and index is built no matter if no new/updated file is present).
@@ -63,4 +63,4 @@ pyssg -s src_dir -d dst_dir -u https://base.url -b
 
 That creates all `*.html` for the site and can be easily moved to the server. Here, the `-u` flag is technically optional in the sense that you'll not receive a warning/error, but it's used to prepend links with this URL (not strictly required everywhere), so don't ignore it; also don't include the trailing `/`.
 
-For now, the `-b`uild tag also creates a `rss.xml` file based on a template (created when initializing the directories/templates) adding all converted `*.md` files, meaning that separate `*.html` files should be included manually in the template.
+For now, the `-b`uild tag also creates the `rss.xml` and `sitemap.xml` files based on templates including only all converted `*.md` files (and processed tags in case of the sitemap), meaning that separate `*.html` files should be included manually in the template.
