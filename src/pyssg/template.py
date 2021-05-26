@@ -219,6 +219,9 @@ class Template(HF):
         os.chdir('rss')
         self.rss = self.__read_template('rss.xml')
 
+        # go back to templates
+        os.chdir('..')
+
         # sitemap
         os.chdir('sitemap')
         self.sitemap = self.__read_template('sitemap.xml')
