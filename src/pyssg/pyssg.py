@@ -117,10 +117,11 @@ def main() -> None:
 
         # get all tags for sitemap construction
         all_tags: list[str] = builder.get_tags()
-        sitemap_builder: SitemapBuilder = SitemapBuilder(config,
-                                                         template.sitemap,
-                                                         all_tags)
-        sitemap_builder.build()
+        sm_builder: SitemapBuilder = SitemapBuilder(config,
+                                                    template.sitemap,
+                                                    all_pages,
+                                                    all_tags)
+        sm_builder.build()
 
         db.write()
         return
