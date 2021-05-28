@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* add tags inside article footer instead of separate html element
+
 v0.4.0
 ------
 

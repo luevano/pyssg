@@ -34,7 +34,10 @@ class SitemapBuilder:
         u_f: str = ''
         for p in self.pages:
             url: str = f'{self.config.base_url}/{p.name.replace(".md", ".html")}'
-            date: str = p.m_datetime.strftime(DFORMAT)
+            if p.m_datetime is not None:
+                date: str = p.m_datetime.strftime(DFORMAT)
+            else:
+                date: str = p.c_datetime.strftime(DFORMAT)
 
             u_f = f'{u_f}    <url>\n'
             u_f = f'{u_f}      <loc>{url}</loc>\n'
