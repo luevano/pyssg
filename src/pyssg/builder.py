@@ -148,6 +148,12 @@ class HTMLBuilder:
         t_list: list[str] = None
         if page.tags is not None:
             t_list = self.__get_tags_formatted(page.tags, t)
+        # tags formatted as a single string.
+        tags_formatted: str = ''.join(t_list)
+        # join list header and footer with all tags list.
+        tags_formatted = ''.join([t.tags.list_header,
+                                  tags_formatted,
+                                  t.tags.list_footer])
 
         # common
         t.header = t.header.replace("$$LANG", page.lang)
@@ -171,17 +177,25 @@ class HTMLBuilder:
         else:
             t.article.footer = t.article.footer.replace('$$MTIME', '')
 
+        # add tags to article list
+        if t_list is not None:
+            t.article.footer = t.article.footer.replace('$$TAGS',
+                                                        tags_formatted)
+        else:
+            t.article.footer = t.article.footer.replace('$$TAGS', '')
+
 
         with open(os.path.join(self.dst, f_name), 'w') as f:
             f.write(t.header)
             f.write(t.article.header)
             f.write(page.html)
 
-            if t_list is not None:
-                f.write(t.tags.list_header)
-                for tag in t_list:
-                    f.write(tag)
-                f.write(t.tags.list_footer)
+            # not required anymore, tags included in article footer
+            # if t_list is not None:
+            #     f.write(t.tags.list_header)
+            #     for tag in t_list:
+            #         f.write(tag)
+            #     f.write(t.tags.list_footer)
 
             f.write(t.article.footer)
             f.write(t.footer)
