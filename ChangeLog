@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+v0.4.1
+------
+
+* fix m\_datetime bug
 * add tags inside article footer instead of separate html element
 
 v0.4.0
