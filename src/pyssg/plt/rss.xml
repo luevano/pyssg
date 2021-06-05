@@ -29,10 +29,10 @@
       <guid isPermaLink="true">{{p.url}}</guid>
       <pubDate>{{p.cdate_rss}}</pubDate>
       {%for t in p.tags%}
-      <category>{{t[0]}}</category>
+      <category>{{t[0].lower().capitalize()}}</category>
       {%endfor%}
       <description>{{p.summary}}</description>
-      <content:decoded><![CDATA[{{p.content}}]]></content:decoded>
+      <content:encoded><![CDATA[{{p.content}}]]></content:encoded>
     </item>
     {%endfor%}
   </channel>
