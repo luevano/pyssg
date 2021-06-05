@@ -98,10 +98,10 @@ class Page:
 
         try:
             self.image_url = \
-            f'{self.config.base_static_url}/{self.meta["image_url"]}'
+            f'{self.config.static_url}/{self.meta["image_url"]}'
         except KeyError:
             self.image_url = \
-            f'{self.config.base_static_url}/{self.config.default_image_url}'
+            f'{self.config.static_url}/{self.config.default_image_url}'
 
         # if contains open graph elements
         try:
