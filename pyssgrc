@@ -1,0 +1,9 @@
+SRC_PATH=e_src
+DST_PATH=e_dst
+PLT_PATH=plt
+BASE_URL=https://blog.luevano.xyz
+BASE_STATIC_URL=https://static.luevano.xyz
+TITLE=Luévano's Blog
+DATE_FORMAT=%a, %b %d, %Y @ %H:%M %Z
+LIST_DATE_FORMAT=%b %d
+LIST_SEP_DATE_FORMAT=%B %Y

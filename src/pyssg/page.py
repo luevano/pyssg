@@ -1,68 +1,101 @@
 from datetime import datetime, timezone
 
+from .configuration import Configuration
+
+
+DFORMAT_RSS = '%a, %d %b %Y %H:%M:%S GMT'
+DFORMAT_SITEMAP = '%Y-%m-%d'
+
 
 class Page:
     def __init__(self,
                  name: str,
-                 c_time: float,
-                 m_time: float,
+                 ctime: float,
+                 mtime: float,
                  html: str,
                  meta: dict):
+        # initial data
         self.name: str = name
-        self.c_time: float = c_time
-        self.m_time: float = m_time
-        self.html: str = html
+        self.ctimestamp: float = ctime
+        self.mtimestamp: float = mtime
+        self.content: str = html
         self.meta: dict = meta
 
         # data from self.meta
         self.title: str = ''
         self.author: str = ''
-        self.c_datetime: datetime = None
-        self.m_datetime: datetime = None
+        self.cdatetime: datetime = None
+        self.mdatetime: datetime = None
         self.summary: str = ''
         self.lang: str = 'en'
-        self.tags: list = None
+        self.tags: list[tuple[str]] = []
+
+        # constructed
+        self.url: str = ''
+        self.cdate: str = ''
+        self.cdate_list: str = ''
+        self.cdate_list_sep: str = ''
+        self.cdate_rss: str = ''
+        self.cdate_sitemap: str = ''
+        self.mdate: str = None
+        self.mdate_list: str = None
+        self.mdate_list_sep: str = None
+        self.mdate_rss: str = ''
+        self.mdate_sitemap: str = ''
+
+        # later assigned references to next and previous pages
+        self.next: Page = None
+        self.previous: Page = None
 
         # also from self.meta, but for og metadata
         self.og: dict[str, str] = dict()
 
-        self.__parse_meta()
 
     def __lt__(self, other):
-        return self.c_time < other.c_time
+        return self.ctimestamp < other.ctimestamp
 
 
     # parses meta from self.meta, for og, it prioritizes,
     # the actual og meta
-    def __parse_meta(self):
-        try:
-            self.title = self.meta['title'][0]
-        except KeyError: pass
+    def parse(self, config: Configuration):
+        # required meta elements
+        self.title = self.meta['title'][0]
+        self.author = self.meta['author'][0]
+        self.summary = self.meta['summary'][0]
+        self.lang = self.meta['lang'][0]
 
-        try:
-            self.author = self.meta['author'][0]
-        except KeyError: pass
-
-        self.c_datetime = datetime.fromtimestamp(self.c_time,
+        # dates
+        self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
                                                  tz=timezone.utc)
+        self.cdate = self.cdatetime.strftime(config.dformat)
+        self.cdate_list = self.cdatetime.strftime(config.l_dformat)
+        self.cdate_list_sep = self.cdatetime.strftime(config.lsep_dformat)
+        self.cdate_rss = self.cdatetime.strftime(DFORMAT_RSS)
+        self.cdate_sitemap = self.cdatetime.strftime(DFORMAT_SITEMAP)
 
-        if self.m_time != 0.0:
-            self.m_datetime = datetime.fromtimestamp(self.m_time,
+        # only if file/page has been modified
+        if self.mtimestamp != 0.0:
+            self.mdatetime = datetime.fromtimestamp(self.mtimestamp,
                                                      tz=timezone.utc)
+            self.mdate = self.mdatetime.strftime(config.dformat)
+            self.mdate_list = self.mdatetime.strftime(config.l_dformat)
+            self.mdate_list_sep = self.mdatetime.strftime(config.lsep_dformat)
+            self.mdate_rss = self.mdatetime.strftime(DFORMAT_RSS)
+            self.mdate_sitemap = self.mdatetime.strftime(DFORMAT_SITEMAP)
 
+        # not always contains tags
         try:
-            self.summary = self.meta['summary'][0]
+            tags_only: list[str] = self.meta['tags']
+            tags_only.sort()
+
+            for t in tags_only:
+                self.tags.append((t,
+                                  f'{config.base_url}/tag/@{t}.html'))
         except KeyError: pass
 
-        try:
-            self.lang = self.meta['lang'][0]
-        except KeyError: pass
+        self.url = f'{config.base_url}/{self.name.replace(".md", ".html")}'
 
-        try:
-            self.tags = self.meta['tags']
-            self.tags.sort()
-        except KeyError: pass
-
+        # if contains object graph elements
         try:
             # og_e = object graph entry
             for og_e in self.meta['og']:

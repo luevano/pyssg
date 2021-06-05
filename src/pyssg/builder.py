@@ -1,34 +1,48 @@
 import os
 import shutil
+from operator import itemgetter
 from copy import deepcopy
+from jinja2 import Environment, Template
+from markdown import Markdown
+from importlib.metadata import version
+from datetime import datetime, timezone
 
 from .configuration import Configuration
-from .template import Template
 from .database import Database
 from .parser import MDParser
 from .page import Page
 from .discovery import get_file_list, get_dir_structure
 
+
+VERSION = version('pyssg')
+# specific format for rss
+DFORMAT = '%a, %d %b %Y %H:%M:%S GMT'
+RUN_DATE = datetime.now(tz=timezone.utc).strftime(DFORMAT)
+
+
 class HTMLBuilder:
     def __init__(self, config: Configuration,
-                 template: Template,
-                 db: Database):
+                 env: Environment,
+                 db: Database,
+                 md: Markdown):
         self.src: str = config.src
         self.dst: str = config.dst
+        self.title: str = config.title
         self.base_url: str = config.base_url
-        self.dformat: str = config.dformat
-        self.l_dformat: str = config.l_dformat
-        self.lsep_dformat: str = config.lsep_dformat
+        self.base_static_url: str = config.base_static_url
         self.force: bool = config.force
 
-        self.template: Template = template
+        self.config: Configuration = config
+        self.env: Environment = env
         self.db: Database = db
+        self.md: Markdown = md
 
         self.dirs: list[str] = None
         self.md_files: list[str] = None
         self.html_files: list[str] = None
 
         self.all_pages: list[Page] = None
+        self.updated_pages: list[Page] = None
         self.all_tags: list[str] = None
 
 
@@ -40,31 +54,22 @@ class HTMLBuilder:
         self.__create_dir_structure()
         self.__copy_html_files()
 
-        parser: MDParser = MDParser(self.src, self.md_files, self.db)
-        parser.parse()
+        parser: MDParser = MDParser(self.src,
+                                    self.md_files,
+                                    self.db,
+                                    self.md)
+        parser.parse(self.config)
 
         # just to be able to extract all pages out of this class
         self.all_pages = parser.all_pages
+        self.updated_pages = parser.updated_pages
         self.all_tags = parser.all_tags
 
         # create the article index
-        self.__create_article_index(parser.all_tags, parser.all_pages)
-
-        # create each category of html pages
+        self.__create_article_index()
         # check if all pages should be created
-        if self.force:
-            self.__create_articles(parser.all_pages)
-        else:
-            self.__create_articles(parser.updated_pages)
-        self.__create_tags(parser.all_tags, parser.all_pages)
-
-
-    def get_pages(self) -> list[Page]:
-        return self.all_pages
-
-
-    def get_tags(self) -> list[str]:
-        return self.all_tags
+        self.__create_articles()
+        self.__create_tags()
 
 
     def __create_dir_structure(self) -> None:
@@ -90,142 +95,57 @@ class HTMLBuilder:
                 shutil.copy2(src_file, dst_file)
 
 
-    # this is really similar to create_tag (singular)
-    def __create_article_index(self, tags: list[str],
-                               pages: list[Page]) -> None:
-        # make temporary template
-        t: Template = deepcopy(self.template)
-
-        # do basic replacements
-        # get page and tag list formated, both functions do replacements
-        p_list: list[str] = self.__get_pages_formatted(pages, t)
-        t_list: list[str] = self.__get_tags_formatted(tags, t)
-        # common
-        t.header = t.header.replace("$$LANG", 'en')
-        t.header = t.header.replace('$$TITLE', f'Index')
+    def __create_article_index(self) -> None:
+        template: Template = self.env.get_template("index.html")
+        content: str = template.render(site_title=self.title,
+                                       site_base_url=self.base_url,
+                                       site_base_static_url=self.base_static_url,
+                                       pyssg_version=VERSION,
+                                       run_date=RUN_DATE,
+                                       all_pages=self.all_pages,
+                                       all_tags=self.all_tags)
 
         with open(os.path.join(self.dst, 'index.html'), 'w') as f:
-            f.write(t.header)
-            f.write(t.articles.header)
-
-            f.write(t.tags.list_header)
-            for tag in t_list:
-                f.write(tag)
-            f.write(t.tags.list_footer)
-
-            f.write(t.articles.list_header)
-            for page in p_list:
-                f.write(page)
-            f.write(t.articles.list_footer)
-
-            f.write(t.articles.footer)
-            f.write(t.footer)
+            f.write(content)
 
 
-    def __create_articles(self, pages: list[Page]) -> None:
-        for p in pages:
-            self.__create_article(p)
+    def __create_articles(self) -> None:
+        # check if only updated should be created
+        if self.force:
+            for p in self.all_pages:
+                self.__create_article(p)
+        else:
+            for p in self.updated_pages:
+                self.__create_article(p)
 
 
     def __create_article(self, page: Page) -> None:
-        # TODO: create better solution for replace
-        # make temporary template
-        t: Template = deepcopy(self.template)
-
         # prepare html file name
         f_name: str = page.name
         f_name = f_name.replace('.md', '.html')
 
-        # get timestamps
-        c_date: str = page.c_datetime.strftime(self.dformat)
-        m_date: str = None
-        if page.m_datetime is not None:
-            m_date: str = page.m_datetime.strftime(self.dformat)
-
-        # do basic replacements
-        # get tag list formatted (some replacements done inside
-        # get_tags_formatted)
-        t_list: list[str] = None
-        if page.tags is not None:
-            t_list = self.__get_tags_formatted(page.tags, t)
-        # tags formatted as a single string.
-        tags_formatted: str = ''.join(t_list)
-        # join list header and footer with all tags list.
-        tags_formatted = ''.join([t.tags.list_header,
-                                  tags_formatted,
-                                  t.tags.list_footer])
-
-        # common
-        t.header = t.header.replace("$$LANG", page.lang)
-        t.header = t.header.replace('$$TITLE', page.title)
-
-        # article header
-        t.article.header = t.article.header.replace('$$TITLE', page.title)
-        t.article.header = t.article.header.replace('$$AUTHOR', page.author)
-        t.article.header = t.article.header.replace('$$CTIME', c_date)
-        if m_date is not None:
-            t.article.header = t.article.header.replace('$$MTIME', m_date)
-        else:
-            t.article.header = t.article.header.replace('$$MTIME', '')
-
-        # article footer (same replaces as header)
-        t.article.footer = t.article.footer.replace('$$TITLE', page.title)
-        t.article.footer = t.article.footer.replace('$$AUTHOR', page.author)
-        t.article.footer = t.article.footer.replace('$$CTIME', c_date)
-        if m_date is not None:
-            t.article.footer = t.article.footer.replace('$$MTIME', m_date)
-        else:
-            t.article.footer = t.article.footer.replace('$$MTIME', '')
-
-        # add tags to article list
-        if t_list is not None:
-            t.article.footer = t.article.footer.replace('$$TAGS',
-                                                        tags_formatted)
-        else:
-            t.article.footer = t.article.footer.replace('$$TAGS', '')
+        template: Template = self.env.get_template("page.html")
+        content: str = template.render(site_title=self.title,
+                                       site_base_url=self.base_url,
+                                       site_base_static_url=self.base_static_url,
+                                       pyssg_version=VERSION,
+                                       run_date=RUN_DATE,
+                                       all_pages=self.all_pages,
+                                       all_tags=self.all_tags,
+                                       page=page)
 
 
         with open(os.path.join(self.dst, f_name), 'w') as f:
-            f.write(t.header)
-            f.write(t.article.header)
-            f.write(page.html)
-
-            # not required anymore, tags included in article footer
-            # if t_list is not None:
-            #     f.write(t.tags.list_header)
-            #     for tag in t_list:
-            #         f.write(tag)
-            #     f.write(t.tags.list_footer)
-
-            f.write(t.article.footer)
-            f.write(t.footer)
+            f.write(content)
 
 
-    def __get_tags_formatted(self, tags: list[str],
-                             template: Template) -> list[str]:
-        tag_amount: int = len(tags)
-        tags_formatted: list[str] = []
-        for i, t in enumerate(tags):
-            # t_e=tag entry
-            t_e: str = template.tags.list_entry
-            t_e = t_e.replace('$$URL',
-                              f'{self.base_url}/tag/@{t}.html')
-            t_e = t_e.replace('$$NAME', t)
-
-            tags_formatted.append(t_e)
-            if i != tag_amount - 1:
-                tags_formatted.append(template.tags.list_separator)
-
-        return tags_formatted
-
-
-    def __create_tags(self, tags: list[str],
-                      pages: list[Page]) -> None:
-        for t in tags:
+    def __create_tags(self) -> None:
+        for t in self.all_tags:
             # get a list of all pages that have current tag
             tag_pages: list[Page] = []
-            for p in pages:
-                if p.tags is not None and t in p.tags:
+            for p in self.all_pages:
+                if p.tags is not None and t[0] in list(map(itemgetter(0),
+                                                           p.tags)):
                     tag_pages.append(p)
 
             # build tag page
@@ -235,61 +155,19 @@ class HTMLBuilder:
             tag_pages = []
 
 
-    def __create_tag(self, tag: str,
+    def __create_tag(self, tag: tuple[str],
                      pages: list[Page]) -> None:
-        # TODO: create better solution for replace
-        # make temporary template
-        t: Template = deepcopy(self.template)
 
-        # do basic replacements
-        # get page list formated (some replacements done inside
-        # get_pages_formatted)
-        p_list: list[str] = self.__get_pages_formatted(pages, t)
-        # common
-        t.header = t.header.replace("$$LANG", 'en')
-        t.header = t.header.replace('$$TITLE', f'Posts filtered by: {tag}')
+        template: Template = self.env.get_template("tag.html")
+        content: str = template.render(site_title=self.title,
+                                       site_base_url=self.base_url,
+                                       site_base_static_url=self.base_static_url,
+                                       pyssg_version=VERSION,
+                                       run_date=RUN_DATE,
+                                       all_pages=self.all_pages,
+                                       all_tags=self.all_tags,
+                                       tag=tag,
+                                       tag_pages=pages)
 
-        # tag header
-        tag_url: str = f'{self.base_url}/tag/@{tag}.html'
-        t.tags.header = t.tags.header.replace('$$NAME', tag)
-
-        with open(os.path.join(self.dst, f'tag/@{tag}.html'), 'w') as f:
-            f.write(t.header)
-            f.write(t.tags.header)
-
-            f.write(t.articles.list_header)
-            for p in p_list:
-                f.write(p)
-            f.write(t.articles.list_footer)
-
-            f.write(t.tags.footer)
-            f.write(t.footer)
-
-
-    def __get_pages_formatted(self, pages: list[Page],
-                              template: Template) -> list[str]:
-        month_year: str = '-'
-        pages_formatted: list[str] = []
-        for p in pages:
-            # check if the monthly separator should be included
-            c_month_year: str = p.c_datetime.strftime(self.lsep_dformat)
-            if c_month_year != month_year:
-                month_year = c_month_year
-
-                month_sep: str = template.articles.list_separator
-                month_sep = month_sep.replace('$$SEP', month_year)
-
-                pages_formatted.append(month_sep)
-
-            f_name: str = p.name
-            f_name = f_name.replace('.md', '.html')
-
-            # p_e=page entry
-            p_e: str = template.articles.list_entry
-            p_e = p_e.replace('$$URL', f'{self.base_url}/{f_name}')
-            p_e = p_e.replace('$$DATE', p.c_datetime.strftime(self.l_dformat))
-            p_e = p_e.replace('$$TITLE', p.title)
-
-            pages_formatted.append(p_e)
-
-        return pages_formatted
+        with open(os.path.join(self.dst, f'tag/@{tag[0]}.html'), 'w') as f:
+            f.write(content)

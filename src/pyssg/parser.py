@@ -1,8 +1,11 @@
 import os
+from operator import itemgetter
 from datetime import datetime
 from markdown import Markdown
 
 from .database import Database
+from .configuration import Configuration
+from .configuration import Configuration
 from .page import Page
 
 
@@ -10,33 +13,38 @@ from .page import Page
 class MDParser:
     def __init__(self, src: str,
                  files: list[str],
-                 db: Database):
-        self.md: Markdown = Markdown(extensions=['extra', 'meta', 'sane_lists',
-                                                 'smarty', 'toc', 'wikilinks'],
-                                     output_format='html5')
+                 db: Database,
+                 md: Markdown):
         self.src: str = src
         self.files: list[str] = files
+
         self.db: Database = db
+        self.md: Markdown = md
 
         self.all_pages: list[Page] = None
         self.updated_pages: list[Page] = None
-        self.all_tags: list[str] = None
+        self.all_tags: list[tuple[str]] = None
 
 
-    def parse(self):
+    def parse(self, config: Configuration):
         # initialize lists
         self.all_pages = []
         self.updated_pages = []
         self.all_tags = []
+        all_tag_names: list[str] = []
 
         for f in self.files:
             src_file: str = os.path.join(self.src, f)
             # get flag if update is successful
             updated: bool = self.db.update(src_file, remove=f'{self.src}/')
 
-            page: Page = None
             content: str = self.md.reset().convert(open(src_file).read())
-            page = Page(f, self.db.e[f][0], self.db.e[f][1], content, self.md.Meta)
+            page: Page = Page(f,
+                              self.db.e[f][0],
+                              self.db.e[f][1],
+                              content,
+                              self.md.Meta)
+            page.parse(config)
 
             # keep a separated list for all and updated pages
             if updated:
@@ -46,14 +54,26 @@ class MDParser:
             # parse tags
             if page.tags is not None:
                 # add its tag to corresponding db entry if existent
-                self.db.update_tags(f, page.tags)
+                self.db.update_tags(f, list(map(itemgetter(0), page.tags)))
 
                 # update all_tags attribute
                 for t in page.tags:
-                    if t not in self.all_tags:
+                    if t[0] not in list(map(itemgetter(0), self.all_tags)):
                         self.all_tags.append(t)
 
         # sort list of tags for consistency
-        self.all_tags.sort()
+        self.all_tags.sort(key=itemgetter(0))
         self.updated_pages.sort(reverse=True)
         self.all_pages.sort(reverse=True)
+        # TODO: fix this in case it doesn't work lol
+        # this should update references to all_pages and updated_pages???
+        for i, p in enumerate(self.all_pages):
+            try:
+                prev_page: Page = self.all_pages[i - 1]
+                p.previous = prev_page
+            except IndexError: pass
+
+            try:
+                next_page: Page = self.all_pages[i + 1]
+                p.next = next_page
+            except IndexError: pass

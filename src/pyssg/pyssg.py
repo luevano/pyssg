@@ -1,14 +1,21 @@
 import os
 from argparse import ArgumentParser, Namespace
 from typing import Union
+from jinja2 import Environment, FileSystemLoader
+from markdown import Markdown
+from importlib.metadata import version
+from importlib.resources import contents
+from datetime import datetime, timezone
 
 from .configuration import Configuration
 from .database import Database
-from .template import Template
 from .builder import HTMLBuilder
 from .page import Page
 from .rss import RSSBuilder
 from .sitemap import SitemapBuilder
+
+
+VERSION = version('pyssg')
 
 
 def get_options() -> Namespace:
@@ -19,6 +26,9 @@ def get_options() -> Namespace:
                             location) all other options are ignored.\nFor
                             datetime formats see:
                             https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes''')
+    parser.add_argument('-v', '--version',
+                        action='store_true',
+                        help='''print program version''')
     parser.add_argument('-c', '--config',
                         default='$XDG_CONFIG_HOME/pyssg/pyssgrc',
                         type=str,
@@ -34,11 +44,20 @@ def get_options() -> Namespace:
                         type=str,
                         help='''dst directory; generated (and transfered html)
                         files; defaults to 'dst' ''')
+    parser.add_argument('-t', '--plt',
+                        default='plt',
+                        type=str,
+                        help='''plt directory; all template files; defaults to
+                        'plt' ''')
     parser.add_argument('-u', '--url',
                         default='',
                         type=str,
                         help='''base url without trailing slash''')
-    parser.add_argument('-t', '--title',
+    parser.add_argument('--static-url',
+                        default='',
+                        type=str,
+                        help='''base static url without trailing slash''')
+    parser.add_argument('--title',
                         default='Blog',
                         type=str,
                         help='''general title for the website; defaults to
@@ -86,16 +105,20 @@ def main() -> None:
     config.read()
     config.fill_missing(opts)
 
+    if opts['version']:
+        print(f'pyssg v{VERSION}')
+        return
+
     if opts['init']:
         try:
             os.mkdir(config.src)
             os.makedirs(os.path.join(config.dst, 'tag'))
+            os.mkdir(config.plt)
         except FileExistsError:
             pass
 
-        # write default templates
-        template: Template = Template(config.src)
-        template.write()
+        for f in contents('pyssg'):
+            print(f)
         return
 
     if opts['build']:
@@ -103,22 +126,34 @@ def main() -> None:
         db: Database = Database(os.path.join(config.src, '.files'))
         db.read()
 
-        # read templates
-        template: Template = Template(config.src)
-        template.read()
+        # the autoescape option could be a security risk if used in a dynamic
+        # website, as far as i can tell
+        env: Environment = Environment(loader=FileSystemLoader(config.plt),
+                                       autoescape=False,
+                                       trim_blocks=True,
+                                       lstrip_blocks=True)
 
-        builder: HTMLBuilder = HTMLBuilder(config, template, db)
+        md: Markdown = Markdown(extensions=['extra', 'meta', 'sane_lists',
+                                            'smarty', 'toc', 'wikilinks'],
+                                output_format='html5')
+        builder: HTMLBuilder = HTMLBuilder(config,
+                                           env,
+                                           db,
+                                           md)
         builder.build()
 
-        # get all parsed pages for rss construction
-        all_pages: list[Page] = builder.get_pages()
-        rss_builder: RSSBuilder = RSSBuilder(config, template.rss, all_pages)
+        # get all parsed pages and tags for rss and sitemap construction
+        all_pages: list[Page] = builder.all_pages
+        all_tags: list[tuple[str]] = builder.all_tags
+
+        rss_builder: RSSBuilder = RSSBuilder(config,
+                                             env,
+                                             all_pages,
+                                             all_tags)
         rss_builder.build()
 
-        # get all tags for sitemap construction
-        all_tags: list[str] = builder.get_tags()
         sm_builder: SitemapBuilder = SitemapBuilder(config,
-                                                    template.sitemap,
+                                                    env,
                                                     all_pages,
                                                     all_tags)
         sm_builder.build()

@@ -7,7 +7,9 @@ class Configuration:
         self.path: str = path
         self.src: str = None
         self.dst: str = None
+        self.plt: str = None
         self.base_url: str = None
+        self.base_static_url: str = None
         self.title: str = None
         self.dformat: str = None
         self.l_dformat: str = None
@@ -45,7 +47,15 @@ class Configuration:
             except KeyError: pass
 
             try:
+                self.plt = opts['PLT_PATH']
+            except KeyError: pass
+
+            try:
                 self.base_url = opts['BASE_URL']
+            except KeyError: pass
+
+            try:
+                self.base_static_url = opts['BASE_STATIC_URL']
             except KeyError: pass
 
             try:
@@ -80,8 +90,14 @@ class Configuration:
         if self.dst is None:
             self.dst = opts['dst']
 
+        if self.plt is None:
+            self.plt = opts['plt']
+
         if self.base_url is None:
             self.base_url = opts['url']
+
+        if self.base_static_url is None:
+            self.base_static_url = opts['static_url']
 
         if self.title is None:
             self.title = opts['title']
