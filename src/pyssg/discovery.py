@@ -26,6 +26,6 @@ def get_dir_structure(directory: str,
         for d in dirs:
             if root in out:
                 out.remove(root)
-                out.append(os.path.join(root, d))
+            out.append(os.path.join(root, d))
 
     return [o.replace(directory, '')[1:] for o in out]

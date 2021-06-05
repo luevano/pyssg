@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+v0.5.0
+------
+
+* add ability to copy basic template files
 * move plt dir to be included in data
 * refactor and add support for jinija
 * just include changelog
