@@ -1,6 +1,6 @@
 SRC_PATH=e_src
 DST_PATH=e_dst
-PLT_PATH=src/pyssg/plt
+PLT_PATH=e_plt
 BASE_URL=https://blog.luevano.xyz
 BASE_STATIC_URL=https://static.luevano.xyz
 TITLE=Luévano's Blog

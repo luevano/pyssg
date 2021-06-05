@@ -1,10 +1,11 @@
 import os
+import shutil
 from argparse import ArgumentParser, Namespace
 from typing import Union
 from jinja2 import Environment, FileSystemLoader
 from markdown import Markdown
 from importlib.metadata import version
-from importlib.resources import contents
+from importlib.resources import path
 from datetime import datetime, timezone
 
 from .configuration import Configuration
@@ -117,8 +118,18 @@ def main() -> None:
         except FileExistsError:
             pass
 
-        for f in contents('pyssg'):
-            print(f)
+        # copy basic template files
+        files: list[str] = ('index.html',
+                            'page.html',
+                            'tag.html',
+                            'rss.xml',
+                            'sitemap.xml')
+        for f in files:
+            plt_file: str = os.path.join(config.plt, f)
+            with path('pyssg.plt', f) as p:
+                if not os.path.exists(plt_file):
+                    shutil.copy(p, plt_file)
+
         return
 
     if opts['build']:

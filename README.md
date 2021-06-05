@@ -58,7 +58,7 @@ Strongly recommended to edit the `rss.xml` template.
 Build the site with:
 
 ```sh
-pyssg -s src_dir -d dst_dir -u https://base.url -b
+pyssg -s src_dir -d dst_dir -t plt_dir -u https://base.url -b
 ```
 
 That creates all `*.html` for the site and can be easily moved to the server. Here, the `-u` flag is technically optional in the sense that you'll not receive a warning/error, but it's used to prepend links with this URL (not strictly required everywhere), so don't ignore it; also don't include the trailing `/`.

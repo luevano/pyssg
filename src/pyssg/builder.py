@@ -1,7 +1,6 @@
 import os
 import shutil
 from operator import itemgetter
-from copy import deepcopy
 from jinja2 import Environment, Template
 from markdown import Markdown
 from importlib.metadata import version
