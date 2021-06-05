@@ -10,8 +10,6 @@ from .configuration import Configuration
 from .database import Database
 from .builder import Builder
 from .page import Page
-from .rss import RSSBuilder
-from .sitemap import SitemapBuilder
 
 
 def get_options() -> Namespace:

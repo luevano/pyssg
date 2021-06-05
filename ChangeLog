@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+v0.5.3
+------
+
+* refactor code and add image\_url parsing
+
 v0.5.2
 ------
 
