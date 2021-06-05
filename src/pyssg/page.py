@@ -3,23 +3,21 @@ from datetime import datetime, timezone
 from .configuration import Configuration
 
 
-DFORMAT_RSS = '%a, %d %b %Y %H:%M:%S GMT'
-DFORMAT_SITEMAP = '%Y-%m-%d'
-
-
 class Page:
     def __init__(self,
                  name: str,
                  ctime: float,
                  mtime: float,
                  html: str,
-                 meta: dict):
+                 meta: dict,
+                 config: Configuration):
         # initial data
         self.name: str = name
         self.ctimestamp: float = ctime
         self.mtimestamp: float = mtime
         self.content: str = html
         self.meta: dict = meta
+        self.config: Configuration = config
 
         # data from self.meta
         self.title: str = ''
@@ -32,6 +30,7 @@ class Page:
 
         # constructed
         self.url: str = ''
+        self.image_url: str = ''
         self.cdate: str = ''
         self.cdate_list: str = ''
         self.cdate_list_sep: str = ''
@@ -57,7 +56,7 @@ class Page:
 
     # parses meta from self.meta, for og, it prioritizes,
     # the actual og meta
-    def parse(self, config: Configuration):
+    def parse(self):
         # required meta elements
         self.title = self.meta['title'][0]
         self.author = self.meta['author'][0]
@@ -67,21 +66,23 @@ class Page:
         # dates
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
                                                  tz=timezone.utc)
-        self.cdate = self.cdatetime.strftime(config.dformat)
-        self.cdate_list = self.cdatetime.strftime(config.l_dformat)
-        self.cdate_list_sep = self.cdatetime.strftime(config.lsep_dformat)
-        self.cdate_rss = self.cdatetime.strftime(DFORMAT_RSS)
-        self.cdate_sitemap = self.cdatetime.strftime(DFORMAT_SITEMAP)
+        self.cdate = self.cdatetime.strftime(self.config.dformat)
+        self.cdate_list = self.cdatetime.strftime(self.config.l_dformat)
+        self.cdate_list_sep = self.cdatetime.strftime(self.config.lsep_dformat)
+        self.cdate_rss = self.cdatetime.strftime(self.config.dformat_rss)
+        self.cdate_sitemap = \
+        self.cdatetime.strftime(self.config.dformat_sitemap)
 
         # only if file/page has been modified
         if self.mtimestamp != 0.0:
             self.mdatetime = datetime.fromtimestamp(self.mtimestamp,
                                                      tz=timezone.utc)
-            self.mdate = self.mdatetime.strftime(config.dformat)
-            self.mdate_list = self.mdatetime.strftime(config.l_dformat)
-            self.mdate_list_sep = self.mdatetime.strftime(config.lsep_dformat)
-            self.mdate_rss = self.mdatetime.strftime(DFORMAT_RSS)
-            self.mdate_sitemap = self.mdatetime.strftime(DFORMAT_SITEMAP)
+            self.mdate = self.mdatetime.strftime(self.config.dformat)
+            self.mdate_list = self.mdatetime.strftime(self.config.l_dformat)
+            self.mdate_list_sep = self.mdatetime.strftime(self.config.lsep_dformat)
+            self.mdate_rss = self.mdatetime.strftime(self.config.dformat_rss)
+            self.mdate_sitemap = \
+            self.mdatetime.strftime(self.config.dformat_sitemap)
 
         # not always contains tags
         try:
@@ -90,12 +91,19 @@ class Page:
 
             for t in tags_only:
                 self.tags.append((t,
-                                  f'{config.base_url}/tag/@{t}.html'))
+                                  f'{self.config.url}/tag/@{t}.html'))
         except KeyError: pass
 
-        self.url = f'{config.base_url}/{self.name.replace(".md", ".html")}'
+        self.url = f'{self.config.url}/{self.name.replace(".md", ".html")}'
 
-        # if contains object graph elements
+        try:
+            self.image_url = \
+            f'{self.config.base_static_url}/{self.meta["image_url"]}'
+        except KeyError:
+            self.image_url = \
+            f'{self.config.base_static_url}/{self.config.default_image_url}'
+
+        # if contains open graph elements
         try:
             # og_e = object graph entry
             for og_e in self.meta['og']:

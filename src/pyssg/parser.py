@@ -5,7 +5,6 @@ from markdown import Markdown
 
 from .database import Database
 from .configuration import Configuration
-from .configuration import Configuration
 from .page import Page
 
 
@@ -13,11 +12,13 @@ from .page import Page
 class MDParser:
     def __init__(self, src: str,
                  files: list[str],
+                 config: Configuration,
                  db: Database,
                  md: Markdown):
         self.src: str = src
         self.files: list[str] = files
 
+        self.config: Configuration = config
         self.db: Database = db
         self.md: Markdown = md
 
@@ -26,7 +27,7 @@ class MDParser:
         self.all_tags: list[tuple[str]] = None
 
 
-    def parse(self, config: Configuration):
+    def parse(self) -> None:
         # initialize lists
         self.all_pages = []
         self.updated_pages = []
@@ -43,8 +44,9 @@ class MDParser:
                               self.db.e[f][0],
                               self.db.e[f][1],
                               content,
-                              self.md.Meta)
-            page.parse(config)
+                              self.md.Meta,
+                              self.config)
+            page.parse()
 
             # keep a separated list for all and updated pages
             if updated:
@@ -66,7 +68,6 @@ class MDParser:
         self.updated_pages.sort(reverse=True)
         self.all_pages.sort(reverse=True)
         # TODO: fix this in case it doesn't work lol
-        # this should update references to all_pages and updated_pages???
         for i, p in enumerate(self.all_pages):
             try:
                 prev_page: Page = self.all_pages[i - 1]

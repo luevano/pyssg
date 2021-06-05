@@ -71,12 +71,13 @@ For more options/flags just checkout `pyssg -h`.
 
 Here is the list of variables that you can use specific Jinja templates with a short description. Note that all urls are without the trailing slash `/`.
 
-- General:
-    - `site_title` (`str`) (all): title of the website.
-    - `site_base_url` (`str`) (all): base url of the website.
-    - `site_base_static_url` (`str`) (all): base static url where all static files are located, mostly needed for correct rss feed generator when using a `base` tag and using relative links to files. For more, see [<base>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base).
-    - `pyssg_version` (`str`) (all): version in numeric form, i.e. `0.5.0`.
-    - `run_date` (`str`) (all): date when the program was run, with format required for rss.
+- `config` (`Configuration`) (all): configuration object containing general/global attributes, the useful ones being:
+    - `title` (`str`): title of the website.
+    - `url` (`str`): base url of the website.
+    - `static_url` (`str`): base static url where all static files are located, mostly needed for correct rss feed generator when using a `base` tag and using relative links to files. For more, see [<base>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base).
+    - `default_image_url` (`str`): as defined in `DEFAULT_IMAGE_URL` configuration option.
+    - `version` (`str`): version in numeric form, i.e. `0.5.0`.
+    - `run_date` (`str`): date when the program was run, with format required for rss.
 - Pages:
     - `all_pages` (`list(Page)`) (all): list of all the pages, sorted by creation time, reversed.
     - `page` (`Page`) (`page.html`): page object that contains the following attributes:
@@ -98,7 +99,8 @@ Here is the list of variables that you can use specific Jinja templates with a s
         - `summary` (`str`): summary of the page, as specified in the `*.md` file.
         - `lang` (`str`): page language, used for the general `html` tag `lang` attribute.
         - `tags` (`list(tuple(str))`): list of tuple of tags of the page, containing the name and the url of the tag, in that order. Defaults to empty list.
-        - `url` (`str`): url of the page, this already includes the `site_base_url`.
+        - `url` (`str`): url of the page, this already includes the `config.url`.
+        - `image_url` (`str`): image url of the page, this already includes the `config.static_url`. Defaults to the `DEFAULT_IMAGE_URL` configuration option.
         - `next/previous` (`Page`): reference to the next or previous page object (containing all these attributes). Defaults to None
         - `og` (`dict(str, str)`): dict for object graph metadata.
         - `meta` (`dict(str, list(str))`): meta dict as obtained from python-markdown, in case you use a meta tag not yet supported, it will be available there.

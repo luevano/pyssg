@@ -4,19 +4,14 @@ from argparse import ArgumentParser, Namespace
 from typing import Union
 from jinja2 import Environment, FileSystemLoader
 from markdown import Markdown
-from importlib.metadata import version
 from importlib.resources import path
-from datetime import datetime, timezone
 
 from .configuration import Configuration
 from .database import Database
-from .builder import HTMLBuilder
+from .builder import Builder
 from .page import Page
 from .rss import RSSBuilder
 from .sitemap import SitemapBuilder
-
-
-VERSION = version('pyssg')
 
 
 def get_options() -> Namespace:
@@ -58,6 +53,10 @@ def get_options() -> Namespace:
                         default='',
                         type=str,
                         help='''base static url without trailing slash''')
+    parser.add_argument('--default-image-url',
+                        default='',
+                        type=str,
+                        help='''default image url''')
     parser.add_argument('--title',
                         default='Blog',
                         type=str,
@@ -107,7 +106,7 @@ def main() -> None:
     config.fill_missing(opts)
 
     if opts['version']:
-        print(f'pyssg v{VERSION}')
+        print(f'pyssg v{config.version}')
         return
 
     if opts['init']:
@@ -147,27 +146,8 @@ def main() -> None:
         md: Markdown = Markdown(extensions=['extra', 'meta', 'sane_lists',
                                             'smarty', 'toc', 'wikilinks'],
                                 output_format='html5')
-        builder: HTMLBuilder = HTMLBuilder(config,
-                                           env,
-                                           db,
-                                           md)
+        builder: Builder = Builder(config, env, db, md)
         builder.build()
-
-        # get all parsed pages and tags for rss and sitemap construction
-        all_pages: list[Page] = builder.all_pages
-        all_tags: list[tuple[str]] = builder.all_tags
-
-        rss_builder: RSSBuilder = RSSBuilder(config,
-                                             env,
-                                             all_pages,
-                                             all_tags)
-        rss_builder.build()
-
-        sm_builder: SitemapBuilder = SitemapBuilder(config,
-                                                    env,
-                                                    all_pages,
-                                                    all_tags)
-        sm_builder.build()
 
         db.write()
         return
