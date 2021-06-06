@@ -98,7 +98,7 @@ class Page:
 
         try:
             self.image_url = \
-            f'{self.config.static_url}/{self.meta["image_url"]}'
+            f'{self.config.static_url}/{self.meta["image_url"][0]}'
         except KeyError:
             self.image_url = \
             f'{self.config.static_url}/{self.config.default_image_url}'
