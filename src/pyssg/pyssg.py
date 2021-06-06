@@ -27,6 +27,7 @@ def get_options() -> Namespace:
                         default='$XDG_CONFIG_HOME/pyssg/pyssgrc',
                         type=str,
                         help='''config file (path) to read from; defaults to
+                        'pyssgrc' first, then
                         '$XDG_CONFIG_HOME/pyssg/pyssgrc' ''')
     parser.add_argument('-s', '--src',
                         default='src',
@@ -99,7 +100,13 @@ def main() -> None:
     conf_path: str = opts['config']
     conf_path = os.path.expandvars(conf_path)
 
-    config: Configuration = Configuration(conf_path)
+
+    config: Configuration = None
+    if os.path.exists('pyssgrc'):
+        config = Configuration('pyssgrc')
+    else:
+        config = Configuration(conf_path)
+
     config.read()
     config.fill_missing(opts)
 
