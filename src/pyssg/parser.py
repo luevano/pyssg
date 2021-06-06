@@ -67,14 +67,15 @@ class MDParser:
         self.all_tags.sort(key=itemgetter(0))
         self.updated_pages.sort(reverse=True)
         self.all_pages.sort(reverse=True)
-        # TODO: fix this in case it doesn't work lol
-        for i, p in enumerate(self.all_pages):
-            try:
-                prev_page: Page = self.all_pages[i - 1]
-                p.previous = prev_page
-            except IndexError: pass
 
-            try:
-                next_page: Page = self.all_pages[i + 1]
+        pages_amount: int = len(self.all_pages)
+        # note that prev and next are switched because of the reverse rodering
+        # of all_pages
+        for i, p in enumerate(self.all_pages):
+            if i != 0:
+                next_page: Page = self.all_pages[i - 1]
                 p.next = next_page
-            except IndexError: pass
+
+            if i != pages_amount - 1:
+                prev_page: Page = self.all_pages[i + 1]
+                p.previous = prev_page

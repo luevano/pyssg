@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+v0.5.6
+------
+
+* add config to read first pyssgrc and then to the xdg directory
+* fix bug on image\_url
+
 v0.5.5
 ------
 
