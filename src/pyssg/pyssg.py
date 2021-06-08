@@ -1,10 +1,14 @@
 import os
 import shutil
+from importlib.resources import path
 from argparse import ArgumentParser, Namespace
 from typing import Union
+
 from jinja2 import Environment, FileSystemLoader
 from markdown import Markdown
-from importlib.resources import path
+import yafg
+from MarkdownHighlight.highlight import HighlightExtension
+from markdown_checklist.extension import ChecklistExtension
 
 from .configuration import Configuration
 from .database import Database
@@ -148,8 +152,23 @@ def main() -> None:
                                        trim_blocks=True,
                                        lstrip_blocks=True)
 
-        md: Markdown = Markdown(extensions=['extra', 'meta', 'sane_lists',
-                                            'smarty', 'toc', 'wikilinks'],
+
+        # md extensions
+        exts: list = ['extra',
+                      'meta',
+                      'sane_lists',
+                      'smarty',
+                      'toc',
+                      'wikilinks',
+                      yafg.YafgExtension(stripTitle=True,
+                                         figureClass="",
+                                         figcaptionClass="",
+                                         figureNumbering=False,
+                                         figureNumberClass="number",
+                                         figureNumberText="Figure"),
+                      HighlightExtension,
+                      ChecklistExtension()]
+        md: Markdown = Markdown(extensions=exts,
                                 output_format='html5')
         builder: Builder = Builder(config, env, db, md)
         builder.build()

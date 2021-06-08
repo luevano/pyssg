@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+v0.5.7
+------
+
+* fix bug on prev/next objects of page
+
 v0.5.6
 ------
 

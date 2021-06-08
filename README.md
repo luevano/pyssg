@@ -31,6 +31,9 @@ This program uses the base [`markdown` syntax](https://daringfireball.net/projec
 - SmartyPants.
 - Table of Contents.
 - WikiLinks.
+- [yafg - Yet Another Figure Generator](https://git.sr.ht/~ferruck/yafg)
+- [markdown.highlight](https://github.com/ribalba/markdown.highlight)
+- [Markdown Checklist](https://github.com/FND/markdown-checklist)
 
 ## Installation
 
