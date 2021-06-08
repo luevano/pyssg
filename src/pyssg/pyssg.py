@@ -6,7 +6,7 @@ from typing import Union
 
 from jinja2 import Environment, FileSystemLoader
 from markdown import Markdown
-import yafg
+from yafg import YafgExtension
 from MarkdownHighlight.highlight import HighlightExtension
 from markdown_checklist.extension import ChecklistExtension
 
@@ -160,13 +160,15 @@ def main() -> None:
                       'smarty',
                       'toc',
                       'wikilinks',
-                      yafg.YafgExtension(stripTitle=True,
-                                         figureClass="",
-                                         figcaptionClass="",
-                                         figureNumbering=False,
-                                         figureNumberClass="number",
-                                         figureNumberText="Figure"),
-                      HighlightExtension,
+                      # stripTitle generates an error when True,
+                      # if there is no title attr
+                      YafgExtension(stripTitle=False,
+                                    figureClass="",
+                                    figcaptionClass="",
+                                    figureNumbering=False,
+                                    figureNumberClass="number",
+                                    figureNumberText="Figure"),
+                      HighlightExtension(),
                       ChecklistExtension()]
         md: Markdown = Markdown(extensions=exts,
                                 output_format='html5')
