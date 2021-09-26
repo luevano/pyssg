@@ -1,4 +1,3 @@
-import os
 from typing import Union
 from importlib.metadata import version
 from datetime import datetime, timezone
