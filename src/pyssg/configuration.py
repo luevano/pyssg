@@ -79,15 +79,15 @@ class Configuration:
             except KeyError: pass
 
             try:
-                self.dformat = opts['date_formaT']
+                self.dformat = opts['date_format']
             except KeyError: pass
 
             try:
-                self.l_dformat = opts['list_date_FORMAT']
+                self.l_dformat = opts['list_date_format']
             except KeyError: pass
 
             try:
-                self.lsep_dformat = opts['list_sep_dATE_FORMAT']
+                self.lsep_dformat = opts['list_sep_date_format']
             except KeyError: pass
 
             try:
