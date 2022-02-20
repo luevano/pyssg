@@ -23,8 +23,8 @@ I'm writing this in *pYtHoN* (thought about doing it in Go, but I'm most comfort
 
 ### To be added/fixed
 
-- Avoid the program to freak out when there are directories created in advance.
-- Provide more meaningful error messages when you are missing mandatory tags in your `.md` files.
+- [ ] Avoid the program to freak out when there are directories created in advance.
+- [ ] Provide more meaningful error messages when you are missing mandatory tags in your `.md` files.
 
 ### Markdown features
 
