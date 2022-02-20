@@ -21,6 +21,11 @@ I'm writing this in *pYtHoN* (thought about doing it in Go, but I'm most comfort
 	- [ ] Extend this to tag pages and index (right now all tags and index is built no matter if no new/updated file is present).
 - [x] Configuration file as an alternative to using command line flags (configuration file options are prioritized).
 
+## To be added/fixed
+
+- Avoid the program to freak out when there are directories created in advance.
+- Provide more meaningful error messages when you are missing mandatory tags in your `.md` files.
+
 ### Markdown features
 
 This program uses the base [`markdown` syntax](https://daringfireball.net/projects/markdown/syntax) plus additional syntax, all thanks to [`python-markdown`](https://python-markdown.github.io/) that provides [extensions](https://python-markdown.github.io/extensions/). The following extensions are used:
@@ -54,6 +59,8 @@ First initialize the directories you're going to use for the source files and de
 ```sh
 pyssg -s src_dir -d dst_dir -i
 ```
+You do not have to create any directories, in advance, the command above will do it.
+Actually for the moment I will encourage you to **not create** any directories in advance.
 
 That creates the desired directories with the basic templates that can be edited as desired (see variables available for Jinja below). Place your `*.md` files somewhere inside the source directory (`src_dir` in the command above), but outside of the `templates` directory. It accepts sub-directories.
 
@@ -65,7 +72,20 @@ Build the site with:
 pyssg -s src_dir -d dst_dir -t plt_dir -u https://base.url -b
 ```
 
-That creates all `*.html` for the site and can be easily moved to the server. Here, the `-u` flag is technically optional in the sense that you'll not receive a warning/error, but it's used to prepend links with this URL (not strictly required everywhere), so don't ignore it; also don't include the trailing `/`.
+Remember to add the mandatory meta-data keys to your `.md` files, these are:
+
+```
+title: the title of your blog entry or whatever
+author: your name or online handle
+lang: the language the entry is written on
+summary: a summary of the entry
+```
+
+You can add more meta-data keys as long as it is [Python-Markdown compliant](https://python-markdown.github.io/extensions/meta_data/).
+
+Also strongly recomended to add the `tags` test for `pyssg` to generate some nice filtering tags.
+
+So...that creates all `*.html` for the site and can be easily moved to the server. Here, the `-u` flag is technically optional in the sense that you'll not receive a warning/error, but it's used to prepend links with this URL (not strictly required everywhere), so don't ignore it; also don't include the trailing `/`.
 
 For now, the `-b`uild tag also creates the `rss.xml` and `sitemap.xml` files based on templates including only all converted `*.md` files (and processed tags in case of the sitemap), meaning that separate `*.html` files should be included manually in the template.
 
