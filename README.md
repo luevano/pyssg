@@ -21,7 +21,7 @@ I'm writing this in *pYtHoN* (thought about doing it in Go, but I'm most comfort
 	- [ ] Extend this to tag pages and index (right now all tags and index is built no matter if no new/updated file is present).
 - [x] Configuration file as an alternative to using command line flags (configuration file options are prioritized).
 
-## To be added/fixed
+### To be added/fixed
 
 - Avoid the program to freak out when there are directories created in advance.
 - Provide more meaningful error messages when you are missing mandatory tags in your `.md` files.
