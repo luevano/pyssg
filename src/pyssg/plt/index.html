@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <base href="{{config.static_url}}">
-    <title>Index -- {{config.title}}</title>
+    <base href="{{config.get('url', 'static')}}">
+    <title>Index -- {{config.get('info', 'title')}}</title>
   </head>
   <body>
-  <h1>Index -- {{config.title}}</h1>
+  <h1>Index -- {{config.get('info', 'title')}}</h1>
   <p>Some text here.</p>
 
   <p>Tags:

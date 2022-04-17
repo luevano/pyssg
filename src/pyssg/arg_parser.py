@@ -3,21 +3,40 @@ from argparse import ArgumentParser, Namespace
 
 def get_parsed_arguments() -> Namespace:
     parser = ArgumentParser(prog='pyssg',
-                            description='''Static Site Generator that reads
-                            Markdown files and creates HTML files.\nIf
-                            [-c]onfig file is provided (or exists in default
-                            location) all other options are ignored.\nFor
-                            datetime formats see:
+                            description='''Static Site Generator that parses
+                            Markdown files into HTML files. For datetime
+                            formats see:
                             https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes''')
     parser.add_argument('-v', '--version',
                         action='store_true',
                         help='''print program version''')
     parser.add_argument('-c', '--config',
-                        default='$XDG_CONFIG_HOME/pyssg/pyssgrc',
+                        # don't give a default here, as it would seem like
+                        #   --config was passed
+                        # default='$XDG_CONFIG_HOME/pyssg/config.ini',
                         type=str,
-                        help='''config file (path) to read from; defaults to
-                        'pyssgrc' first, then
-                        '$XDG_CONFIG_HOME/pyssg/pyssgrc' ''')
+                        help='''config file (path) to read from; if not passed,
+                        '$XDG_CONFIG_HOME/pyssg/config.ini' is used''')
+    parser.add_argument('--copy-default-config',
+                        action='store_true',
+                        help='''copies the default config to path specified in
+                        --config flag''')
+    parser.add_argument('-i', '--init',
+                        action='store_true',
+                        help='''initializes the directory structures and copies
+                        over default templates''')
+    parser.add_argument('-b', '--build',
+                        action='store_true',
+                        help='''generates all HTML files by parsing MD files
+                        present in source directory and copies over manually
+                        written HTML files''')
+    parser.add_argument('-f', '--force',
+                        action='store_true',
+                        help='''force building all pages and not only the
+                        updated ones''')
+    # really not needed, too much bloat and case scenarios to check for,
+    #   instead, just read from config file or default config file
+    """
     parser.add_argument('-s', '--src',
                         default='src',
                         type=str,
@@ -68,17 +87,6 @@ def get_parsed_arguments() -> Namespace:
                         help='''date format used for the separator between page
                         entries in a list; defaults to '%%B %%Y' ('March 2021',
                         for example)''')
-    parser.add_argument('-i', '--init',
-                        action='store_true',
-                        help='''initializes the dir structure, templates,
-                        as well as the 'src' and 'dst' directories''')
-    parser.add_argument('-b', '--build',
-                        action='store_true',
-                        help='''generates all html files and passes over
-                        existing (handmade) ones''')
-    parser.add_argument('-f', '--force',
-                        action='store_true',
-                        help='''force building all pages and not only the
-                        updated ones''')
+    """
 
     return parser.parse_args()

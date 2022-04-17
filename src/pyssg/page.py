@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from .configuration import Configuration
+from configparser import ConfigParser
 
 
 class Page:
@@ -10,14 +10,14 @@ class Page:
                  mtime: float,
                  html: str,
                  meta: dict,
-                 config: Configuration):
+                 config: ConfigParser):
         # initial data
         self.name: str = name
         self.ctimestamp: float = ctime
         self.mtimestamp: float = mtime
         self.content: str = html
         self.meta: dict = meta
-        self.config: Configuration = config
+        self.config: ConfigParser = config
 
         # data from self.meta
         self.title: str = ''
@@ -66,23 +66,23 @@ class Page:
         # dates
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
                                                  tz=timezone.utc)
-        self.cdate = self.cdatetime.strftime(self.config.dformat)
-        self.cdate_list = self.cdatetime.strftime(self.config.l_dformat)
-        self.cdate_list_sep = self.cdatetime.strftime(self.config.lsep_dformat)
-        self.cdate_rss = self.cdatetime.strftime(self.config.dformat_rss)
+        self.cdate = self.cdatetime.strftime(self.config.get('fmt', 'date'))
+        self.cdate_list = self.cdatetime.strftime(self.config.get('fmt', 'list_date'))
+        self.cdate_list_sep = self.cdatetime.strftime(self.config.get('fmt', 'list_sep_date'))
+        self.cdate_rss = self.cdatetime.strftime(self.config.get('fmt', 'rss_date'))
         self.cdate_sitemap = \
-        self.cdatetime.strftime(self.config.dformat_sitemap)
+        self.cdatetime.strftime(self.config.get('fmt', 'sitemap_date'))
 
         # only if file/page has been modified
         if self.mtimestamp != 0.0:
             self.mdatetime = datetime.fromtimestamp(self.mtimestamp,
                                                      tz=timezone.utc)
-            self.mdate = self.mdatetime.strftime(self.config.dformat)
-            self.mdate_list = self.mdatetime.strftime(self.config.l_dformat)
-            self.mdate_list_sep = self.mdatetime.strftime(self.config.lsep_dformat)
-            self.mdate_rss = self.mdatetime.strftime(self.config.dformat_rss)
+            self.mdate = self.mdatetime.strftime(self.config.get('fmt', 'date'))
+            self.mdate_list = self.mdatetime.strftime(self.config.get('fmt', 'list_date'))
+            self.mdate_list_sep = self.mdatetime.strftime(self.config.get('fmt', 'list_sep_date'))
+            self.mdate_rss = self.mdatetime.strftime(self.config.get('fmt', 'rss_date'))
             self.mdate_sitemap = \
-            self.mdatetime.strftime(self.config.dformat_sitemap)
+            self.mdatetime.strftime(self.config.get('fmt', 'sitemap_date'))
 
         # not always contains tags
         try:
@@ -91,17 +91,17 @@ class Page:
 
             for t in tags_only:
                 self.tags.append((t,
-                                  f'{self.config.url}/tag/@{t}.html'))
+                                  f'{self.config.get("url", "main")}/tag/@{t}.html'))
         except KeyError: pass
 
-        self.url = f'{self.config.url}/{self.name.replace(".md", ".html")}'
+        self.url = f'{self.config.get("url", "main")}/{self.name.replace(".md", ".html")}'
 
         try:
             self.image_url = \
-            f'{self.config.static_url}/{self.meta["image_url"][0]}'
+            f'{self.config.get("url", "static")}/{self.meta["image_url"][0]}'
         except KeyError:
             self.image_url = \
-            f'{self.config.static_url}/{self.config.default_image_url}'
+            f'{self.config.get("url", "static")}/{self.config.get("url", "default_image")}'
 
         # if contains open graph elements
         try:

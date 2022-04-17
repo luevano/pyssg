@@ -4,8 +4,8 @@ from copy import deepcopy
 from operator import itemgetter
 from jinja2 import Environment, Template
 from markdown import Markdown
+from configparser import ConfigParser
 
-from .configuration import Configuration
 from .database import Database
 from .parser import MDParser
 from .page import Page
@@ -13,11 +13,11 @@ from .discovery import get_file_list, get_dir_structure
 
 
 class Builder:
-    def __init__(self, config: Configuration,
+    def __init__(self, config: ConfigParser,
                  env: Environment,
                  db: Database,
                  md: Markdown):
-        self.config: Configuration = config
+        self.config: ConfigParser = config
         self.env: Environment = env
         self.db: Database = db
         self.md: Markdown = md
@@ -33,15 +33,19 @@ class Builder:
 
 
     def build(self) -> None:
-        self.dirs = get_dir_structure(self.config.src, ['templates'])
-        self.md_files = get_file_list(self.config.src, ['.md'], ['templates'])
-        self.html_files = get_file_list(self.config.src, ['.html'], ['templates'])
+        self.dirs = get_dir_structure(self.config.get('path', 'src'),
+                                      ['templates'])
+        self.md_files = get_file_list(self.config.get('path', 'src'),
+                                      ['.md'],
+                                      ['templates'])
+        self.html_files = get_file_list(self.config.get('path', 'src'),
+                                        ['.html'],
+                                        ['templates'])
 
         self.__create_dir_structure()
         self.__copy_html_files()
 
-        parser: MDParser = MDParser(self.config.src,
-                                    self.md_files,
+        parser: MDParser = MDParser(self.md_files,
                                     self.config,
                                     self.db,
                                     self.md)
@@ -69,7 +73,7 @@ class Builder:
             # for the dir structure,
             # doesn't matter if the dir already exists
             try:
-                os.makedirs(os.path.join(self.config.dst, d))
+                os.makedirs(os.path.join(self.config.get('path', 'dst'), d))
             except FileExistsError:
                 pass
 
@@ -79,18 +83,18 @@ class Builder:
         dst_file: str = None
 
         for f in self.html_files:
-            src_file = os.path.join(self.config.src, f)
-            dst_file = os.path.join(self.config.dst, f)
+            src_file = os.path.join(self.config.get('path', 'src'), f)
+            dst_file = os.path.join(self.config.get('path', 'dst'), f)
 
             # only copy files if they have been modified (or are new)
-            if self.db.update(src_file, remove=f'{self.config.src}/'):
+            if self.db.update(src_file, remove=f'{self.config.get("path", "src")}/'):
                 shutil.copy2(src_file, dst_file)
 
 
     def __render_articles(self) -> None:
         article_vars: dict = deepcopy(self.common_vars)
         # check if only updated should be created
-        if self.config.force:
+        if self.config.getboolean('other', 'force'):
             for p in self.all_pages:
                 article_vars['page'] = p
                 self.__render_template("page.html",
@@ -132,5 +136,5 @@ class Builder:
         template: Template = self.env.get_template(template_name)
         content: str = template.render(**template_vars)
 
-        with open(os.path.join(self.config.dst, file_name), 'w') as f:
+        with open(os.path.join(self.config.get('path', 'dst'), file_name), 'w') as f:
             f.write(content)

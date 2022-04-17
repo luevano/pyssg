@@ -1,24 +1,21 @@
 import os
 from operator import itemgetter
-from datetime import datetime
 from markdown import Markdown
+from configparser import ConfigParser
 
 from .database import Database
-from .configuration import Configuration
 from .page import Page
 
 
 # parser of md files, stores list of pages and tags
 class MDParser:
-    def __init__(self, src: str,
-                 files: list[str],
-                 config: Configuration,
+    def __init__(self, files: list[str],
+                 config: ConfigParser,
                  db: Database,
                  md: Markdown):
-        self.src: str = src
         self.files: list[str] = files
 
-        self.config: Configuration = config
+        self.config: ConfigParser = config
         self.db: Database = db
         self.md: Markdown = md
 
@@ -32,12 +29,13 @@ class MDParser:
         self.all_pages = []
         self.updated_pages = []
         self.all_tags = []
-        all_tag_names: list[str] = []
+        # not used, not sure why i had this
+        # all_tag_names: list[str] = []
 
         for f in self.files:
-            src_file: str = os.path.join(self.src, f)
+            src_file: str = os.path.join(self.config.get('path', 'src'), f)
             # get flag if update is successful
-            updated: bool = self.db.update(src_file, remove=f'{self.src}/')
+            updated: bool = self.db.update(src_file, remove=f'{self.config.get("path", "src")}/')
 
             content: str = self.md.reset().convert(open(src_file).read())
             page: Page = Page(f,
