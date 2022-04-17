@@ -1,30 +1,25 @@
 CHANGES
 =======
 
-v0.5.8
+v0.6.0
 ------
 
+* refactor config handler and more
+* add default configuration to resources
+* refactor argument parser
+* update requirements
+* The bullets did not have checkboxes in the To be added section
+* A header was wrong
+* A little documentation added to avoid mistakes by new users
+* kek xd rofl lmao forgot to save a file:), now actually a quick fix
+* quick fix on random uppercased letters
+* Delete pyssgrc
+* fix bug on new extensions
 * add new extensions
-
-v0.5.7
-------
-
 * fix bug on prev/next objects of page
-
-v0.5.6
-------
-
 * add config to read first pyssgrc and then to the xdg directory
 * fix bug on image\_url
-
-v0.5.5
-------
-
 * fix another bug
-
-v0.5.4
-------
-
 * fix bug
 
 v0.5.3

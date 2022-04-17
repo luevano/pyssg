@@ -2,7 +2,7 @@
 
 Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and [`rssg`](https://rgz.ee/bin/rssg), Luke Smith's [`lb` and `sup`](https://github.com/LukeSmithxyz/lb) and, pedantic.software's great (but *"mamador"*, as I would say in spanish) [`blogit`](https://pedantic.software/git/blogit/).
 
-## Current features
+## Features and to-do
 
 - [x] Build static site parsing `markdown` files ( `*.md` -> `*.html`)
 	- [x] ~~Using plain `*.html` files for templates.~~ Changed to Jinja templates.
@@ -19,13 +19,10 @@ Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and 
 	- [ ] Extend this to tag pages and index (right now all tags and index is built no matter if no new/updated file is present).
 - [x] Configuration file. ~~as an alternative to using command line flags (configuration file options are prioritized).~~ 
 	- [x] Use [`configparser`](https://docs.python.org/3/library/configparser.html) instead of custom config handler.
-
-**Please note that I've removed the use of command line flags for now as it was too much bloat and unnecessary.**
-
-### To be added/fixed
-
+	- [ ] Migrate to YAML instead of INI, as it is way more flexible.
 - [x] Avoid the program to freak out when there are directories created in advance.
 - [ ] Provide more meaningful error messages when you are missing mandatory tags in your `.md` files.
+- [ ] More complex directory structure to support multiple subdomains and different types of pages.
 
 ### Markdown features
 
