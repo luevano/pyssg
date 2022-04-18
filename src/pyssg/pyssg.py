@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-from logging import Logger, StreamHandler
+from logging import Logger
 from importlib.resources import path as rpath
 from typing import Union
 from configparser import ConfigParser
@@ -12,7 +12,6 @@ from yafg import YafgExtension
 from MarkdownHighlight.highlight import HighlightExtension
 from markdown_checklist.extension import ChecklistExtension
 
-from .per_level_formatter import PerLevelFormatter
 from .utils import create_dir, copy_file, sanity_check_path
 from .arg_parser import get_parsed_arguments
 from .configuration import get_parsed_config, DEFAULT_CONFIG_PATH, VERSION
@@ -63,9 +62,7 @@ def main() -> None:
                   ' first time if you haven\'t already', config_path)
         sys.exit(1)
 
-    log.debug('parsing config file')
     config: ConfigParser = get_parsed_config(config_path)
-    log.debug('parsed config file')
 
     if args['init']:
         log.info('initializing the directory structure and copying over templates')
@@ -84,8 +81,6 @@ def main() -> None:
                 copy_file(p, plt_file)
         sys.exit(0)
 
-    # TODO: add logging to all of the build part, that includes the builder,
-    #   database, discovery, page and parser
     if args['build']:
         log.debug('building the html files')
         db: Database = Database(os.path.join(config.get('path', 'src'), '.files'))
@@ -93,6 +88,7 @@ def main() -> None:
 
         # the autoescape option could be a security risk if used in a dynamic
         # website, as far as i can tell
+        log.debug('initializing the jinja environment')
         env: Environment = Environment(loader=FileSystemLoader(config.get('path', 'plt')),
                                        autoescape=False,
                                        trim_blocks=True,
@@ -115,6 +111,8 @@ def main() -> None:
                                     figureNumberText="Figure"),
                       HighlightExtension(),
                       ChecklistExtension()]
+        log.debug('list of md extensions: (%s)', ', '.join(exts))
+        log.debug('initializing markdown parser')
         md: Markdown = Markdown(extensions=exts,
                                 output_format='html5')
         builder: Builder = Builder(config, env, db, md)
