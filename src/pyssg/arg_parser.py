@@ -34,6 +34,9 @@ def get_parsed_arguments() -> Namespace:
                         action='store_true',
                         help='''force building all pages and not only the
                         updated ones''')
+    parser.add_argument('--debug',
+                        action='store_true',
+                        help='''change logging level from info to debug''')
     # really not needed, too much bloat and case scenarios to check for,
     #   instead, just read from config file or default config file
     """

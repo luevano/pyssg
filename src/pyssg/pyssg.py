@@ -25,7 +25,17 @@ log: Logger = logging.getLogger(__name__)
 def main() -> None:
     args: dict[str, Union[str, bool]] = vars(get_parsed_arguments())
 
-    if not len(sys.argv) > 1:
+    if args['debug']:
+        # need to modify the root logger specifically,
+        #   as it is the one that holds the config
+        #   (__name__ happens to resolve to pyssg in __init__)
+        root_logger: Logger = logging.getLogger('pyssg')
+        root_logger.setLevel(logging.DEBUG)
+        for handler in root_logger.handlers:
+            handler.setLevel(logging.DEBUG)
+        log.debug('changed logging level to DEBUG')
+
+    if not len(sys.argv) > 1 or (len(sys.argv) == 2 and args['debug']):
         log.info('pyssg v%s - no arguments passed, --help for more', VERSION)
         sys.exit(0)
 
@@ -77,7 +87,7 @@ def main() -> None:
     # TODO: add logging to all of the build part, that includes the builder,
     #   database, discovery, page and parser
     if args['build']:
-        # start the db
+        log.debug('building the html files')
         db: Database = Database(os.path.join(config.get('path', 'src'), '.files'))
         db.read()
 

@@ -57,7 +57,7 @@ Will add a PKBUILD (and possibly submit it to the AUR) sometime later.
 pyssg --copy-default-config -c <path/to/config>
 ```
 
-Where `-c` is optional as by default `$XDG_CONFIG_HOME/pyssg/config.ini` is used.
+- Where `-c` is optional as by default `$XDG_CONFIG_HOME/pyssg/config.ini` is used.
 
 2. Edit the config file created as needed.
 
