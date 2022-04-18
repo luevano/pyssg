@@ -111,7 +111,9 @@ def main() -> None:
                                     figureNumberText="Figure"),
                       HighlightExtension(),
                       ChecklistExtension()]
-        log.debug('list of md extensions: (%s)', ', '.join(exts))
+        log.debug('list of md extensions: (%s)',
+                  ', '.join([e if isinstance(e, str) else type(e).__name__
+                             for e in exts]))
         log.debug('initializing markdown parser')
         md: Markdown = Markdown(extensions=exts,
                                 output_format='html5')

@@ -106,34 +106,40 @@ class Database:
 
 
     def read(self) -> None:
-        if os.path.exists(self.db_path) and os.path.isfile(self.db_path):
-            rows: list[str] = None
-            log.debug('reading db')
-            with open(self.db_path, 'r') as file:
-                rows = file.readlines()
-            log.info('db contains %d rows', len(rows))
+        log.debug('reading db')
+        if not os.path.exists(self.db_path):
+            log.warning('"%s" doesn\'t exist, will be'
+                        ' created once process finishes,'
+                        ' ignore if it\'s the first run', self.db_path)
+            return
 
-            # parse each entry and populate accordingly
-            l: list[str] = None
-            # l=list of values in entry
-            log.debug('parsing rows from db')
-            for i, row in enumerate(rows):
-                log.debug('row %d content: "%s"', i, row)
-                l = tuple(row.strip().split())
-                if len(l) != self.COLUMN_NUM:
-                    log.critical('row doesn\t contain %s columns,'
-                                 ' contains %d elements; row %d content: "%s"',
-                                 self.COLUMN_NUM, len(l), i, row)
-                    sys.exit(1)
-
-                t: list[str] = None
-                if l[3] == '-':
-                    t = []
-                else:
-                    t = l[3].split(',')
-                log.debug('tag content: (%s)', ', '.join(t))
-
-                self.e[l[0]] = (float(l[1]), float(l[2]), t)
-        else:
-            log.error('database file "%s" doesn\'t exist or it\'s not a file')
+        if os.path.exists(self.db_path) and not os.path.isfile(self.db_path):
+            log.error('"%s" is not a file"', self.db_path)
             sys.exit(1)
+
+        rows: list[str] = None
+        with open(self.db_path, 'r') as file:
+            rows = file.readlines()
+        log.info('db contains %d rows', len(rows))
+
+        # parse each entry and populate accordingly
+        l: list[str] = None
+        # l=list of values in entry
+        log.debug('parsing rows from db')
+        for i, row in enumerate(rows):
+            log.debug('row %d content: "%s"', i, row)
+            l = tuple(row.strip().split())
+            if len(l) != self.COLUMN_NUM:
+                log.critical('row doesn\t contain %s columns,'
+                             ' contains %d elements; row %d content: "%s"',
+                             self.COLUMN_NUM, len(l), i, row)
+                sys.exit(1)
+
+            t: list[str] = None
+            if l[3] == '-':
+                t = []
+            else:
+                t = l[3].split(',')
+            log.debug('tag content: (%s)', ', '.join(t))
+
+            self.e[l[0]] = (float(l[1]), float(l[2]), t)
