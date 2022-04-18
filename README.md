@@ -23,6 +23,7 @@ Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and 
 - [x] Avoid the program to freak out when there are directories created in advance.
 - [ ] Provide more meaningful error messages when you are missing mandatory tags in your `.md` files.
 - [ ] More complex directory structure to support multiple subdomains and different types of pages.
+- [ ] Add option/change to using an SQL database instead of the custom solution.
 
 ### Markdown features
 
