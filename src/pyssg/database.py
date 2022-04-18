@@ -89,20 +89,20 @@ class Database:
 
     def write(self) -> None:
         log.debug('writing db')
-        with open(self.db_path, 'w', newline='\n') as file:
-            # write each k,v pair in dict to db file
-            for k, v in self.e.items():
-                log.debug('parsing row for page "%s"', k)
-                t: str = None
-                row: str = None
-                if len(v[2]) == 0:
-                    t = '-'
-                else:
-                    t = ','.join(v[2])
+        for k, v in self.e.items():
+            log.debug('parsing row for page "%s"', k)
+            t: str = None
+            row: str = None
+            if len(v[2]) == 0:
+                t = '-'
+            else:
+                t = ','.join(v[2])
 
-                row = f'{k} {v[0]} {v[1]} {t}'
-                log.debug('writing row: "%s"', row)
-                file.write(row)
+            row = f'{k} {v[0]} {v[1]} {t}'
+
+            log.debug('writing row: "%s\\n"', row)
+            with open(self.db_path, 'w') as file:
+                file.write(f'{row}\n')
 
 
     def read(self) -> None:
@@ -126,13 +126,14 @@ class Database:
         l: list[str] = None
         # l=list of values in entry
         log.debug('parsing rows from db')
-        for i, row in enumerate(rows):
+        for it, row in enumerate(rows):
+            i = it + 1
             log.debug('row %d content: "%s"', i, row)
             l = tuple(row.strip().split())
             if len(l) != self.COLUMN_NUM:
-                log.critical('row doesn\t contain %s columns,'
+                log.critical('row %d doesn\'t contain %s columns,'
                              ' contains %d elements; row %d content: "%s"',
-                             self.COLUMN_NUM, len(l), i, row)
+                             i, self.COLUMN_NUM, len(l), i, row)
                 sys.exit(1)
 
             t: list[str] = None
