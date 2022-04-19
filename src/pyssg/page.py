@@ -1,3 +1,4 @@
+import os
 import sys
 from datetime import datetime, timezone
 import logging
@@ -61,15 +62,24 @@ class Page:
         return self.ctimestamp < other.ctimestamp
 
 
+    def __get_mandatory_meta(self, meta: str) -> str:
+        try:
+            log.debug('parsing required metadata "%s"', meta)
+            return self.meta[meta][0]
+        except KeyError:
+            log.error('failed to parse mandatory metadata "%s" from file "%s"',
+                      meta, os.path.join(self.config.get('path', 'src'), self.name))
+            sys.exit(1)
+
+
     # parses meta from self.meta, for og, it prioritizes,
     # the actual og meta
     def parse_metadata(self):
         log.debug('parsing metadata for file "%s"', self.name)
-        log.debug('parsing required metadata')
-        self.title = self.meta['title'][0]
-        self.author = self.meta['author'][0]
-        self.summary = self.meta['summary'][0]
-        self.lang = self.meta['lang'][0]
+        self.title = self.__get_mandatory_meta('title')
+        self.author = self.__get_mandatory_meta('author')
+        self.summary = self.__get_mandatory_meta('summary')
+        self.lang = self.__get_mandatory_meta('lang')
 
         log.debug('parsing timestamp')
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp,

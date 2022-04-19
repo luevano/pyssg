@@ -21,7 +21,7 @@ Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and 
 	- [x] Use [`configparser`](https://docs.python.org/3/library/configparser.html) instead of custom config handler.
 	- [ ] Migrate to YAML instead of INI, as it is way more flexible.
 - [x] Avoid the program to freak out when there are directories created in advance.
-- [ ] Provide more meaningful error messages when you are missing mandatory tags in your `.md` files.
+- [x] Provide more meaningful error messages when you are missing mandatory metadata in your `*.md` files.
 - [ ] More complex directory structure to support multiple subdomains and different types of pages.
 - [ ] Add option/change to using an SQL database instead of the custom solution.
 
