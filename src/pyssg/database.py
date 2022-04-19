@@ -49,7 +49,7 @@ class Database:
 
         # get current time, needs actual file name
         time: float = os.stat(file_name).st_mtime
-        log.debug('modified time for "%s": %f', file_name, time)
+        log.debug('modified time for "%s": %s', file_name, time)
 
         # three cases, 1) entry didn't exist,
         # 2) entry hasn't been mod and,
@@ -82,8 +82,7 @@ class Database:
                           f, old_time, time, ', '.join(tags))
                 return True
 
-        log.warning('none of the case scenarios for updating'
-                    ' entry "%s" matched', f)
+        log.debug('entry "%s" hasn\'t been modified', f)
         return False
 
 
@@ -128,12 +127,13 @@ class Database:
         log.debug('parsing rows from db')
         for it, row in enumerate(rows):
             i = it + 1
-            log.debug('row %d content: "%s"', i, row)
-            l = tuple(row.strip().split())
+            r = row.strip()
+            log.debug('row %d content: "%s"', i, r)
+            l = tuple(r.split())
             if len(l) != self.COLUMN_NUM:
                 log.critical('row %d doesn\'t contain %s columns,'
                              ' contains %d elements; row %d content: "%s"',
-                             i, self.COLUMN_NUM, len(l), i, row)
+                             i, self.COLUMN_NUM, len(l), i, r)
                 sys.exit(1)
 
             t: list[str] = None
