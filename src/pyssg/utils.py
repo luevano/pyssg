@@ -20,7 +20,7 @@ def create_dir(path: str, p: bool=False) -> None:
 
 def copy_file(src: str, dst: str) -> None:
     if not os.path.exists(dst):
-        shutil.copy(src, dst)
+        shutil.copy2(src, dst)
         log.info('copied file "%s" to "%s"', src, dst)
     else:
         log.info('file "%s" already exists, ignoring', dst)

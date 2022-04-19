@@ -1,6 +1,12 @@
+import sys
 from datetime import datetime, timezone
+import logging
+from logging import Logger
 
 from configparser import ConfigParser
+from re import L
+
+log: Logger = logging.getLogger(__name__)
 
 
 class Page:
@@ -11,6 +17,7 @@ class Page:
                  html: str,
                  meta: dict,
                  config: ConfigParser):
+        log.debug('initializing the page object with name "%s"', name)
         # initial data
         self.name: str = name
         self.ctimestamp: float = ctime
@@ -56,14 +63,15 @@ class Page:
 
     # parses meta from self.meta, for og, it prioritizes,
     # the actual og meta
-    def parse(self):
-        # required meta elements
+    def parse_metadata(self):
+        log.debug('parsing metadata for file "%s"', self.name)
+        log.debug('parsing required metadata')
         self.title = self.meta['title'][0]
         self.author = self.meta['author'][0]
         self.summary = self.meta['summary'][0]
         self.lang = self.meta['lang'][0]
 
-        # dates
+        log.debug('parsing timestamp')
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
                                                  tz=timezone.utc)
         self.cdate = self.cdatetime.strftime(self.config.get('fmt', 'date'))
@@ -73,8 +81,8 @@ class Page:
         self.cdate_sitemap = \
         self.cdatetime.strftime(self.config.get('fmt', 'sitemap_date'))
 
-        # only if file/page has been modified
         if self.mtimestamp != 0.0:
+            log.debug('parsing modified timestamp')
             self.mdatetime = datetime.fromtimestamp(self.mtimestamp,
                                                      tz=timezone.utc)
             self.mdate = self.mdatetime.strftime(self.config.get('fmt', 'date'))
@@ -83,36 +91,49 @@ class Page:
             self.mdate_rss = self.mdatetime.strftime(self.config.get('fmt', 'rss_date'))
             self.mdate_sitemap = \
             self.mdatetime.strftime(self.config.get('fmt', 'sitemap_date'))
+        else:
+            log.debug('not parsing modified timestamp, hasn\'t been modified')
 
-        # not always contains tags
         try:
             tags_only: list[str] = self.meta['tags']
+            log.debug('parsing tags')
             tags_only.sort()
 
             for t in tags_only:
                 self.tags.append((t,
                                   f'{self.config.get("url", "main")}/tag/@{t}.html'))
-        except KeyError: pass
+        except KeyError:
+            log.debug('not parsing tags, doesn\'t have any')
 
+        log.debug('parsing url')
         self.url = f'{self.config.get("url", "main")}/{self.name.replace(".md", ".html")}'
+        log.debug('final url "%s"', self.url)
 
+        log.debug('parsing image url')
         try:
             self.image_url = \
             f'{self.config.get("url", "static")}/{self.meta["image_url"][0]}'
         except KeyError:
+            log.debug('using default image, no image_url tag found')
             self.image_url = \
             f'{self.config.get("url", "static")}/{self.config.get("url", "default_image")}'
+        log.debug('final image url "%s"', self.image_url)
 
         # if contains open graph elements
         try:
             # og_e = object graph entry
-            for og_e in self.meta['og']:
+            og_elements: list[str] = self.meta['og']
+            log.debug('parsing og metadata')
+            for og_e in og_elements:
                 kv: str = og_e.split(',', 1)
                 if len(kv) != 2:
-                    raise Exception('invalid og syntax')
+                    log.error('invalid og syntax for "%s", needs to be "k, v"', og_e)
+                    sys.exit(1)
 
                 k: str = kv[0].strip()
                 v: str = kv[1].strip()
 
+                log.debug('og element: ("%s", "%s")', k, v)
                 self.og[k] = v
-        except KeyError: pass
+        except KeyError:
+            log.debug('no og metadata found')

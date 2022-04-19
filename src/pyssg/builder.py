@@ -5,11 +5,16 @@ from operator import itemgetter
 from jinja2 import Environment, Template
 from markdown import Markdown
 from configparser import ConfigParser
+import logging
+from logging import Logger
 
+from .utils import create_dir, copy_file
 from .database import Database
-from .parser import MDParser
+from .md_parser import MDParser
 from .page import Page
 from .discovery import get_file_list, get_dir_structure
+
+log: Logger = logging.getLogger(__name__)
 
 
 class Builder:
@@ -17,6 +22,7 @@ class Builder:
                  env: Environment,
                  db: Database,
                  md: Markdown):
+        log.debug('initializing site builder')
         self.config: ConfigParser = config
         self.env: Environment = env
         self.db: Database = db
@@ -26,13 +32,15 @@ class Builder:
         self.md_files: list[str] = None
         self.html_files: list[str] = None
 
-        self.all_pages: list[Page] = None
-        self.updated_pages: list[Page] = None
+        # files and pages are synoyms
+        self.all_files: list[Page] = None
+        self.updated_files: list[Page] = None
         self.all_tags: list[str] = None
         self.common_vars: dict = None
 
 
     def build(self) -> None:
+        log.debug('building site')
         self.dirs = get_dir_structure(self.config.get('path', 'src'),
                                       ['templates'])
         self.md_files = get_file_list(self.config.get('path', 'src'),
@@ -49,16 +57,17 @@ class Builder:
                                     self.config,
                                     self.db,
                                     self.md)
-        parser.parse()
+        parser.parse_files()
 
         # just so i don't have to pass these vars to all the functions
-        self.all_pages = parser.all_pages
-        self.updated_pages = parser.updated_pages
+        self.all_files = parser.all_files
+        self.updated_files = parser.updated_files
         self.all_tags = parser.all_tags
 
         # dict for the keyword args to pass to the template renderer
+        log.debug('adding config, all_pages and all_tags to exposed vars for jinja')
         self.common_vars = dict(config=self.config,
-                                all_pages=self.all_pages,
+                                all_pages=self.all_files,
                                 all_tags=self.all_tags)
 
         self.__render_articles()
@@ -69,16 +78,18 @@ class Builder:
 
 
     def __create_dir_structure(self) -> None:
+        log.debug('creating dir structure')
+        dir_path: str = None
         for d in self.dirs:
-            # for the dir structure,
-            # doesn't matter if the dir already exists
-            try:
-                os.makedirs(os.path.join(self.config.get('path', 'dst'), d))
-            except FileExistsError:
-                pass
+            dir_path = os.path.join(self.config.get('path', 'dst'), d)
+            create_dir(dir_path, True)
 
 
     def __copy_html_files(self) -> None:
+        if len(self.html_files) > 0:
+            log.debug('copying all html files')
+        else:
+            log.debug('no html files to copy')
         src_file: str = None
         dst_file: str = None
 
@@ -88,53 +99,73 @@ class Builder:
 
             # only copy files if they have been modified (or are new)
             if self.db.update(src_file, remove=f'{self.config.get("path", "src")}/'):
-                shutil.copy2(src_file, dst_file)
+                log.debug('file "%s" has been modified or is new, copying', f)
+                copy_file(src_file, dst_file)
+            else:
+                if self.config.getboolean('other', 'force'):
+                    log.debug('file "%s" hasn\'t been modified, but option force is set to true, copying anyways', f)
+                    copy_file(src_file, dst_file)
+                else:
+                    log.debug('file "%s" hasn\'t been modified, ignoring', f)
 
 
     def __render_articles(self) -> None:
+        log.debug('rendering html')
         article_vars: dict = deepcopy(self.common_vars)
+        temp_files: list[Page] = None
+
         # check if only updated should be created
         if self.config.getboolean('other', 'force'):
-            for p in self.all_pages:
-                article_vars['page'] = p
-                self.__render_template("page.html",
-                                       p.name.replace('.md','.html'),
-                                       **article_vars)
+            log.debug('all html will be rendered, force is set to true')
+            temp_files = self.all_files
         else:
-            for p in self.updated_pages:
-                article_vars['page'] = p
-                self.__render_template("page.html",
-                                       p.name.replace('.md','.html'),
-                                       **article_vars)
+            log.debug('only updated or new html will be rendered')
+            temp_files = self.updated_files
+
+        for p in temp_files:
+            log.debug('adding page to exposed vars for jinja')
+            article_vars['page'] = p
+            # actually render article
+            self.__render_template("page.html",
+                                   p.name.replace('.md','.html'),
+                                   **article_vars)
 
 
     def __render_tags(self) -> None:
+        log.debug('rendering tags')
         tag_vars: dict = deepcopy(self.common_vars)
+        tag_pages: list[Page] = None
         for t in self.all_tags:
-            # get a list of all pages that have current tag
-            tag_pages: list[Page] = []
-            for p in self.all_pages:
+            log.debug('rendering tag "%s"', t[0])
+            # clean tag_pages
+            tag_pages = []
+            log.debug('adding all pages that contain current tag')
+            for p in self.all_files:
                 if p.tags is not None and t[0] in list(map(itemgetter(0),
                                                            p.tags)):
+                    log.debug('adding page "%s" as it contains tag "%s"',
+                              p.name, t[0])
                     tag_pages.append(p)
 
+            log.debug('adding tag and tag_pages to exposed vars for jinja')
             tag_vars['tag'] = t
             tag_vars['tag_pages'] = tag_pages
 
-            # build tag page
+            # actually render tag page
             self.__render_template('tag.html',
                                    f'tag/@{t[0]}.html',
                                    **tag_vars)
-
-            # clean list of pages with current tag
-            tag_pages = []
 
 
     def __render_template(self, template_name: str,
                           file_name: str,
                           **template_vars) -> None:
+        log.debug('rendering html "%s" with template "%s"',
+                  file_name, template_name)
         template: Template = self.env.get_template(template_name)
         content: str = template.render(**template_vars)
+        dst_path: str = os.path.join(self.config.get('path', 'dst'), file_name)
 
-        with open(os.path.join(self.config.get('path', 'dst'), file_name), 'w') as f:
+        log.debug('writing html file to path "%s"', dst_path)
+        with open(dst_path, 'w') as f:
             f.write(content)
