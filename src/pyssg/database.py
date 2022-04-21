@@ -1,6 +1,10 @@
 import os
 import sys
 from logging import Logger, getLogger
+from configparser import ConfigParser
+from tabnanny import check
+
+from .utils import get_checksum
 
 log: Logger = getLogger(__name__)
 
@@ -9,9 +13,11 @@ log: Logger = getLogger(__name__)
 class Database:
     __COLUMN_NUM: int = 4
 
-    def __init__(self, db_path: str):
+    def __init__(self, db_path: str,
+                 config: ConfigParser):
         log.debug('initializing the page db on path "%s"', db_path)
         self.db_path: str = db_path
+        self.config: ConfigParser = config
         self.e: dict[str, tuple[float, float, list[str]]] = dict()
 
 
@@ -87,19 +93,19 @@ class Database:
 
     def write(self) -> None:
         log.debug('writing db')
-        for k, v in self.e.items():
-            log.debug('parsing row for page "%s"', k)
-            t: str = None
-            row: str = None
-            if len(v[2]) == 0:
-                t = '-'
-            else:
-                t = ','.join(v[2])
+        with open(self.db_path, 'w') as file:
+            for k, v in self.e.items():
+                log.debug('parsing row for page "%s"', k)
+                t: str = None
+                row: str = None
+                if len(v[2]) == 0:
+                    t = '-'
+                else:
+                    t = ','.join(v[2])
 
-            row = f'{k} {v[0]} {v[1]} {t}'
+                row = f'{k} {v[0]} {v[1]} {t}'
 
-            log.debug('writing row: "%s\\n"', row)
-            with open(self.db_path, 'w') as file:
+                log.debug('writing row: "%s\\n"', row)
                 file.write(f'{row}\n')
 
 

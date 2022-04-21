@@ -76,7 +76,8 @@ def main() -> None:
 
     if args['build']:
         log.debug('building the html files')
-        db: Database = Database(os.path.join(config.get('path', 'src'), '.files'))
+        db_path: str = os.path.join(config.get('path', 'src'), '.files')
+        db: Database = Database(db_path, config)
         db.read()
 
         builder: Builder = Builder(config, db)
