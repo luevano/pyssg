@@ -1,13 +1,10 @@
 import os
 import sys
 from datetime import datetime, timezone
-import logging
-from logging import Logger
-
+from logging import Logger, getLogger
 from configparser import ConfigParser
-from re import L
 
-log: Logger = logging.getLogger(__name__)
+log: Logger = getLogger(__name__)
 
 
 class Page:
@@ -124,7 +121,7 @@ class Page:
             self.image_url = \
             f'{self.config.get("url", "static")}/{self.meta["image_url"][0]}'
         except KeyError:
-            log.debug('using default image, no image_url tag found')
+            log.debug('using default image, no image_url metadata found')
             self.image_url = \
             f'{self.config.get("url", "static")}/{self.config.get("url", "default_image")}'
         log.debug('final image url "%s"', self.image_url)

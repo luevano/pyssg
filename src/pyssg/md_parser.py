@@ -2,27 +2,53 @@ import os
 from operator import itemgetter
 from markdown import Markdown
 from configparser import ConfigParser
-import logging
-from logging import Logger
+from logging import Logger, getLogger
+
+from markdown import Markdown
+from yafg import YafgExtension
+from MarkdownHighlight.highlight import HighlightExtension
+from markdown_checklist.extension import ChecklistExtension
 
 from .database import Database
 from .page import Page
 
-log: Logger = logging.getLogger(__name__)
+log: Logger = getLogger(__name__)
+
+
+def _get_md_obj() -> Markdown:
+    exts: list = ['extra',
+                  'meta',
+                  'sane_lists',
+                  'smarty',
+                  'toc',
+                  'wikilinks',
+                  # stripTitle generates an error when True,
+                  # if there is no title attr
+                  YafgExtension(stripTitle=False,
+                                figureClass="",
+                                figcaptionClass="",
+                                figureNumbering=False,
+                                figureNumberClass="number",
+                                figureNumberText="Figure"),
+                  HighlightExtension(),
+                  ChecklistExtension()]
+    log.debug('list of md extensions: (%s)',
+              ', '.join([e if isinstance(e, str) else type(e).__name__
+                         for e in exts]))
+    return Markdown(extensions=exts, output_format='html5')
 
 
 # page and file is basically a synonym here...
 class MDParser:
     def __init__(self, files: list[str],
                  config: ConfigParser,
-                 db: Database,
-                 md: Markdown):
+                 db: Database):
         log.debug('initializing the md parser with %d files', len(files))
         self.files: list[str] = files
 
         self.config: ConfigParser = config
         self.db: Database = db
-        self.md: Markdown = md
+        self.md: Markdown = _get_md_obj()
 
         self.all_files: list[Page] = None
         # updated and modified are synonyms here

@@ -1,28 +1,27 @@
-import logging
-from logging import Formatter
+from logging import Formatter, DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 
-class PerLevelFormatter(logging.Formatter):
+class PerLevelFormatter(Formatter):
     # colors for the terminal in ansi
-    yellow: str = "\x1b[33m"
-    red: str = "\x1b[31m"
-    bold_red: str = "\x1b[31;1m"
-    reset: str = "\x1b[0m"
+    __YELLOW: str = "\x1b[33m"
+    __RED: str = "\x1b[31m"
+    __BOLD_RED: str = "\x1b[31;1m"
+    __RESET: str = "\x1b[0m"
 
-    DATE_FMT: str = '%Y-%m-%d %H:%M:%S'
-    COMMON_FMT: str = '[%(levelname)s] [%(module)s:%(funcName)s:%(lineno)d]: %(message)s'
-    FORMATS: dict[int, str] = {
-        logging.DEBUG: COMMON_FMT,
-        logging.INFO: '%(message)s',
-        logging.WARNING: f'{yellow}{COMMON_FMT}{reset}',
-        logging.ERROR: f'{red}{COMMON_FMT}{reset}',
-        logging.CRITICAL: f'{bold_red}{COMMON_FMT}{reset}'
+    __DATE_FMT: str = '%Y-%m-%d %H:%M:%S'
+    __COMMON_FMT: str = '[%(levelname)s] [%(module)s:%(funcName)s:%(lineno)d]: %(message)s'
+    __FORMATS: dict[int, str] = {
+        DEBUG: __COMMON_FMT,
+        INFO: '%(message)s',
+        WARNING: f'{__YELLOW}{__COMMON_FMT}{__RESET}',
+        ERROR: f'{__RED}{__COMMON_FMT}{__RESET}',
+        CRITICAL: f'{__BOLD_RED}{__COMMON_FMT}{__RESET}'
     }
 
 
     def format(self, record: str) -> str:
-        fmt: str = self.FORMATS.get(record.levelno)
-        formatter: Formatter = logging.Formatter(
-            fmt=fmt, datefmt=self.DATE_FMT, style='%')
+        fmt: str = self.__FORMATS.get(record.levelno)
+        formatter: Formatter = Formatter(
+            fmt=fmt, datefmt=self.__DATE_FMT, style='%')
 
         return formatter.format(record)

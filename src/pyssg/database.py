@@ -1,14 +1,13 @@
 import os
 import sys
-import logging
-from logging import Logger
+from logging import Logger, getLogger
 
-log: Logger = logging.getLogger(__name__)
+log: Logger = getLogger(__name__)
 
 
 # db class that works for both html and md files
 class Database:
-    COLUMN_NUM: int = 4
+    __COLUMN_NUM: int = 4
 
     def __init__(self, db_path: str):
         log.debug('initializing the page db on path "%s"', db_path)
@@ -130,10 +129,10 @@ class Database:
             r = row.strip()
             log.debug('row %d content: "%s"', i, r)
             l = tuple(r.split())
-            if len(l) != self.COLUMN_NUM:
+            if len(l) != self.__COLUMN_NUM:
                 log.critical('row %d doesn\'t contain %s columns,'
                              ' contains %d elements; row %d content: "%s"',
-                             i, self.COLUMN_NUM, len(l), i, r)
+                             i, self.__COLUMN_NUM, len(l), i, r)
                 sys.exit(1)
 
             t: list[str] = None

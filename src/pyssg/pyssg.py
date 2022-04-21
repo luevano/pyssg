@@ -1,16 +1,9 @@
 import os
 import sys
-import logging
-from logging import Logger
 from importlib.resources import path as rpath
 from typing import Union
 from configparser import ConfigParser
-
-from jinja2 import Environment, FileSystemLoader
-from markdown import Markdown
-from yafg import YafgExtension
-from MarkdownHighlight.highlight import HighlightExtension
-from markdown_checklist.extension import ChecklistExtension
+from logging import Logger, getLogger, DEBUG
 
 from .utils import create_dir, copy_file, sanity_check_path
 from .arg_parser import get_parsed_arguments
@@ -18,7 +11,7 @@ from .configuration import get_parsed_config, DEFAULT_CONFIG_PATH, VERSION
 from .database import Database
 from .builder import Builder
 
-log: Logger = logging.getLogger(__name__)
+log: Logger = getLogger(__name__)
 
 
 def main() -> None:
@@ -28,10 +21,10 @@ def main() -> None:
         # need to modify the root logger specifically,
         #   as it is the one that holds the config
         #   (__name__ happens to resolve to pyssg in __init__)
-        root_logger: Logger = logging.getLogger('pyssg')
-        root_logger.setLevel(logging.DEBUG)
+        root_logger: Logger = getLogger('pyssg')
+        root_logger.setLevel(DEBUG)
         for handler in root_logger.handlers:
-            handler.setLevel(logging.DEBUG)
+            handler.setLevel(DEBUG)
         log.debug('changed logging level to DEBUG')
 
     if not len(sys.argv) > 1 or (len(sys.argv) == 2 and args['debug']):
@@ -86,38 +79,7 @@ def main() -> None:
         db: Database = Database(os.path.join(config.get('path', 'src'), '.files'))
         db.read()
 
-        # the autoescape option could be a security risk if used in a dynamic
-        # website, as far as i can tell
-        log.debug('initializing the jinja environment')
-        env: Environment = Environment(loader=FileSystemLoader(config.get('path', 'plt')),
-                                       autoescape=False,
-                                       trim_blocks=True,
-                                       lstrip_blocks=True)
-
-        # md extensions
-        exts: list = ['extra',
-                      'meta',
-                      'sane_lists',
-                      'smarty',
-                      'toc',
-                      'wikilinks',
-                      # stripTitle generates an error when True,
-                      # if there is no title attr
-                      YafgExtension(stripTitle=False,
-                                    figureClass="",
-                                    figcaptionClass="",
-                                    figureNumbering=False,
-                                    figureNumberClass="number",
-                                    figureNumberText="Figure"),
-                      HighlightExtension(),
-                      ChecklistExtension()]
-        log.debug('list of md extensions: (%s)',
-                  ', '.join([e if isinstance(e, str) else type(e).__name__
-                             for e in exts]))
-        log.debug('initializing markdown parser')
-        md: Markdown = Markdown(extensions=exts,
-                                output_format='html5')
-        builder: Builder = Builder(config, env, db, md)
+        builder: Builder = Builder(config, db)
         builder.build()
 
         db.write()

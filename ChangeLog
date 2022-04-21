@@ -1,6 +1,20 @@
 CHANGES
 =======
 
+v0.6.1
+------
+
+* add meaningful error messages when missing mandatory metadata
+* add logging to builder, md\_parser and page, and minor code refactor
+* minor debug fix for database
+* fix db write bug missing newline, minor refactor
+* fix pyssg and database errors
+* add logging to database, discovery and pyssg
+* add typing to formatter
+* add debug flag, minor fix in readme
+* add initial logging capabilities
+* add build and upload command, modified readme
+
 v0.6.0
 ------
 

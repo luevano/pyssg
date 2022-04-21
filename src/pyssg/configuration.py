@@ -3,10 +3,9 @@ from importlib.metadata import version
 from importlib.resources import path as rpath
 from datetime import datetime, timezone
 from configparser import ConfigParser
-import logging
-from logging import Logger
+from logging import Logger, getLogger
 
-log: Logger = logging.getLogger(__name__)
+log: Logger = getLogger(__name__)
 
 
 DEFAULT_CONFIG_PATH = '$XDG_CONFIG_HOME/pyssg/config.ini'

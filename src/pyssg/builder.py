@@ -1,32 +1,34 @@
 import os
-import shutil
 from copy import deepcopy
 from operator import itemgetter
-from jinja2 import Environment, Template
-from markdown import Markdown
 from configparser import ConfigParser
-import logging
-from logging import Logger
+from logging import Logger, getLogger
 
-from .utils import create_dir, copy_file
+from jinja2 import Environment, Template, FileSystemLoader as FSLoader
+
+from .utils import get_file_list, get_dir_structure, create_dir, copy_file
 from .database import Database
 from .md_parser import MDParser
 from .page import Page
-from .discovery import get_file_list, get_dir_structure
 
-log: Logger = logging.getLogger(__name__)
+log: Logger = getLogger(__name__)
 
 
 class Builder:
     def __init__(self, config: ConfigParser,
-                 env: Environment,
-                 db: Database,
-                 md: Markdown):
+                 db: Database):
         log.debug('initializing site builder')
         self.config: ConfigParser = config
-        self.env: Environment = env
         self.db: Database = db
-        self.md: Markdown = md
+
+        # the autoescape option could be a security risk if used in a dynamic
+        # website, as far as i can tell
+        log.debug('initializing the jinja environment')
+        self.__loader: FSLoader = FSLoader(self.config.get('path', 'plt'))
+        self.env: Environment = Environment(loader=self.__loader,
+                                            autoescape=False,
+                                            trim_blocks=True,
+                                            lstrip_blocks=True)
 
         self.dirs: list[str] = None
         self.md_files: list[str] = None
@@ -55,8 +57,7 @@ class Builder:
 
         parser: MDParser = MDParser(self.md_files,
                                     self.config,
-                                    self.db,
-                                    self.md)
+                                    self.db)
         parser.parse_files()
 
         # just so i don't have to pass these vars to all the functions
