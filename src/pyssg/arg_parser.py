@@ -37,6 +37,9 @@ def get_parsed_arguments() -> Namespace:
     parser.add_argument('--debug',
                         action='store_true',
                         help='''change logging level from info to debug''')
+    parser.add_argument('--add-checksum-to-db',
+                        action='store_true',
+                        help='''add checksum column to db entries''')
     # really not needed, too much bloat and case scenarios to check for,
     #   instead, just read from config file or default config file
     """

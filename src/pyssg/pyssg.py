@@ -56,6 +56,7 @@ def main() -> None:
         sys.exit(1)
 
     config: ConfigParser = get_parsed_config(config_path)
+    config.set('info', 'debug', str(args['debug']))
 
     if args['init']:
         log.info('initializing the directory structure and copying over templates')
@@ -74,8 +75,18 @@ def main() -> None:
                 copy_file(p, plt_file)
         sys.exit(0)
 
+    if args['add_checksum_to_db']:
+        log.info('adding checksum column to existing db')
+        db_path: str = os.path.join(config.get('path', 'src'), '.files')
+        db: Database = Database(db_path, config)
+        # needs to be read_old instead of read
+        db.read_old()
+        db.write()
+
+        sys.exit(0)
+
     if args['build']:
-        log.debug('building the html files')
+        log.info('building the html files')
         db_path: str = os.path.join(config.get('path', 'src'), '.files')
         db: Database = Database(db_path, config)
         db.read()

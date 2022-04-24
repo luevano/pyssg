@@ -4,6 +4,8 @@ Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and 
 
 ## Features and to-do
 
+**Please note that since this is a WIP, there will be changes that will break your site setup (the database management, for example). Read the tag notes for any possible break between the version you're using and the one you're updating to.**
+
 - [x] Build static site parsing `markdown` files ( `*.md` -> `*.html`)
 	- [x] ~~Using plain `*.html` files for templates.~~ Changed to Jinja templates.
 		- [x] Would like to change to something more flexible and easier to manage ([`jinja`](https://jinja.palletsprojects.com/en/3.0.x/), for example).
@@ -23,7 +25,8 @@ Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and 
 - [x] Avoid the program to freak out when there are directories created in advance.
 - [x] Provide more meaningful error messages when you are missing mandatory metadata in your `*.md` files.
 - [ ] More complex directory structure to support multiple subdomains and different types of pages.
-- [ ] Add option/change to using an SQL database instead of the custom solution.
+- [ ] Option/change to using an SQL database instead of the custom solution.
+- [x] Checksum checking because the timestamp of the file is not enough.
 
 ### Markdown features
 
@@ -131,6 +134,7 @@ rss_date=%%a, %%d %%b %%Y %%H:%%M:%%S GMT # fixed
 sitemap_date=%%Y-%%m-%%d # fixed
 [info]
 version= # current 'pyssg' version (0.5.1.dev16, for example)
+debug=True/False # depending if --debug was used when executing
 rss_run_date= # date the program was run, formatted with 'rss_date'
 sitemap_run_date= # date the program was run, formatted with 'sitemap_date'
 ```

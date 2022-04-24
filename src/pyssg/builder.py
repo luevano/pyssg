@@ -83,7 +83,8 @@ class Builder:
         dir_path: str = None
         for d in self.dirs:
             dir_path = os.path.join(self.config.get('path', 'dst'), d)
-            create_dir(dir_path, True)
+            # using silent=True to not print the info create dir msgs for this
+            create_dir(dir_path, True, True)
 
 
     def __copy_html_files(self) -> None:

@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+v0.6.2
+------
+
+* mayor bugfix in the database writer
+* minor refactoring
+
 v0.6.1
 ------
 

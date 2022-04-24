@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+from hashlib import md5
 from logging import Logger, getLogger
 
 log: Logger = getLogger(__name__)
@@ -54,15 +55,15 @@ def get_dir_structure(path: str,
     return [o.replace(path, '')[1:] for o in out]
 
 
-def create_dir(path: str, p: bool=False) -> None:
+def create_dir(path: str, p: bool=False, silent=False) -> None:
     try:
         if p:
             os.makedirs(path)
         else:
             os.mkdir(path)
-        log.info('created directory "%s"', path)
+        if not silent: log.info('created directory "%s"', path)
     except FileExistsError:
-        log.info('directory "%s" already exists, ignoring', path)
+        if not silent: log.info('directory "%s" already exists, ignoring', path)
 
 
 def copy_file(src: str, dst: str) -> None:
@@ -78,3 +79,14 @@ def sanity_check_path(path: str) -> None:
         log.error('"$" character found in path "%s";'
                   ' could be due to non-existant env var.', path)
         sys.exit(1)
+
+
+# as seen in SO: https://stackoverflow.com/a/1131238
+def get_checksum(path: str) -> str:
+    log.debug('calculating md5 checksum for "%s"', path)
+    file_hash = md5()
+    with open(path, "rb") as f:
+        while chunk := f.read(4096):
+            file_hash.update(chunk)
+
+    return file_hash.hexdigest()
