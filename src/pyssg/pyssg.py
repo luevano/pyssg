@@ -5,7 +5,7 @@ from typing import Union
 from configparser import ConfigParser
 from logging import Logger, getLogger, DEBUG
 
-from .utils import create_dir, copy_file, sanity_check_path
+from .utils import create_dir, copy_file, get_expanded_path
 from .arg_parser import get_parsed_arguments
 from .configuration import get_parsed_config, DEFAULT_CONFIG_PATH, VERSION
 from .database import Database
@@ -35,10 +35,8 @@ def main() -> None:
         log.info('pyssg v%s', VERSION)
         sys.exit(0)
 
-    log.debug('checking config file path')
     config_path: str = args['config'] if args['config'] else DEFAULT_CONFIG_PATH
-    config_path = os.path.normpath(os.path.expandvars(config_path))
-    sanity_check_path(config_path)
+    config_path = get_expanded_path(config_path)
     config_dir, _ = os.path.split(config_path)
     log.debug('checked config file path, final config path "%s"', config_path)
 

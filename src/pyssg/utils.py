@@ -74,13 +74,6 @@ def copy_file(src: str, dst: str) -> None:
         log.info('file "%s" already exists, ignoring', dst)
 
 
-def sanity_check_path(path: str) -> None:
-    if '$' in  path:
-        log.error('"$" character found in path "%s";'
-                  ' could be due to non-existant env var.', path)
-        sys.exit(1)
-
-
 # as seen in SO: https://stackoverflow.com/a/1131238
 def get_checksum(path: str) -> str:
     log.debug('calculating md5 checksum for "%s"', path)
@@ -90,3 +83,15 @@ def get_checksum(path: str) -> str:
             file_hash.update(chunk)
 
     return file_hash.hexdigest()
+
+
+def get_expanded_path(path: str) -> None:
+    log.debug('expanding path "%s"', path)
+    expanded_path: str = os.path.normpath(os.path.expandvars(path))
+    if '$' in expanded_path:
+        log.error('"$" character found in expanded path "%s";'
+                  ' could be due to non-existant env var.', expanded_path)
+        sys.exit(1)
+    log.debug('expanded path "%s" to "%s"', path, expanded_path)
+
+    return expanded_path

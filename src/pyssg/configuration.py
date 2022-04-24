@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from configparser import ConfigParser
 from logging import Logger, getLogger
 
+from .utils import get_expanded_path
+
 log: Logger = getLogger(__name__)
 
 
@@ -12,7 +14,15 @@ DEFAULT_CONFIG_PATH = '$XDG_CONFIG_HOME/pyssg/config.ini'
 VERSION = version('pyssg')
 
 
+def __expand_all_paths(config: ConfigParser) -> None:
+    log.debug('expanding all path options')
+    for option in config.options('path'):
+        path: str = config.get('path', option)
+        config.set('path', option, get_expanded_path(path))
+
+
 def __check_well_formed_config(config: ConfigParser) -> None:
+    log.debug('checking that config file is well formed')
     default_config: ConfigParser = ConfigParser()
     with rpath('pyssg.plt', 'default.ini') as p:
         log.debug('reading config file "%s"', p)
@@ -35,8 +45,8 @@ def get_parsed_config(path: str) -> ConfigParser:
     log.debug('reading config file "%s"', path)
     config.read(path)
 
-    log.debug('checking that config file is well formed')
     __check_well_formed_config(config)
+    __expand_all_paths(config)
 
     # set other required options
     log.debug('setting extra config options')
