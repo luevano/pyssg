@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+v0.7.1
+------
+
+* add proper var expansion from config file
+
 v0.7.0
 ------
 

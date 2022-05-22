@@ -31,7 +31,9 @@ def _get_md_obj() -> Markdown:
                                 figureNumberClass="number",
                                 figureNumberText="Figure"),
                   HighlightExtension(),
-                  ChecklistExtension()]
+                  ChecklistExtension(),
+                  'pymdownx.caret',
+                  'pymdownx.tilde']
     log.debug('list of md extensions: (%s)',
               ', '.join([e if isinstance(e, str) else type(e).__name__
                          for e in exts]))

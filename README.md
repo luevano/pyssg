@@ -27,6 +27,7 @@ Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and 
 - [ ] More complex directory structure to support multiple subdomains and different types of pages.
 - [ ] Option/change to using an SQL database instead of the custom solution.
 - [x] Checksum checking because the timestamp of the file is not enough.
+- [ ] Better management of the extensions.
 
 ### Markdown features
 
@@ -41,6 +42,9 @@ This program uses the base [`markdown` syntax](https://daringfireball.net/projec
 - [yafg - Yet Another Figure Generator](https://git.sr.ht/~ferruck/yafg)
 - [markdown.highlight](https://github.com/ribalba/markdown.highlight)
 - [Markdown Checklist](https://github.com/FND/markdown-checklist)
+- [PyMdown Extensions](https://facelessuser.github.io/pymdown-extensions/)
+	- [Caret](https://facelessuser.github.io/pymdown-extensions/extensions/caret/)
+	- [Tilde](https://facelessuser.github.io/pymdown-extensions/extensions/tilde/)
 
 ## Installation
 
