@@ -40,11 +40,11 @@ This program uses the base [`markdown` syntax](https://daringfireball.net/projec
 - Table of Contents.
 - WikiLinks.
 - [yafg - Yet Another Figure Generator](https://git.sr.ht/~ferruck/yafg)
-- [markdown.highlight](https://github.com/ribalba/markdown.highlight)
 - [Markdown Checklist](https://github.com/FND/markdown-checklist)
 - [PyMdown Extensions](https://facelessuser.github.io/pymdown-extensions/)
 	- [Caret](https://facelessuser.github.io/pymdown-extensions/extensions/caret/)
 	- [Tilde](https://facelessuser.github.io/pymdown-extensions/extensions/tilde/)
+	- [Mark](https://facelessuser.github.io/pymdown-extensions/extensions/mark/)
 
 ## Installation
 

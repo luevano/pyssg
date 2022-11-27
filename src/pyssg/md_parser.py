@@ -6,7 +6,6 @@ from logging import Logger, getLogger
 
 from markdown import Markdown
 from yafg import YafgExtension
-from MarkdownHighlight.highlight import HighlightExtension
 from markdown_checklist.extension import ChecklistExtension
 
 from .database import Database
@@ -30,8 +29,8 @@ def _get_md_obj() -> Markdown:
                                 figureNumbering=False,
                                 figureNumberClass="number",
                                 figureNumberText="Figure"),
-                  HighlightExtension(),
                   ChecklistExtension(),
+                  'pymdownx.mark',
                   'pymdownx.caret',
                   'pymdownx.tilde']
     log.debug('list of md extensions: (%s)',

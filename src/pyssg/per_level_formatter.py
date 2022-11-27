@@ -1,6 +1,7 @@
 from logging import Formatter, DEBUG, INFO, WARNING, ERROR, CRITICAL
 
-
+# only reason for this class is to get info formatting as normal text
+#   and everything else with more info and with colors
 class PerLevelFormatter(Formatter):
     # colors for the terminal in ansi
     __YELLOW: str = "\x1b[33m"
