@@ -27,11 +27,11 @@ class Page:
         # data from self.meta
         self.title: str = ''
         self.author: str = ''
-        self.cdatetime: datetime = None
-        self.mdatetime: datetime = None
+        self.cdatetime: datetime
+        self.mdatetime: datetime
         self.summary: str = ''
         self.lang: str = 'en'
-        self.tags: list[tuple[str]] = []
+        self.tags: list[tuple[str, str]] = []
 
         # constructed
         self.url: str = ''
@@ -41,15 +41,16 @@ class Page:
         self.cdate_list_sep: str = ''
         self.cdate_rss: str = ''
         self.cdate_sitemap: str = ''
-        self.mdate: str = None
-        self.mdate_list: str = None
-        self.mdate_list_sep: str = None
+        self.mdate: str
+        self.mdate_list: str
+        self.mdate_list_sep: str
         self.mdate_rss: str = ''
         self.mdate_sitemap: str = ''
 
         # later assigned references to next and previous pages
-        self.next: Page = None
-        self.previous: Page = None
+        #   not always assigned (tail ends), and the None helps check it, ignoring
+        self.next: Page = None  # type: ignore
+        self.previous: Page = None  # type: ignore
 
         # also from self.meta, but for og metadata
         self.og: dict[str, str] = dict()
@@ -70,7 +71,7 @@ class Page:
 
 
     # parses meta from self.meta, for og, it prioritizes,
-    # the actual og meta
+    #   the actual og meta
     def parse_metadata(self):
         log.debug('parsing metadata for file "%s"', self.name)
         self.title = self.__get_mandatory_meta('title')
@@ -132,7 +133,7 @@ class Page:
             og_elements: list[str] = self.meta['og']
             log.debug('parsing og metadata')
             for og_e in og_elements:
-                kv: str = og_e.split(',', 1)
+                kv: list[str] = og_e.split(',', 1)
                 if len(kv) != 2:
                     log.error('invalid og syntax for "%s", needs to be "k, v"', og_e)
                     sys.exit(1)

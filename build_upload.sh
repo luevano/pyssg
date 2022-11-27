@@ -7,7 +7,6 @@ echo "building package"
 python -m build
 
 echo "uploading to pypi"
-# alternatively, use /bin/python -m twine, i use twine in arch
 twine upload dist/*
 
 echo "removing dist/*"

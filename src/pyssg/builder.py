@@ -30,15 +30,15 @@ class Builder:
                                             trim_blocks=True,
                                             lstrip_blocks=True)
 
-        self.dirs: list[str] = None
-        self.md_files: list[str] = None
-        self.html_files: list[str] = None
+        self.dirs: list[str]
+        self.md_files: list[str]
+        self.html_files: list[str]
 
         # files and pages are synoyms
-        self.all_files: list[Page] = None
-        self.updated_files: list[Page] = None
-        self.all_tags: list[str] = None
-        self.common_vars: dict = None
+        self.all_files: list[Page]
+        self.updated_files: list[Page]
+        self.all_tags: list[tuple[str, str]]
+        self.common_vars: dict
 
 
     def build(self) -> None:
@@ -80,7 +80,7 @@ class Builder:
 
     def __create_dir_structure(self) -> None:
         log.debug('creating dir structure')
-        dir_path: str = None
+        dir_path: str
         for d in self.dirs:
             dir_path = os.path.join(self.config.get('path', 'dst'), d)
             # using silent=True to not print the info create dir msgs for this
@@ -92,8 +92,8 @@ class Builder:
             log.debug('copying all html files')
         else:
             log.debug('no html files to copy')
-        src_file: str = None
-        dst_file: str = None
+        src_file: str
+        dst_file: str
 
         for f in self.html_files:
             src_file = os.path.join(self.config.get('path', 'src'), f)
@@ -114,7 +114,7 @@ class Builder:
     def __render_articles(self) -> None:
         log.debug('rendering html')
         article_vars: dict = deepcopy(self.common_vars)
-        temp_files: list[Page] = None
+        temp_files: list[Page]
 
         # check if only updated should be created
         if self.config.getboolean('other', 'force'):
@@ -136,7 +136,7 @@ class Builder:
     def __render_tags(self) -> None:
         log.debug('rendering tags')
         tag_vars: dict = deepcopy(self.common_vars)
-        tag_pages: list[Page] = None
+        tag_pages: list[Page]
         for t in self.all_tags:
             log.debug('rendering tag "%s"', t[0])
             # clean tag_pages

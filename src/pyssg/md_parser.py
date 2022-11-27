@@ -36,7 +36,9 @@ def _get_md_obj() -> Markdown:
     log.debug('list of md extensions: (%s)',
               ', '.join([e if isinstance(e, str) else type(e).__name__
                          for e in exts]))
-    return Markdown(extensions=exts, output_format='html5')
+    # for some reason, the d efinition for output_format doesn't include html5
+    #   even though it is listed in the documentation, ignoring
+    return Markdown(extensions=exts, output_format='html5')  # type: ignore
 
 
 # page and file is basically a synonym here...
@@ -51,21 +53,14 @@ class MDParser:
         self.db: Database = db
         self.md: Markdown = _get_md_obj()
 
-        self.all_files: list[Page] = None
+        self.all_files: list[Page] = []
         # updated and modified are synonyms here
-        self.updated_files: list[Page] = None
-        self.all_tags: list[tuple[str]] = None
+        self.updated_files: list[Page] = []
+        self.all_tags: list[tuple[str, str]] = []
 
 
     def parse_files(self) -> None:
         log.debug('parsing all files')
-        # initialize lists
-        self.all_files = []
-        self.updated_files = []
-        self.all_tags = []
-        # not used, not sure why i had this
-        # all_tag_names: list[str] = []
-
         for f in self.files:
             log.debug('parsing file "%s"', f)
             src_file: str = os.path.join(self.config.get('path', 'src'), f)
@@ -75,11 +70,12 @@ class MDParser:
 
             log.debug('parsing md into html')
             content: str = self.md.reset().convert(open(src_file).read())
+            # ignoring md.Meta type as it is not yet defined (because it is from an extension)
             page: Page = Page(f,
                               self.db.e[f][0],
                               self.db.e[f][1],
                               content,
-                              self.md.Meta,
+                              self.md.Meta,  # type: ignore
                               self.config)
             page.parse_metadata()
 

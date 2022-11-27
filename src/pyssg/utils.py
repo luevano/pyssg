@@ -9,14 +9,14 @@ log: Logger = getLogger(__name__)
 
 def get_file_list(path: str,
                   exts: list[str],
-                  exclude: list[str]=None) -> list[str]:
+                  exclude: list[str]=[]) -> list[str]:
     log.debug('retrieving file list in path "%s" that contain file'
               ' extensions (%s) except (%s)',
               path, ', '.join(exts),
-              ', '.join(exclude if exclude is not None else []))
+              ', '.join(exclude))
     out: list[str] = []
     for root, dirs, files in os.walk(path):
-        if exclude is not None:
+        if exclude != []:
             log.debug('removing excludes from list')
             dirs[:] = [d for d in dirs if d not in exclude]
 
@@ -34,12 +34,12 @@ def get_file_list(path: str,
 
 
 def get_dir_structure(path: str,
-                      exclude: list[str]=None) -> list[str]:
+                      exclude: list[str]=[]) -> list[str]:
     log.debug('retrieving dir structure in path "%s" except (%s)',
-              path, ', '.join(exclude if exclude is not None else []))
+              path, ', '.join(exclude))
     out: list[str] = []
     for root, dirs, files in os.walk(path):
-        if exclude is not None:
+        if exclude != []:
             log.debug('removing excludes from list')
             dirs[:] = [d for d in dirs if d not in exclude]
 
@@ -85,7 +85,7 @@ def get_checksum(path: str) -> str:
     return file_hash.hexdigest()
 
 
-def get_expanded_path(path: str) -> None:
+def get_expanded_path(path: str) -> str:
     log.debug('expanding path "%s"', path)
     expanded_path: str = os.path.normpath(os.path.expandvars(path))
     if '$' in expanded_path:

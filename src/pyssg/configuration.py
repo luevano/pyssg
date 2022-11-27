@@ -10,7 +10,7 @@ from .utils import get_expanded_path
 log: Logger = getLogger(__name__)
 
 
-DEFAULT_CONFIG_PATH = '$XDG_CONFIG_HOME/pyssg/config.ini'
+DEFAULT_CONFIG_PATH: str = '$XDG_CONFIG_HOME/pyssg/config.ini'
 VERSION = version('pyssg')
 
 

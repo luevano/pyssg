@@ -1,4 +1,4 @@
-from logging import Formatter, DEBUG, INFO, WARNING, ERROR, CRITICAL
+from logging import Formatter, LogRecord, DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 # only reason for this class is to get info formatting as normal text
 #   and everything else with more info and with colors
@@ -20,8 +20,10 @@ class PerLevelFormatter(Formatter):
     }
 
 
-    def format(self, record: str) -> str:
-        fmt: str = self.__FORMATS.get(record.levelno)
+    def format(self, record: LogRecord) -> str:
+        # this should never fail, as __FORMATS is defined above,
+        #   so no issue of just converting to str
+        fmt: str = str(self.__FORMATS.get(record.levelno))
         formatter: Formatter = Formatter(
             fmt=fmt, datefmt=self.__DATE_FMT, style='%')
 

@@ -10,7 +10,6 @@ log: Logger = getLogger(__name__)
 
 # db class that works for both html and md files
 class Database:
-    __OLD_COLUMN_NUM: int = 4
     __COLUMN_NUM: int = 5
 
     def __init__(self, db_path: str,
@@ -42,12 +41,12 @@ class Database:
     # returns a bool that indicates if the entry
     # was (includes new entries) or wasn't updated
     def update(self, file_name: str,
-               remove: str=None) -> bool:
+               remove: str='') -> bool:
         log.debug('updating entry for file "%s"', file_name)
         # initial default values
         f: str = file_name
         tags: list[str] = []
-        if remove is not None:
+        if remove != '':
             f = file_name.replace(remove, '')
             log.debug('removed "%s" from "%s": "%s"', remove, file_name, f)
 
@@ -94,8 +93,8 @@ class Database:
         with open(self.db_path, 'w') as file:
             for k, v in self.e.items():
                 log.debug('parsing row for page "%s"', k)
-                t: str = None
-                row: str = None
+                t: str
+                row: str
                 if len(v[3]) == 0:
                     t = '-'
                 else:
@@ -123,50 +122,12 @@ class Database:
 
 
     def _read_raw(self) -> list[str]:
-        rows: list[str] = None
+        rows: list[str]
         with open(self.db_path, 'r') as file:
             rows = file.readlines()
         log.debug('db contains %d rows', len(rows))
 
         return rows
-
-
-    def read_old(self) -> None:
-        log.debug('reading db with old schema (%d columns)', self.__OLD_COLUMN_NUM)
-        if not self._db_path_exists():
-            log.error('db path "%s" desn\'t exist, --add-checksum-to-db should'
-                      'only be used when updating the old db schema', self.db_path)
-            sys.exit(1)
-
-        rows: list[str] = self._read_raw()
-        cols: list[str] = None
-        # l=list of values in entry
-        log.debug('parsing rows from db')
-        for it, row in enumerate(rows):
-            i: int = it + 1
-            r: str = row.strip()
-            log.debug('row %d content: "%s"', i, r)
-            # (file_name, ctimestamp, mtimestamp, [tags])
-            cols: tuple[str, float, float, list[str]] = tuple(r.split())
-            col_num: int = len(cols)
-            if col_num != self.__OLD_COLUMN_NUM:
-                log.critical('row %d doesn\'t contain %s columns, contains %d'
-                             ' columns: "%s"',
-                             i, self.__OLD_COLUMN_NUM, col_num, r)
-                sys.exit(1)
-
-            t: list[str] = None
-            if cols[3] == '-':
-                t = []
-            else:
-                t = cols[3].split(',')
-            log.debug('tag content: (%s)', ', '.join(t))
-            file_path: str = os.path.join(self.config.get('path', 'src'), cols[0])
-            checksum: str = get_checksum(file_path)
-            log.debug('checksum for "%s": "%s"', file_path, checksum)
-
-            self.e[cols[0]] = (float(cols[1]), float(cols[2]), checksum, t)
-
 
 
     def read(self) -> None:
@@ -175,26 +136,16 @@ class Database:
             return
 
         rows: list[str] = self._read_raw()
-        cols: list[str] = None
         # l=list of values in entry
         log.debug('parsing rows from db')
         for it, row in enumerate(rows):
             i: int = it + 1
             r: str = row.strip()
             log.debug('row %d content: "%s"', i, r)
+            # ignoring type error, as i'm doing the check later
             # (file_name, ctimestamp, mtimestamp, checksum, [tags])
-            cols: tuple[str, float, float, str, list[str]] = tuple(r.split())
+            cols: tuple[str, float, float, str, list[str]] = tuple(r.split())  # type: ignore
             col_num: int = len(cols)
-            if col_num == self.__OLD_COLUMN_NUM:
-                log.error('row %d contains %d columns: "%s"; this is probably'
-                          ' because of missing checksum column, which is used'
-                          ' now to also check if a file has changed. Rerun'
-                          ' with flag --add-checksum-to-db to add the checksum'
-                          ' column to the current db; if you did any changes'
-                          ' since last timestamp in db, it won\'t update'
-                          ' modification timestamp',
-                          i, self.__OLD_COLUMN_NUM, r)
-                sys.exit(1)
 
             if col_num != self.__COLUMN_NUM:
                 log.critical('row %d doesn\'t contain %s columns, contains %d'
@@ -202,11 +153,12 @@ class Database:
                              i, self.__COLUMN_NUM, col_num, r)
                 sys.exit(1)
 
-            t: list[str] = None
+            t: list[str]
             if cols[4] == '-':
                 t = []
             else:
-                t = cols[4].split(',')
+                # ignoring type error, the "check" is done in this whole if/else
+                t = cols[4].split(',')  # type: ignore
             log.debug('tag content: (%s)', ', '.join(t))
 
             self.e[cols[0]] = (float(cols[1]), float(cols[2]), cols[3], t)
