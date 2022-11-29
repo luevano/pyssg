@@ -1,9 +1,11 @@
 import os
 import sys
+import csv
 from logging import Logger, getLogger
 from configparser import ConfigParser
 
 from .utils import get_checksum
+from .database_entry import DatabaseEntry
 
 log: Logger = getLogger(__name__)
 
@@ -11,27 +13,28 @@ log: Logger = getLogger(__name__)
 # db class that works for both html and md files
 class Database:
     __COLUMN_NUM: int = 5
+    __COLUMN_DELIMITER: str = '|'
 
     def __init__(self, db_path: str,
                  config: ConfigParser):
         log.debug('initializing the page db on path "%s"', db_path)
         self.db_path: str = db_path
         self.config: ConfigParser = config
-        self.e: dict[str, tuple[float, float, str, list[str]]] = dict()
+        self.e: dict[str, DatabaseEntry] = dict()
 
 
     # updates the tags for a specific entry (file)
-    #   file_name only contains the entry name (without the absolute path)
+    #   file_name only contains the entry name (not an absolute path)
     def update_tags(self, file_name: str,
-                    tags: list[str]) -> None:
+                    new_tags: list[str]) -> None:
         if file_name in self.e:
             log.debug('updating tags for entry "%s"', file_name)
-            cts, mts, checksum, old_tags = self.e[file_name]
-            log.debug('entry "%s" old content: (%s, %s, %s, (%s))',
-                      file_name, cts, mts, checksum, ', '.join(old_tags))
-            self.e[file_name] = (cts, mts, checksum, tags)
-            log.debug('entry "%s" new content: (%s, %s, %s, (%s))',
-                      file_name, cts, mts, checksum, ', '.join(tags))
+            log.debug('entry "%s" old content: %s',
+                      file_name, self.e[file_name])
+
+            self.e[file_name].update_tags(new_tags)
+            log.debug('entry "%s" new content: %s',
+                      file_name, self.e[file_name])
         else:
             log.error('can\'t update tags for entry "%s",'
                       ' as it is not present in db', file_name)
@@ -64,23 +67,22 @@ class Database:
         #1)
         if f not in self.e:
             log.debug('entry "%s" didn\'t exist, adding with defaults', f)
-            self.e[f] = (time, 0.0, checksum, tags)
+            self.e[f] = DatabaseEntry([f, time, 0.0, checksum, tags])
             return True
 
-        old_time, old_mod_time, old_checksum, tags = self.e[f]
-        log.debug('entry "%s" old content: (%s, %s, %s, (%s))',
-                  f, old_time, old_mod_time, old_checksum, ', '.join(tags))
+        # old_e is old entity
+        old_e: DatabaseEntry = self.e[f]
+        log.debug('entry "%s" old content: %s', f, old_e)
 
         # 2)
-        if checksum != old_checksum:
-            if old_mod_time == 0.0:
+        if checksum != old_e.checksum:
+            if old_e.mtimestamp == 0.0:
                 log.debug('entry "%s" has been modified for the first'
                           ' time, updating', f)
             else:
                 log.debug('entry "%s" has been modified, updating', f)
-            self.e[f] = (old_time, time, checksum, tags)
-            log.debug('entry "%s" new content: (%s, %s, %s, (%s))',
-                      f, old_time, time, checksum, ', '.join(tags))
+            self.e[f] = DatabaseEntry([f, old_e.ctimestamp, time, checksum, tags])
+            log.debug('entry "%s" new content: (%s, %s, %s, (%s))', f, self.e[f])
             return True
         # 3)
         else:
@@ -91,19 +93,10 @@ class Database:
     def write(self) -> None:
         log.debug('writing db')
         with open(self.db_path, 'w') as file:
-            for k, v in self.e.items():
-                log.debug('parsing row for page "%s"', k)
-                t: str
-                row: str
-                if len(v[3]) == 0:
-                    t = '-'
-                else:
-                    t = ','.join(v[3])
-
-                row = f'{k} {v[0]} {v[1]} {v[2]} {t}'
-
-                log.debug('writing row: "%s\\n"', row)
-                file.write(f'{row}\n')
+            for _, v in self.e.items():
+                log.debug('writing row: %s', v)
+                csv_writer = csv.writer(file, delimiter=self.__COLUMN_DELIMITER)
+                csv_writer.writerow(v.get_raw_entry())
 
 
     def _db_path_exists(self) -> bool:
@@ -121,10 +114,11 @@ class Database:
         return True
 
 
-    def _read_raw(self) -> list[str]:
-        rows: list[str]
-        with open(self.db_path, 'r') as file:
-            rows = file.readlines()
+    def _get_csv_rows(self) -> list[list[str]]:
+        rows: list[list[str]]
+        with open(self.db_path, 'r') as f:
+            csv_reader = csv.reader(f, delimiter=self.__COLUMN_DELIMITER)
+            rows = list(csv_reader)
         log.debug('db contains %d rows', len(rows))
 
         return rows
@@ -135,30 +129,19 @@ class Database:
         if not self._db_path_exists():
             return
 
-        rows: list[str] = self._read_raw()
+        rows: list[list[str]] = self._get_csv_rows()
         # l=list of values in entry
         log.debug('parsing rows from db')
         for it, row in enumerate(rows):
             i: int = it + 1
-            r: str = row.strip()
-            log.debug('row %d content: "%s"', i, r)
-            # ignoring type error, as i'm doing the check later
-            # (file_name, ctimestamp, mtimestamp, checksum, [tags])
-            cols: tuple[str, float, float, str, list[str]] = tuple(r.split())  # type: ignore
-            col_num: int = len(cols)
+            col_num: int = len(row)
+            log.debug('row %d content: "%s"', i, row)
 
             if col_num != self.__COLUMN_NUM:
                 log.critical('row %d doesn\'t contain %s columns, contains %d'
                              ' columns: "%s"',
-                             i, self.__COLUMN_NUM, col_num, r)
+                             i, self.__COLUMN_NUM, col_num, row)
                 sys.exit(1)
 
-            t: list[str]
-            if cols[4] == '-':
-                t = []
-            else:
-                # ignoring type error, the "check" is done in this whole if/else
-                t = cols[4].split(',')  # type: ignore
-            log.debug('tag content: (%s)', ', '.join(t))
-
-            self.e[cols[0]] = (float(cols[1]), float(cols[2]), cols[3], t)
+            entry: DatabaseEntry = DatabaseEntry(row)
+            self.e[entry.fname] = entry

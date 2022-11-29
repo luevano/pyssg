@@ -72,8 +72,8 @@ class MDParser:
             content: str = self.md.reset().convert(open(src_file).read())
             # ignoring md.Meta type as it is not yet defined (because it is from an extension)
             page: Page = Page(f,
-                              self.db.e[f][0],
-                              self.db.e[f][1],
+                              self.db.e[f].ctimestamp,
+                              self.db.e[f].mtimestamp,
                               content,
                               self.md.Meta,  # type: ignore
                               self.config)

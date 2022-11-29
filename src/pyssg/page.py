@@ -25,27 +25,28 @@ class Page:
         self.config: ConfigParser = config
 
         # data from self.meta
-        self.title: str = ''
-        self.author: str = ''
+        self.title: str
+        self.author: str
+        self.summary: str
+        self.lang: str
         self.cdatetime: datetime
         self.mdatetime: datetime
-        self.summary: str = ''
-        self.lang: str = 'en'
         self.tags: list[tuple[str, str]] = []
 
         # constructed
-        self.url: str = ''
-        self.image_url: str = ''
-        self.cdate: str = ''
-        self.cdate_list: str = ''
-        self.cdate_list_sep: str = ''
-        self.cdate_rss: str = ''
-        self.cdate_sitemap: str = ''
+        self.url: str
+        self.image_url: str
+        self.cdate: str
+        self.cdate_list: str
+        self.cdate_list_sep: str
+        self.cdate_rss: str
+        self.cdate_sitemap: str
+
         self.mdate: str
         self.mdate_list: str
         self.mdate_list_sep: str
-        self.mdate_rss: str = ''
-        self.mdate_sitemap: str = ''
+        self.mdate_rss: str
+        self.mdate_sitemap: str
 
         # later assigned references to next and previous pages
         #   not always assigned (tail ends), and the None helps check it, ignoring
