@@ -2,13 +2,12 @@ import os
 import sys
 from importlib.resources import path as rpath
 from typing import Union
-from configparser import ConfigParser
 from logging import Logger, getLogger, DEBUG
 from argparse import ArgumentParser
 
 from .arg_parser import get_parser
 from .utils import create_dir, copy_file, get_expanded_path
-from .configuration import get_parsed_config, DEFAULT_CONFIG_PATH, VERSION
+from .configuration import get_parsed_config, get_static_config, DEFAULT_CONFIG_PATH, VERSION
 from .database import Database
 from .builder import Builder
 
@@ -60,7 +59,7 @@ def main() -> None:
     if args['copy_default_config']:
         log.info('copying default config file')
         create_dir(config_dir)
-        with rpath('pyssg.plt', 'default.ini') as p:
+        with rpath('pyssg.plt', 'default.yaml') as p:
             copy_file(str(p), config_path)
         sys.exit(0)
 
@@ -70,8 +69,18 @@ def main() -> None:
                   ' first time if you haven\'t already', config_path)
         sys.exit(1)
 
-    config: ConfigParser = get_parsed_config(config_path)
-    config.set('info', 'debug', str(args['debug']))
+    log.debug('reading config files')
+    config_all: list[dict] = get_parsed_config(config_path)
+    static_config: dict = get_static_config()
+
+    # easier to add static into config than changing existing code
+    config: dict = config_all[0]
+    config['fmt']['rss_date'] = static_config['fmt']['rss_date']
+    config['fmt']['sitemap_date'] = static_config['fmt']['sitemap_date']
+    config['info'] = dict()
+    config['info']['version'] = static_config['info']['version']
+    config['info']['debug'] = str(args['debug'])
+    config['info']['force'] = str(args['force'])
 
     if args['init']:
         log.info('initializing the directory structure and copying over templates')
@@ -94,8 +103,9 @@ def main() -> None:
 
     if args['build']:
         log.info('building the html files')
+        # TODO: need to add this to the config and not assume it
         db_path: str = os.path.join(config['path']['src'], '.files')
-        db: Database = Database(db_path, config)
+        db: Database = Database(db_path)
         db.read()
 
         builder: Builder = Builder(config, db)

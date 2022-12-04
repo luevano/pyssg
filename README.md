@@ -1,6 +1,8 @@
 # pyssg - Static Site Generator written in Python
 
-Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and [`rssg`](https://rgz.ee/bin/rssg), Luke Smith's [`lb` and `sup`](https://github.com/LukeSmithxyz/lb) and, pedantic.software's great (but *"mamador"*, as I would say in spanish) [`blogit`](https://pedantic.software/git/blogit/).
+Generates HTML files from MD files for a static site, personally using it for a blog-like site.
+
+Initially inspired by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and [`rssg`](https://rgz.ee/bin/rssg), Luke Smith's [`lb` and `sup`](https://github.com/LukeSmithxyz/lb) and, pedantic.software's [`blogit`](https://pedantic.software/git/blogit/).
 
 ## Features and to-do
 
@@ -19,15 +21,15 @@ Inspired (initially) by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and 
 	- [ ] Include manually added `*.html` files.
 - [x] Only build page if `*.md` is new or updated.
 	- [ ] Extend this to tag pages and index (right now all tags and index is built no matter if no new/updated file is present).
-- [x] Configuration file. ~~as an alternative to using command line flags (configuration file options are prioritized).~~ 
-	- [x] Use [`configparser`](https://docs.python.org/3/library/configparser.html) instead of custom config handler.
-	- [ ] Migrate to YAML instead of INI, as it is way more flexible.
+- [x] Configuration file. ~~as an alternative to using command line flags (configuration file options are prioritized).~~
+	- [x] ~~Use [`configparser`](https://docs.python.org/3/library/configparser.html) instead of custom config handler.~~
+	- [x] Migrate to YAML instead of INI, as it is way more flexible. Uses [`PyYAML`](https://pyyaml.org/).
 - [x] Avoid the program to freak out when there are directories created in advance.
 - [x] Provide more meaningful error messages when you are missing mandatory metadata in your `*.md` files.
 - [ ] More complex directory structure to support multiple subdomains and different types of pages.
 - [ ] Option/change to using an SQL database instead of the custom solution.
 - [x] Checksum checking because the timestamp of the file is not enough.
-- [ ] Better management of the extensions.
+- [ ] Better management of the markdown extensions.
 
 ### Markdown features
 
@@ -64,11 +66,11 @@ Will add a PKBUILD (and possibly submit it to the AUR) sometime later.
 pyssg --copy-default-config -c <path/to/config>
 ```
 
-- Where `-c` is optional as by default `$XDG_CONFIG_HOME/pyssg/config.ini` is used.
+- Where `-c` is optional as by default `$XDG_CONFIG_HOME/pyssg/config.yaml` is used.
 
 2. Edit the config file created as needed.
 
-- `config.ini` is parsed using Python's [`configparser`](https://docs.python.org/3/library/configparser.html), [more about the config file](#config-file).
+- `config.yaml` is parsed using [`PyYAML`](https://pyyaml.org/), [more about the config file](#config-file).
 
 3. Initialize the directory structures (source, destination, template) and move template files:
 
@@ -107,54 +109,61 @@ pyssg -b
 
 ## Config file
 
-All sections/options need to be compliant with the [`configparser`](https://docs.python.org/3/library/configparser.html).
+All sections/options need to be compliant with [`PyYAML`](https://pyyaml.org/) which should be compliant with [`YAML 1.2`](https://yaml.org/spec/1.2.2/). Additionaly, I've added the custom tag `!join` which concatenates strings from an array, which an be used as follows:
 
-At least the sections and options given in the default config should be present:
-
-```ini
-[path]
-src=src # source
-dst=dst # destination
-plt=plt # template
-[url]
-main=https://example.com
-static=https://static.example.com # used for static resources (images, js, css, etc)
-default_image=/images/default.png # this will be appended to 'static' at the end
-[fmt] # % needs to be escaped with another %
-date=%%a, %%b %%d, %%Y @ %%H:%%M %%Z
-list_date=%%b %%d
-list_sep_date=%%B %%Y
-[info]
-title=Example site
-[other]
-force=False
+```yaml
+variable: &variable_reference_name "value"
+other_variable: !join [*variable_reference_name, "other_value", 1]
 ```
 
-Along with these, these extra ones will be added on runtime:
+Which would produce `other_variable: "valueother_value1`. Also environment variables will be expanded internally.
 
-```ini
-[fmt]
-rss_date=%%a, %%d %%b %%Y %%H:%%M:%%S GMT # fixed
-sitemap_date=%%Y-%%m-%%d # fixed
-[info]
-version= # current 'pyssg' version (0.5.1.dev16, for example)
-debug=True/False # depending if --debug was used when executing
-rss_run_date= # date the program was run, formatted with 'rss_date'
-sitemap_run_date= # date the program was run, formatted with 'sitemap_date'
+At least the following config items should be present in the config:
+
+```yaml
+%YAML 1.2
+---
+# not needed, shown here as an example of the !join tag
+define: &root "$HOME/path/to/" # $HOME expands to /home/user, for example
+
+title: "Example site"
+path:
+  src: !join [*root, "src"] # $HOME/path/to/src
+  dst: "$HOME/some/other/path/to/dst"
+  plt: "plt"
+url:
+  main: "https://example.com"
+fmt:
+  date: "%a, %b %d, %Y @ %H:%M %Z"
+  list_date: "%b %d"
+  list_sep_date: "%B %Y"
+...
 ```
 
-You can add any other option/section that you can later use in the Jinja templates via the exposed config object. 
+The following will be added on runtime:
 
-Other requisites are:
+```yaml
+%YAML 1.2
+---
+fmt:
+  rss_date: "%a, %d %b %Y %H:%M:%S GMT" # fixed
+  sitemap_date: "%Y-%m-%d" # fixed
+info:
+  version: "x.y.z" # current 'pyssg' version (0.5.1.dev16, for example)
+  debug: True/False # depending if --debug was used when executing
+  force: True/False # depending if --force was used when executing
+rss_run_date: # date the program was run, formatted with 'fmt.rss_date'
+sitemap_run_date: # date the program was run, formatted with 'fmt.sitemap_date'
+...
+```
 
-- Urls shouldn't have the trailing slash `/`.
-- The only character that needs to be escaped is `%` with another `%`.
+You can add any other option/section that you can later use in the Jinja templates via the exposed config object. URL's shouldn't have the trailing slash `/`
 
 ## Available Jinja variables
 
 These variables are exposed to use within the templates. The below list is in the form of *variable (type) (available from): description*. `section/option` describe config file section and option and `object.attribute` corresponding object and it's attribute.
 
-- `config` (`ConfigParser`) (all): parsed config file plus the added options internally (as described in [config file](#config-file)).
+- `config` (`dict`) (all): parsed config file plus the added options internally (as described in [config file](#config-file)).
 - `all_pages` (`list(Page)`) (all): list of all the pages, sorted by creation time, reversed.
 - `page` (`Page`) (`page.html`): contains the following attributes (genarally these are parsed from the metadata in the `*.md` files):
 	- `title` (`str`): title of the page.

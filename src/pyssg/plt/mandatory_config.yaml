@@ -1,0 +1,14 @@
+%YAML 1.2
+---
+title:
+path:
+  src:
+  dst:
+  plt:
+url:
+  main:
+fmt:
+  date:
+  list_date:
+  list_sep_date:
+...

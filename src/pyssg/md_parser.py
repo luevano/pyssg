@@ -1,7 +1,6 @@
 import os
 from operator import itemgetter
 from markdown import Markdown
-from configparser import ConfigParser
 from logging import Logger, getLogger
 
 from markdown import Markdown
@@ -44,12 +43,12 @@ def _get_md_obj() -> Markdown:
 # page and file is basically a synonym here...
 class MDParser:
     def __init__(self, files: list[str],
-                 config: ConfigParser,
+                 config: dict,
                  db: Database):
         log.debug('initializing the md parser with %d files', len(files))
         self.files: list[str] = files
 
-        self.config: ConfigParser = config
+        self.config: dict = config
         self.db: Database = db
         self.md: Markdown = _get_md_obj()
 

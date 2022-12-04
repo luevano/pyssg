@@ -2,7 +2,6 @@ import os
 import sys
 import csv
 from logging import Logger, getLogger
-from configparser import ConfigParser
 
 from .utils import get_checksum
 from .database_entry import DatabaseEntry
@@ -15,11 +14,9 @@ class Database:
     __COLUMN_NUM: int = 5
     __COLUMN_DELIMITER: str = '|'
 
-    def __init__(self, db_path: str,
-                 config: ConfigParser):
+    def __init__(self, db_path: str) -> None:
         log.debug('initializing the page db on path "%s"', db_path)
         self.db_path: str = db_path
-        self.config: ConfigParser = config
         self.e: dict[str, DatabaseEntry] = dict()
 
 

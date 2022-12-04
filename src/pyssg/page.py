@@ -2,7 +2,6 @@ import os
 import sys
 from datetime import datetime, timezone
 from logging import Logger, getLogger
-from configparser import ConfigParser
 
 log: Logger = getLogger(__name__)
 
@@ -14,7 +13,7 @@ class Page:
                  mtime: float,
                  html: str,
                  meta: dict,
-                 config: ConfigParser):
+                 config: dict):
         log.debug('initializing the page object with name "%s"', name)
         # initial data
         self.name: str = name
@@ -22,7 +21,7 @@ class Page:
         self.mtimestamp: float = mtime
         self.content: str = html
         self.meta: dict = meta
-        self.config: ConfigParser = config
+        self.config: dict = config
 
         # data from self.meta
         self.title: str

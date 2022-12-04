@@ -1,7 +1,6 @@
 import os
 from copy import deepcopy
 from operator import itemgetter
-from configparser import ConfigParser
 from logging import Logger, getLogger
 
 from jinja2 import Environment, Template, FileSystemLoader as FSLoader
@@ -15,10 +14,10 @@ log: Logger = getLogger(__name__)
 
 
 class Builder:
-    def __init__(self, config: ConfigParser,
+    def __init__(self, config: dict,
                  db: Database):
         log.debug('initializing site builder')
-        self.config: ConfigParser = config
+        self.config: dict = config
         self.db: Database = db
 
         # the autoescape option could be a security risk if used in a dynamic
@@ -104,7 +103,8 @@ class Builder:
                 log.debug('file "%s" has been modified or is new, copying', f)
                 copy_file(src_file, dst_file)
             else:
-                if self.config.getboolean('other', 'force'):
+                # TODO: need to check if this holds after yaml update
+                if self.config['info']['force']:
                     log.debug('file "%s" hasn\'t been modified, but option force is set to true, copying anyways', f)
                     copy_file(src_file, dst_file)
                 else:
@@ -117,7 +117,7 @@ class Builder:
         temp_files: list[Page]
 
         # check if only updated should be created
-        if self.config.getboolean('other', 'force'):
+        if self.config['info']['force']:
             log.debug('all html will be rendered, force is set to true')
             temp_files = self.all_files
         else:
