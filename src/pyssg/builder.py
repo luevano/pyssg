@@ -24,7 +24,7 @@ class Builder:
         # the autoescape option could be a security risk if used in a dynamic
         # website, as far as i can tell
         log.debug('initializing the jinja environment')
-        self.__loader: FSLoader = FSLoader(self.config.get('path', 'plt'))
+        self.__loader: FSLoader = FSLoader(self.config['path']['plt'])
         self.env: Environment = Environment(loader=self.__loader,
                                             autoescape=False,
                                             trim_blocks=True,
@@ -43,12 +43,12 @@ class Builder:
 
     def build(self) -> None:
         log.debug('building site')
-        self.dirs = get_dir_structure(self.config.get('path', 'src'),
+        self.dirs = get_dir_structure(self.config['path']['src'],
                                       ['templates'])
-        self.md_files = get_file_list(self.config.get('path', 'src'),
+        self.md_files = get_file_list(self.config['path']['src'],
                                       ['.md'],
                                       ['templates'])
-        self.html_files = get_file_list(self.config.get('path', 'src'),
+        self.html_files = get_file_list(self.config['path']['src'],
                                         ['.html'],
                                         ['templates'])
 
@@ -82,7 +82,7 @@ class Builder:
         log.debug('creating dir structure')
         dir_path: str
         for d in self.dirs:
-            dir_path = os.path.join(self.config.get('path', 'dst'), d)
+            dir_path = os.path.join(self.config['path']['dst'], d)
             # using silent=True to not print the info create dir msgs for this
             create_dir(dir_path, True, True)
 
@@ -96,11 +96,11 @@ class Builder:
         dst_file: str
 
         for f in self.html_files:
-            src_file = os.path.join(self.config.get('path', 'src'), f)
-            dst_file = os.path.join(self.config.get('path', 'dst'), f)
+            src_file = os.path.join(self.config['path']['src'], f)
+            dst_file = os.path.join(self.config['path']['dst'], f)
 
             # only copy files if they have been modified (or are new)
-            if self.db.update(src_file, remove=f'{self.config.get("path", "src")}/'):
+            if self.db.update(src_file, remove=f'{self.config["path"]["src"]}/'):
                 log.debug('file "%s" has been modified or is new, copying', f)
                 copy_file(src_file, dst_file)
             else:
@@ -166,7 +166,7 @@ class Builder:
                   file_name, template_name)
         template: Template = self.env.get_template(template_name)
         content: str = template.render(**template_vars)
-        dst_path: str = os.path.join(self.config.get('path', 'dst'), file_name)
+        dst_path: str = os.path.join(self.config['path']['dst'], file_name)
 
         log.debug('writing html file to path "%s"', dst_path)
         with open(dst_path, 'w') as f:

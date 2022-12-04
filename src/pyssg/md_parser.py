@@ -63,10 +63,10 @@ class MDParser:
         log.debug('parsing all files')
         for f in self.files:
             log.debug('parsing file "%s"', f)
-            src_file: str = os.path.join(self.config.get('path', 'src'), f)
+            src_file: str = os.path.join(self.config['path']['src'], f)
             log.debug('path "%s"', src_file)
             # get flag if update is successful
-            file_updated: bool = self.db.update(src_file, remove=f'{self.config.get("path", "src")}/')
+            file_updated: bool = self.db.update(src_file, remove=f'{self.config["path"]["src"]}/')
 
             log.debug('parsing md into html')
             content: str = self.md.reset().convert(open(src_file).read())

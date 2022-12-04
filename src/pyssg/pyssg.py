@@ -52,6 +52,7 @@ def main() -> None:
         log.debug('changed logging level to DEBUG')
 
     config_path: str = str(args['config']) if args['config'] else DEFAULT_CONFIG_PATH
+    # only needed for the DEFAULT_CONFIG_PATH
     config_path = get_expanded_path(config_path)
     config_dir, _ = os.path.split(config_path)
     log.debug('checked config file path, final config path "%s"', config_path)
@@ -74,9 +75,9 @@ def main() -> None:
 
     if args['init']:
         log.info('initializing the directory structure and copying over templates')
-        create_dir(config.get('path', 'src'))
-        create_dir(os.path.join(config.get('path', 'dst'), 'tag'), True)
-        create_dir(config.get('path', 'plt'))
+        create_dir(config['path']['src'])
+        create_dir(os.path.join(config['path']['dst'], 'tag'), True)
+        create_dir(config['path']['plt'])
         files: list[str] = ['index.html',
                             'page.html',
                             'tag.html',
@@ -84,7 +85,7 @@ def main() -> None:
                             'sitemap.xml']
         log.debug('list of files to copy over: (%s)', ', '.join(files))
         for f in files:
-            plt_file: str = os.path.join(config.get('path', 'plt'), f)
+            plt_file: str = os.path.join(config['path']['plt'], f)
             with rpath('pyssg.plt', f) as p:
                 copy_file(str(p), plt_file)
         log.info('finished initialization')
@@ -93,7 +94,7 @@ def main() -> None:
 
     if args['build']:
         log.info('building the html files')
-        db_path: str = os.path.join(config.get('path', 'src'), '.files')
+        db_path: str = os.path.join(config['path']['src'], '.files')
         db: Database = Database(db_path, config)
         db.read()
 

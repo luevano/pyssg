@@ -67,7 +67,7 @@ class Page:
             return self.meta[meta][0]
         except KeyError:
             log.error('failed to parse mandatory metadata "%s" from file "%s"',
-                      meta, os.path.join(self.config.get('path', 'src'), self.name))
+                      meta, os.path.join(self.config['path']['src'], self.name))
             sys.exit(1)
 
 
@@ -83,23 +83,23 @@ class Page:
         log.debug('parsing timestamp')
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
                                                  tz=timezone.utc)
-        self.cdate = self.cdatetime.strftime(self.config.get('fmt', 'date'))
-        self.cdate_list = self.cdatetime.strftime(self.config.get('fmt', 'list_date'))
-        self.cdate_list_sep = self.cdatetime.strftime(self.config.get('fmt', 'list_sep_date'))
-        self.cdate_rss = self.cdatetime.strftime(self.config.get('fmt', 'rss_date'))
+        self.cdate = self.cdatetime.strftime(self.config['fmt']['date'])
+        self.cdate_list = self.cdatetime.strftime(self.config['fmt']['list_date'])
+        self.cdate_list_sep = self.cdatetime.strftime(self.config['fmt']['list_sep_date'])
+        self.cdate_rss = self.cdatetime.strftime(self.config['fmt']['rss_date'])
         self.cdate_sitemap = \
-        self.cdatetime.strftime(self.config.get('fmt', 'sitemap_date'))
+        self.cdatetime.strftime(self.config['fmt']['sitemap_date'])
 
         if self.mtimestamp != 0.0:
             log.debug('parsing modified timestamp')
             self.mdatetime = datetime.fromtimestamp(self.mtimestamp,
                                                      tz=timezone.utc)
-            self.mdate = self.mdatetime.strftime(self.config.get('fmt', 'date'))
-            self.mdate_list = self.mdatetime.strftime(self.config.get('fmt', 'list_date'))
-            self.mdate_list_sep = self.mdatetime.strftime(self.config.get('fmt', 'list_sep_date'))
-            self.mdate_rss = self.mdatetime.strftime(self.config.get('fmt', 'rss_date'))
+            self.mdate = self.mdatetime.strftime(self.config['fmt']['date'])
+            self.mdate_list = self.mdatetime.strftime(self.config['fmt']['list_date'])
+            self.mdate_list_sep = self.mdatetime.strftime(self.config['fmt']['list_sep_date'])
+            self.mdate_rss = self.mdatetime.strftime(self.config['fmt']['rss_date'])
             self.mdate_sitemap = \
-            self.mdatetime.strftime(self.config.get('fmt', 'sitemap_date'))
+            self.mdatetime.strftime(self.config['fmt']['sitemap_date'])
         else:
             log.debug('not parsing modified timestamp, hasn\'t been modified')
 
@@ -110,22 +110,22 @@ class Page:
 
             for t in tags_only:
                 self.tags.append((t,
-                                  f'{self.config.get("url", "main")}/tag/@{t}.html'))
+                                  f'{self.config["url"]["main"]}/tag/@{t}.html'))
         except KeyError:
             log.debug('not parsing tags, doesn\'t have any')
 
         log.debug('parsing url')
-        self.url = f'{self.config.get("url", "main")}/{self.name.replace(".md", ".html")}'
+        self.url = f'{self.config["url"]["main"]}/{self.name.replace(".md", ".html")}'
         log.debug('final url "%s"', self.url)
 
         log.debug('parsing image url')
         try:
             self.image_url = \
-            f'{self.config.get("url", "static")}/{self.meta["image_url"][0]}'
+            f'{self.config["url"]["static"]}/{self.meta["image_url"][0]}'
         except KeyError:
             log.debug('using default image, no image_url metadata found')
             self.image_url = \
-            f'{self.config.get("url", "static")}/{self.config.get("url", "default_image")}'
+            f'{self.config["url"]["static"]}/{self.config["url"]["default_image"]}'
         log.debug('final image url "%s"', self.image_url)
 
         # if contains open graph elements

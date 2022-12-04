@@ -3,24 +3,24 @@
   xmlns:atom="http://www.w3.org/2005/Atom"
   xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>{{config.get('info', 'title')}}</title>
-    <link>{{config.get('url', 'main')}}</link>
-    <atom:link href="{{config.get('url', 'main')}}/rss.xml" rel="self" type="application/rss+xml"/>
+    <title>{{config['info']['title']}}</title>
+    <link>{{config['url']['main']}}</link>
+    <atom:link href="{{config['url']['main']}}/rss.xml" rel="self" type="application/rss+xml"/>
     <description>Short site description.</description>
     <language>en-us</language>
     <category>Blog</category>
     <copyright>Copyright 2021 Somebody</copyright>
     <managingEditor>some@one.com (Sombody)</managingEditor>
     <webMaster>some@one.com (Sombody)</webMaster>
-    <pubDate>{{config.get('info', 'rss_run_date')}}</pubDate>
-    <lastBuildDate>{{config.get('info', 'rss_run_date')}}</lastBuildDate>
-    <generator>pyssg v{{config.get('info', 'version')}}</generator>
+    <pubDate>{{config['info']['rss_run_date']}}</pubDate>
+    <lastBuildDate>{{config['info']['rss_run_date']}}</lastBuildDate>
+    <generator>pyssg v{{config['info']['version']}}</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <ttl>30</ttl>
     <image>
-      <url>{{config.get('url', 'static')}}/images/blog.png</url>
-      <title>{{config.get('info', 'title')}}</title>
-      <link>{{config.get('url', 'main')}}</link>
+      <url>{{config['url']['static']}}/images/blog.png</url>
+      <title>{{config['info']['title']}}</title>
+      <link>{{config['url']['main']}}</link>
     </image>
     {%for p in all_pages%}
     <item>

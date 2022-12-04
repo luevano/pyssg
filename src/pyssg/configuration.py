@@ -1,4 +1,6 @@
 import sys
+import yaml
+import pprint
 from importlib.metadata import version
 from importlib.resources import path as rpath
 from datetime import datetime, timezone
@@ -10,14 +12,14 @@ from .utils import get_expanded_path
 log: Logger = getLogger(__name__)
 
 
-DEFAULT_CONFIG_PATH: str = '$XDG_CONFIG_HOME/pyssg/config.ini'
+DEFAULT_CONFIG_PATH: str = '$XDG_CONFIG_HOME/pyssg/config.yaml'
 VERSION = version('pyssg')
 
 
 def __expand_all_paths(config: ConfigParser) -> None:
     log.debug('expanding all path options')
     for option in config.options('path'):
-        path: str = config.get('path', option)
+        path: str = config['path'][option]
         config.set('path', option, get_expanded_path(path))
 
 
@@ -54,8 +56,8 @@ def get_parsed_config(path: str) -> ConfigParser:
     config.set('fmt', 'sitemap_date', '%%Y-%%m-%%d')
     config.set('info', 'version', VERSION)
     config.set('info', 'rss_run_date', datetime.now(
-        tz=timezone.utc).strftime(config.get('fmt', 'rss_date')))
+        tz=timezone.utc).strftime(config['fmt']['rss_date']))
     config.set('info', 'sitemap_run_date', datetime.now(
-        tz=timezone.utc).strftime(config.get('fmt', 'sitemap_date')))
+        tz=timezone.utc).strftime(config['fmt']['sitemap_date']))
 
     return config
