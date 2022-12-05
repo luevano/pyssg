@@ -16,7 +16,7 @@ def get_parser() -> ArgumentParser:
                         # default='$XDG_CONFIG_HOME/pyssg/config.ini',
                         type=str,
                         help='''config file (path) to read from; if not passed,
-                        '$XDG_CONFIG_HOME/pyssg/config.ini' is used''')
+                        '$XDG_CONFIG_HOME/pyssg/config.yaml' is used''')
     parser.add_argument('--copy-default-config',
                         action='store_true',
                         help='''copies the default config to path specified in
