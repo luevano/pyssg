@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <base href="{{config['url']['static']}}">
+    <title>Posts filtered by {{tag[0]}} -- {{config['title']}}</title>
+  </head>
+  <body>
+  <h1>Posts filtered by {{tag[0]}}</h1>
+  <p>Some text here.</p>
+
+  <h2>Articles</h2>
+  <ul>
+  {%for p in tag_pages%}
+    {%if loop.previtem%}
+      {%if loop.previtem.cdate_list_sep !=p.cdate_list_sep%}
+        <h3>{{p.cdate_list_sep}}</h3>
+      {%endif%}
+    {%else%}
+        <h3>{{p.cdate_list_sep}}</h3>
+    {%endif%}
+    <li>{{p.cdate_list}} - <a href="{{p.url}}">{{p.title}}</a></li>
+  {%endfor%}
+  </ul>
+  </body>
+</html>

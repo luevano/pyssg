@@ -13,7 +13,8 @@ class Page:
                  mtime: float,
                  html: str,
                  meta: dict,
-                 config: dict):
+                 config: dict,
+                 dir_config: dict) -> None:
         log.debug('initializing the page object with name "%s"', name)
         # initial data
         self.name: str = name
@@ -21,7 +22,9 @@ class Page:
         self.mtimestamp: float = mtime
         self.content: str = html
         self.meta: dict = meta
+        # TODO: need to fix this to use the dir_config stuff
         self.config: dict = config
+        self.dir_config: dict = dir_config
 
         # data from self.meta
         self.title: str
@@ -66,7 +69,7 @@ class Page:
             return self.meta[meta][0]
         except KeyError:
             log.error('failed to parse mandatory metadata "%s" from file "%s"',
-                      meta, os.path.join(self.config['path']['src'], self.name))
+                      meta, os.path.join(self.dir_config['src'], self.name))
             sys.exit(1)
 
 
@@ -108,24 +111,38 @@ class Page:
             tags_only.sort()
 
             for t in tags_only:
-                self.tags.append((t,
-                                  f'{self.config["url"]["main"]}/tag/@{t}.html'))
+                # need to specify dir_config['url'] as it is a hardcoded tag url
+                self.tags.append((t, f'{self.dir_config["url"]}/tag/@{t}.html'))
         except KeyError:
             log.debug('not parsing tags, doesn\'t have any')
 
         log.debug('parsing url')
+        # no need to specify dir_config['url'] as self.name already contains the relative url
         self.url = f'{self.config["url"]["main"]}/{self.name.replace(".md", ".html")}'
         log.debug('final url "%s"', self.url)
 
         log.debug('parsing image url')
-        try:
-            self.image_url = \
-            f'{self.config["url"]["static"]}/{self.meta["image_url"][0]}'
-        except KeyError:
+        image_url: str
+        if 'image_url' in self.meta:
+            image_url = self.meta['image_url'][0]
+        elif 'default_image' in self.config['url']:
             log.debug('using default image, no image_url metadata found')
-            self.image_url = \
-            f'{self.config["url"]["static"]}/{self.config["url"]["default_image"]}'
-        log.debug('final image url "%s"', self.image_url)
+            image_url = self.config['url']['default_image']
+        else:
+            image_url = ''
+
+        if image_url != '':
+            if 'static' in self.config['url']:
+                self.image_url = f'{self.config["url"]["static"]}/{image_url}'
+            else:
+                log.debug('no static url set, using main url, this could cause problems')
+                self.image_url = f'{self.config["url"]["main"]}/{image_url}'
+            log.debug('final image url "%s"', self.image_url)
+        else:
+            self.image_url = ''
+            log.debug('no image url set for the page, could be because no'
+                      ' "image_url" was found in the metadata and/or no '
+                      ' "default_image" set in the config file')
 
         # if contains open graph elements
         try:

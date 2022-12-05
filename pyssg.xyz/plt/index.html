@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <base href="{{config['url']['static']}}">
+    <title>Index -- {{config['title']}}</title>
+  </head>
+  <body>
+  <h1>Index -- {{config['title']}}</h1>
+  <p>Some text here.</p>
+
+  <p>Tags:
+  {%for t in all_tags%}
+    <a href="{{t[1]}}">{{t[0]}}</a>{{", " if not loop.last else ""}}
+  {%endfor%}
+  </p>
+
+  <h2>Articles</h2>
+  <ul>
+  {%for p in all_pages%}
+    {%if loop.previtem%}
+      {%if loop.previtem.cdate_list_sep !=p.cdate_list_sep%}
+        <h3>{{p.cdate_list_sep}}</h3>
+      {%endif%}
+    {%else%}
+        <h3>{{p.cdate_list_sep}}</h3>
+    {%endif%}
+    <li>{{p.cdate_list}} - <a href="{{p.url}}">{{p.title}}</a></li>
+  {%endfor%}
+  </ul>
+  </body>
+</html>

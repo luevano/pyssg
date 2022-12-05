@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="{{page.lang}}">
+  <head>
+    <meta charset="utf-8">
+    <base href="{{config['url']['static']}}">
+    <title>{{page.title}} -- {{config['title']}}</title>
+  </head>
+  <body>
+    <h1>{{page.title}}</h1>
+    <p>By {{page.author}}</p>
+    <p>Created: {{page.cdate}}</p>
+    {%if page.mdate is not none%}
+      <p>Modified: {{page.mdate}}</p>
+    {%endif%}
+
+    {{page.content}}
+
+  <p>Tags: 
+  {%for t in page.tags%}
+    <a href="{{t[1]}}">{{t[0]}}</a>{{", " if not loop.last else ""}}
+  {%endfor%}
+  </p>
+  </body>
+</html>
+

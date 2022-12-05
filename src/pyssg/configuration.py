@@ -43,6 +43,8 @@ def get_parsed_config(path: str) -> list[dict]:
     log.debug('reading config file "%s"', path)
     config: list[dict] = get_parsed_yaml(path)  # type: ignore
 
+    log.info('found %s document(s) for configuration "%s"', len(config), path)
+
     __check_well_formed_config(config[0])
     __expand_all_paths(config[0])
 

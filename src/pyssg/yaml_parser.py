@@ -12,7 +12,6 @@ log: Logger = getLogger(__name__)
 def __join_constructor(loader: SafeLoader, node: SequenceNode) -> str:
     seq = loader.construct_sequence(node)
     return ''.join([str(i) for i in seq])
-log.warning('adding the custom join constructor to yaml.SafeLoader')
 SafeLoader.add_constructor('!join', __join_constructor)
 
 
@@ -38,8 +37,5 @@ def get_parsed_yaml(resource: str, package: str='') -> list[dict]:
         with rpath(package, resource) as p:
             with open(p, 'r') as f:
                 all_yaml_docs = __read_raw_yaml(f)
-
-    log.info('found %s document(s) for configuration "%s"',
-        len(all_yaml_docs), f'{package}.{resource}' if package != '' else resource)
 
     return all_yaml_docs

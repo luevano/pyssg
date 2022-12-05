@@ -85,7 +85,8 @@ def main() -> None:
     if args['init']:
         log.info('initializing the directory structure and copying over templates')
         create_dir(config['path']['src'])
-        create_dir(os.path.join(config['path']['dst'], 'tag'), True)
+        # dst gets created on builder
+        # create_dir(config['path']['dst'])
         create_dir(config['path']['plt'])
         files: list[str] = ['index.html',
                             'page.html',
@@ -103,12 +104,10 @@ def main() -> None:
 
     if args['build']:
         log.info('building the html files')
-        # TODO: need to add this to the config and not assume it
-        db_path: str = os.path.join(config['path']['src'], '.files')
-        db: Database = Database(db_path)
+        db: Database = Database(config['path']['db'])
         db.read()
 
-        builder: Builder = Builder(config, db)
+        builder: Builder = Builder(config, db, "/")
         builder.build()
 
         db.write()

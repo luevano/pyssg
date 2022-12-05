@@ -1,0 +1,30 @@
+%YAML 1.2
+---
+define: &root_path "$HOME/pyssg/pyssg.xyz/"
+
+title: "pyssg"
+path:
+  src: !join [*root_path, "src"]
+  dst: !join [*root_path, "dst"]
+  plt: !join [*root_path, "plt"]
+  db: !join [*root_path, "db.psv"]
+url:
+  main: "https://pyssg.xyz"
+  static: "https://static.pyssg.xyz"
+  default_image: "images/default.png"
+fmt:
+  date: "%a, %b %d, %Y @ %H:%M %Z"
+  list_date: "%b %d"
+  list_sep_date: "%B %Y"
+dirs:
+  /:
+    plt: "page.html"
+    tags: False
+    index: False
+    rss: False
+    sitemap: False
+    exclude_dirs: []
+  articles:
+    plt: "page.html"
+    tags: True
+...

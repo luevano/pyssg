@@ -44,11 +44,13 @@ def _get_md_obj() -> Markdown:
 class MDParser:
     def __init__(self, files: list[str],
                  config: dict,
+                 dir_config: dict,
                  db: Database):
         log.debug('initializing the md parser with %d files', len(files))
         self.files: list[str] = files
 
         self.config: dict = config
+        self.dir_config: dict = dir_config
         self.db: Database = db
         self.md: Markdown = _get_md_obj()
 
@@ -62,10 +64,10 @@ class MDParser:
         log.debug('parsing all files')
         for f in self.files:
             log.debug('parsing file "%s"', f)
-            src_file: str = os.path.join(self.config['path']['src'], f)
+            src_file: str = os.path.join(self.dir_config['src'], f)
             log.debug('path "%s"', src_file)
             # get flag if update is successful
-            file_updated: bool = self.db.update(src_file, remove=f'{self.config["path"]["src"]}/')
+            file_updated: bool = self.db.update(src_file, remove=f'{self.dir_config["src"]}/')
 
             log.debug('parsing md into html')
             content: str = self.md.reset().convert(open(src_file).read())
@@ -75,7 +77,8 @@ class MDParser:
                               self.db.e[f].mtimestamp,
                               content,
                               self.md.Meta,  # type: ignore
-                              self.config)
+                              self.config,
+                              self.dir_config)
             page.parse_metadata()
 
             # keep a separated list for all and updated pages
