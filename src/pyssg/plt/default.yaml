@@ -18,10 +18,11 @@ fmt:
   list_sep_date: "%B %Y"
 dirs:
   /:
-    plt: "page.html"
-    tags: False
-    index: False
-    rss: False
-    sitemap: False
-    exclude_dirs: []
+    cfg:
+      plt: "page.html"
+      tags: False
+      index: False
+      rss: False
+      sitemap: False
+      exclude_dirs: []
 ...

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>pyssg</title>
+    <link>https://pyssg.xyz</link>
+    <atom:link href="https://pyssg.xyz/rss.xml" rel="self" type="application/rss+xml"/>
+    <description>Short site description.</description>
+    <language>en-us</language>
+    <category>Blog</category>
+    <copyright>Copyright 2021 Somebody</copyright>
+    <managingEditor>some@one.com (Sombody)</managingEditor>
+    <webMaster>some@one.com (Sombody)</webMaster>
+    <pubDate></pubDate>
+    <lastBuildDate></lastBuildDate>
+    <generator>pyssg v0.7.3</generator>
+    <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+    <ttl>30</ttl>
+    <image>
+      <url>https://static.pyssg.xyz/images/blog.png</url>
+      <title>pyssg</title>
+      <link>https://pyssg.xyz</link>
+    </image>
+    <item>
+      <title>Test file in subdir</title>
+      <link>https://pyssg.xyz/subdir/test2.html</link>
+      <guid isPermaLink="true">https://pyssg.xyz/subdir/test2.html</guid>
+      <pubDate>Mon, 05 Dec 2022 10:58:41 GMT</pubDate>
+      <description>Second file for testing.</description>
+      <content:encoded><![CDATA[<p>This is a small test for the newly added pyssg.xyz.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title>Index</title>
+      <link>https://pyssg.xyz/test.html</link>
+      <guid isPermaLink="true">https://pyssg.xyz/test.html</guid>
+      <pubDate>Mon, 05 Dec 2022 08:05:10 GMT</pubDate>
+      <description>Index page for pyssg.xyz.</description>
+      <content:encoded><![CDATA[<p>This is a small test for the newly added pyssg.xyz.</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>

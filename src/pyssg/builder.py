@@ -27,29 +27,28 @@ class Builder:
         if self.dir_path not in self.config['dirs']:
             log.error('couldn\'t find "dirs.%s" attribute in config file', self.dir_path)
             sys.exit(1)
-
         if os.path.isabs(self.dir_path) and self.dir_path.strip() != '/':
             log.error('dir path "%s" cannot be absolute, except for the special case "/"', self.dir_path)
             sys.exit(1)
 
-        log.debug('building dir_config and src/dst paths for "%s" dir path', self.dir_path)
-        self.dir_config: dict = deepcopy(self.config['dirs'][self.dir_path])
+        log.debug('building dir_cfg for "%s" dir_path', self.dir_path)
+        self.dir_cfg: dict = deepcopy(self.config['dirs'][self.dir_path]['cfg'])
 
         if self.dir_path.strip() == '/':
-            log.debug('dir path is "/", copying src/dst directly')
-            self.dir_config['src'] = self.config['path']['src']
-            self.dir_config['dst'] = self.config['path']['dst']
-            self.dir_config['url'] = self.config['url']['main']
+            log.debug('dir_path is "/", copying src/dst directly')
+            self.dir_cfg['src'] = self.config['path']['src']
+            self.dir_cfg['dst'] = self.config['path']['dst']
+            self.dir_cfg['url'] = self.config['url']['main']
         else:
-            self.dir_config['src'] = os.path.join(self.config['path']['src'], self.dir_path)
-            self.dir_config['dst'] = os.path.join(self.config['path']['dst'], self.dir_path)
-            self.dir_config['url'] = f"{self.config['url']['main']}/{self.dir_path}"
+            log.debug('dir_path is "%s", generating', self.dir_path)
+            self.dir_cfg['src'] = os.path.join(self.config['path']['src'], self.dir_path)
+            self.dir_cfg['dst'] = os.path.join(self.config['path']['dst'], self.dir_path)
+            self.dir_cfg['url'] = f'{self.config["url"]["main"]}/{self.dir_path}'
 
         # the autoescape option could be a security risk if used in a dynamic
         # website, as far as i can tell
         log.debug('initializing the jinja environment')
-        self.__loader: FSLoader = FSLoader(self.config['path']['plt'])
-        self.env: Environment = Environment(loader=self.__loader,
+        self.env: Environment = Environment(loader=FSLoader(self.config['path']['plt']),
                                             autoescape=False,
                                             trim_blocks=True,
                                             lstrip_blocks=True)
@@ -64,31 +63,31 @@ class Builder:
         self.all_tags: list[tuple[str, str]]
         self.common_vars: dict
 
-
     def build(self) -> None:
         log.debug('building site for dir path "%s"', self.dir_path)
-        if 'exclude_dirs' not in self.dir_config:
-            log.debug('"exclude_dirs" attribute not found in "dirs.%s" in config file', self.dir_path)
-            self.dir_config['exclude_dirs'] = []
-        if not isinstance(self.dir_config['exclude_dirs'], list):
-            log.error('"exclude_dirs" attribute is not of type "list"')
+        if 'exclude_dirs' not in self.dir_cfg:
+            log.debug('"exclude_dirs" field not found in "dirs.%s.cfg"', self.dir_path)
+            self.dir_cfg['exclude_dirs'] = []
+        if not isinstance(self.dir_cfg['exclude_dirs'], list):
+            log.error('"exclude_dirs" field in "dirs.%s.cfg" isn\'t of type "list"', self.dir_path)
             sys.exit(1)
 
-        self.dirs = get_dir_structure(self.dir_config['src'],
-                                      self.dir_config['exclude_dirs'])
-        self.md_files = get_file_list(self.dir_config['src'],
-                                      ['.md'],
-                                      self.dir_config['exclude_dirs'])
-        self.html_files = get_file_list(self.dir_config['src'],
-                                        ['.html'],
-                                        self.dir_config['exclude_dirs'])
+        self.dirs = get_dir_structure(self.dir_cfg['src'],
+                                      self.dir_cfg['exclude_dirs'])
+        self.md_files = get_file_list(self.dir_cfg['src'],
+                                      tuple('.md'),
+                                      self.dir_cfg['exclude_dirs'])
+        self.html_files = get_file_list(self.dir_cfg['src'],
+                                        tuple('.html'),
+                                        self.dir_cfg['exclude_dirs'])
 
         self.__create_dir_structure()
         self.__copy_html_files()
 
+        # TODO: check if need to pass dirs.dir_path.files
         parser: MDParser = MDParser(self.md_files,
                                     self.config,
-                                    self.dir_config,
+                                    self.dir_cfg,
                                     self.db)
         parser.parse_files()
 
@@ -97,88 +96,89 @@ class Builder:
         self.updated_files = parser.updated_files
         self.all_tags = parser.all_tags
 
+        # TODO: check if need to pass dirs.dir_path.files
         # dict for the keyword args to pass to the template renderer
-        log.debug('adding config, all_pages and all_tags to exposed vars for jinja')
+        log.debug('adding exposed vars for jinja')
         self.common_vars = dict(config=self.config,
-                                dir_config=self.dir_config,
+                                dir_config=self.dir_cfg,
                                 all_pages=self.all_files,
                                 all_tags=self.all_tags)
 
-        self.__render_pages(self.dir_config['plt'])
+        self.__render_pages(self.dir_cfg['plt'])
 
-        if 'tags' in self.dir_config and self.dir_config['tags']:
-            log.debug('rendering tags for dir "%s"', self.dir_path)
-            create_dir(os.path.join(self.dir_config['dst'], 'tag'), True, True)
-            self.__render_tags(self.dir_config['tags'])
+        if self.dir_cfg['tags']:
+            log.debug('rendering tags for dir_path "%s"', self.dir_path)
+            create_dir(os.path.join(self.dir_cfg['dst'], 'tag'), True, True)
+            if isinstance(self.dir_cfg['tags'], str):
+                self.__render_tags(self.dir_cfg['tags'])
+            else:
+                self.__render_tags('tag.html')
 
-        opt_renders: dict[str, str] = {'index': 'index.html',
+        default_plts: dict[str, str] = {'index': 'index.html',
                                        'rss': 'rss.xml',
                                        'sitemap': 'sitemap.xml'}
-        for opt in opt_renders.keys():
-            if opt in self.dir_config and self.dir_config[opt]:
-                self.__render_template(self.dir_config[opt],
-                    opt_renders[opt],
-                    **self.common_vars)
-
+        for opt in default_plts.keys():
+            if opt in self.dir_cfg:
+                if isinstance(self.dir_cfg[opt], str):
+                    self.__render_template(self.dir_cfg[opt],
+                                           default_plts[opt],
+                                           **self.common_vars)
+                else:
+                    self.__render_template(default_plts[opt],
+                                           default_plts[opt],
+                                           **self.common_vars)
 
     def __create_dir_structure(self) -> None:
-        log.debug('creating dir structure')
-        create_dir(self.dir_config['dst'], True, True)
-        _dir_path: str
+        log.debug('creating dir structure for dir_path "%s"', self.dir_path)
+        create_dir(self.dir_cfg['dst'], True, True)
         for d in self.dirs:
-            _dir_path = os.path.join(self.dir_config['dst'], d)
-            # using silent=True to not print the info create dir msgs for this
-            create_dir(_dir_path, True, True)
-
+            path: str = os.path.join(self.dir_cfg['dst'], d)
+            create_dir(path, True, True)
 
     def __copy_html_files(self) -> None:
-        if len(self.html_files) > 0:
-            log.debug('copying all html files')
-        else:
+        if not len(self.html_files) > 0:
             log.debug('no html files to copy')
+            return
+
+        log.debug('copying all html files')
         src_file: str
         dst_file: str
-
-        for f in self.html_files:
-            src_file = os.path.join(self.dir_config['src'], f)
-            dst_file = os.path.join(self.dir_config['dst'], f)
-
-            # only copy files if they have been modified (or are new)
-            if self.db.update(src_file, remove=f'{self.dir_config["src"]}/'):
-                log.debug('file "%s" has been modified or is new, copying', f)
+        for file in self.html_files:
+            src_file = os.path.join(self.dir_cfg['src'], file)
+            dst_file = os.path.join(self.dir_cfg['dst'], file)
+            # always copy on force
+            if self.config['info']['force']:
+                log.debug('copying "%s"; forced', file)
                 copy_file(src_file, dst_file)
-            else:
-                if self.config['info']['force']:
-                    log.debug('file "%s" hasn\'t been modified, but option force is set to true, copying anyways', f)
-                    copy_file(src_file, dst_file)
-                else:
-                    log.debug('file "%s" hasn\'t been modified, ignoring', f)
-
+                continue
+            # only copy files if they have been modified (or are new)
+            if self.db.update(src_file, remove=f'{self.dir_cfg["src"]}/'):
+                log.debug('copying "%s"; has been modified or is new', file)
+                copy_file(src_file, dst_file)
+                continue
+            log.debug('ignoring "%s"; hasn\'t been modified, not forced', file)
 
     def __render_pages(self, template_name: str) -> None:
-        log.debug('rendering html')
+        log.debug('rendering pages with template "%s"', template_name)
         page_vars: dict = deepcopy(self.common_vars)
-        temp_files: list[Page]
-
+        temp_pages: list[Page]
         # check if only updated should be created
         if self.config['info']['force']:
             log.debug('all html will be rendered, force is set to true')
-            temp_files = self.all_files
+            temp_pages = self.all_files
         else:
             log.debug('only updated or new html will be rendered')
-            temp_files = self.updated_files
+            temp_pages = self.updated_files
 
-        for p in temp_files:
-            log.debug('adding page to exposed vars for jinja')
+        for p in temp_pages:
+            p_fname: str = p.name.replace('.md', '.html')
+            log.debug('adding page "%s" to exposed vars for jinja', p_fname)
             page_vars['page'] = p
             # actually render article
-            self.__render_template(template_name,
-                                   p.name.replace('.md','.html'),
-                                   **page_vars)
-
+            self.__render_template(template_name, p_fname, **page_vars)
 
     def __render_tags(self, template_name: str) -> None:
-        log.debug('rendering tags')
+        log.debug('rendering tags with template "%s"', template_name)
         tag_vars: dict = deepcopy(self.common_vars)
         tag_pages: list[Page]
         for t in self.all_tags:
@@ -192,16 +192,12 @@ class Builder:
                     log.debug('adding page "%s" as it contains tag "%s"',
                               p.name, t[0])
                     tag_pages.append(p)
-
             log.debug('adding tag and tag_pages to exposed vars for jinja')
             tag_vars['tag'] = t
             tag_vars['tag_pages'] = tag_pages
-
+            t_fname: str = f'tag/@{t[0]}.html'
             # actually render tag page
-            self.__render_template(template_name,
-                                   f'tag/@{t[0]}.html',
-                                   **tag_vars)
-
+            self.__render_template(template_name, t_fname, **tag_vars)
 
     def __render_template(self, template_name: str,
                           file_name: str,
@@ -210,7 +206,7 @@ class Builder:
                   file_name, template_name)
         template: Template = self.env.get_template(template_name)
         content: str = template.render(**template_vars)
-        dst_path: str = os.path.join(self.dir_config['dst'], file_name)
+        dst_path: str = os.path.join(self.dir_cfg['dst'], file_name)
 
         log.debug('writing html file to path "%s"', dst_path)
         with open(dst_path, 'w') as f:

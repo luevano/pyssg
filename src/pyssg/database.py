@@ -19,7 +19,6 @@ class Database:
         self.db_path: str = db_path
         self.e: dict[str, DatabaseEntry] = dict()
 
-
     # updates the tags for a specific entry (file)
     #   file_name only contains the entry name (not an absolute path)
     def update_tags(self, file_name: str,
@@ -36,7 +35,6 @@ class Database:
             log.error('can\'t update tags for entry "%s",'
                       ' as it is not present in db', file_name)
             sys.exit(1)
-
 
     # returns a bool that indicates if the entry
     # was (includes new entries) or wasn't updated
@@ -86,7 +84,6 @@ class Database:
             log.debug('entry "%s" hasn\'t been modified', f)
             return False
 
-
     def write(self) -> None:
         log.debug('writing db')
         with open(self.db_path, 'w') as file:
@@ -94,7 +91,6 @@ class Database:
                 log.debug('writing row: %s', v)
                 csv_writer = csv.writer(file, delimiter=self.__COLUMN_DELIMITER)
                 csv_writer.writerow(v.get_raw_entry())
-
 
     def _db_path_exists(self) -> bool:
         log.debug('checking that "%s" exists or is a file', self.db_path)
@@ -110,7 +106,6 @@ class Database:
 
         return True
 
-
     def _get_csv_rows(self) -> list[list[str]]:
         rows: list[list[str]]
         with open(self.db_path, 'r') as f:
@@ -119,7 +114,6 @@ class Database:
         log.debug('db contains %d rows', len(rows))
 
         return rows
-
 
     def read(self) -> None:
         log.debug('reading db')

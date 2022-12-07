@@ -4,8 +4,8 @@ define: &root_path "$HOME/pyssg/pyssg.xyz/"
 
 title: "pyssg"
 path:
-  src: !join [*root_path, "src"]
-  dst: !join [*root_path, "dst"]
+  src: !join [*root_path, "src/pyssg.xyz"]
+  dst: !join [*root_path, "live/pyssg.xyz"]
   plt: !join [*root_path, "plt"]
   db: !join [*root_path, "db.psv"]
 url:
@@ -18,13 +18,18 @@ fmt:
   list_sep_date: "%B %Y"
 dirs:
   /:
-    plt: "page.html"
-    tags: False
-    index: False
-    rss: False
-    sitemap: False
-    exclude_dirs: []
+    cfg:
+      plt: "page.html"
+      tags: False
+      index: False
+      rss: False
+      sitemap: False
+      exclude_dirs: []
   articles:
-    plt: "page.html"
-    tags: True
+    cfg:
+      plt: "page.html"
+      tags: True
+      index: False
+      rss: False
+      sitemap: False
 ...

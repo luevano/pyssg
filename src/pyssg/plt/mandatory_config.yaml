@@ -14,5 +14,12 @@ fmt:
   list_sep_date:
 dirs:
   /:
-    plt:
+...
+---
+cfg:
+  plt:
+  tags:
+  index:
+  rss:
+  sitemap:
 ...
