@@ -107,8 +107,11 @@ def main() -> None:
         db: Database = Database(config['path']['db'])
         db.read()
 
-        builder: Builder = Builder(config, db, "/")
-        builder.build()
+        log.debug('building all dir_paths found in config')
+        for dir_path in config['dirs'].keys():
+            log.debug('building for "%s"', dir_path)
+            builder: Builder = Builder(config, db, dir_path)
+            builder.build()
 
         db.write()
         log.info('finished building the html files')

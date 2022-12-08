@@ -12,29 +12,26 @@ class DatabaseEntry:
         self.ctimestamp: float = float(entry[1])
         self.mtimestamp: float = float(entry[2])
         self.checksum: str = entry[3]
-        self.tags: list[str]
+        self.tags: list[str] = []
 
         if isinstance(entry[4], list):
             self.tags = entry[4]
         else:
-            if entry[4] == '-':
-                self.tags = []
-            else:
+            if entry[4] != '-':
                 self.tags = entry[4].split(',')
 
-        log.debug('tag content: [%s]', ', '.join(self.tags))
-
+        log.debug('"%s" tag: [%s]', self.fname, ', '.join(self.tags))
 
     def __str__(self) -> str:
         _return_str: str = '[{}, {}, {}, {}, [{}]]'\
-                .format(self.fname,
-                        self.ctimestamp,
-                        self.mtimestamp,
-                        self.checksum,
-                        ', '.join(self.tags))
+            .format(self.fname,
+                    self.ctimestamp,
+                    self.mtimestamp,
+                    self.checksum,
+                    ', '.join(self.tags))
         return _return_str
 
-
+    # used for csv writing
     def get_raw_entry(self) -> list[str]:
         return [self.fname,
                 str(self.ctimestamp),
@@ -42,6 +39,6 @@ class DatabaseEntry:
                 self.checksum,
                 ','.join(self.tags) if self.tags else '-']
 
-
+    # TODO: make the function return true/false if updated
     def update_tags(self, new_tags: list[str]) -> None:
         self.tags = new_tags

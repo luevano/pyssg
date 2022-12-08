@@ -58,10 +58,8 @@ class Page:
         # also from self.meta, but for og metadata
         self.og: dict[str, str] = dict()
 
-
     def __lt__(self, other):
         return self.ctimestamp < other.ctimestamp
-
 
     def __get_mandatory_meta(self, meta: str) -> str:
         try:
@@ -71,7 +69,6 @@ class Page:
             log.error('failed to parse mandatory metadata "%s" from file "%s"',
                       meta, os.path.join(self.dir_config['src'], self.name))
             sys.exit(1)
-
 
     # parses meta from self.meta, for og, it prioritizes,
     #   the actual og meta
@@ -85,23 +82,24 @@ class Page:
         log.debug('parsing timestamp')
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
                                                  tz=timezone.utc)
-        self.cdate = self.cdatetime.strftime(self.config['fmt']['date'])
-        self.cdate_list = self.cdatetime.strftime(self.config['fmt']['list_date'])
-        self.cdate_list_sep = self.cdatetime.strftime(self.config['fmt']['list_sep_date'])
-        self.cdate_rss = self.cdatetime.strftime(self.config['fmt']['rss_date'])
-        self.cdate_sitemap = \
-        self.cdatetime.strftime(self.config['fmt']['sitemap_date'])
+        # these could be actual function
+        cdate = lambda x : self.cdatetime.strftime(self.config['fmt'][x])
+        mdate = lambda x : self.mdatetime.strftime(self.config['fmt'][x])
+
+        self.cdate = cdate('date')
+        self.cdate_list = cdate('list_date')
+        self.cdate_list_sep = cdate('list_sep_date')
+        self.cdate_rss = cdate('rss_date')
+        self.cdate_sitemap = cdate('sitemap_date')
 
         if self.mtimestamp != 0.0:
             log.debug('parsing modified timestamp')
-            self.mdatetime = datetime.fromtimestamp(self.mtimestamp,
-                                                     tz=timezone.utc)
-            self.mdate = self.mdatetime.strftime(self.config['fmt']['date'])
-            self.mdate_list = self.mdatetime.strftime(self.config['fmt']['list_date'])
-            self.mdate_list_sep = self.mdatetime.strftime(self.config['fmt']['list_sep_date'])
-            self.mdate_rss = self.mdatetime.strftime(self.config['fmt']['rss_date'])
-            self.mdate_sitemap = \
-            self.mdatetime.strftime(self.config['fmt']['sitemap_date'])
+            self.mdatetime = datetime.fromtimestamp(self.mtimestamp, tz=timezone.utc)
+            self.mdate = mdate('date')
+            self.mdate_list = mdate('list_date')
+            self.mdate_list_sep = mdate('list_sep_date')
+            self.mdate_rss = mdate('rss_date')
+            self.mdate_sitemap = mdate('sitemap_date')
         else:
             log.debug('not parsing modified timestamp, hasn\'t been modified')
 
@@ -145,6 +143,7 @@ class Page:
                       ' "default_image" set in the config file')
 
         # if contains open graph elements
+        # TODO: better handle thsi part
         try:
             # og_e = object graph entry
             og_elements: list[str] = self.meta['og']

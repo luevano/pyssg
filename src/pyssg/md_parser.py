@@ -35,12 +35,12 @@ def _get_md_obj() -> Markdown:
     log.debug('list of md extensions: (%s)',
               ', '.join([e if isinstance(e, str) else type(e).__name__
                          for e in exts]))
-    # for some reason, the d efinition for output_format doesn't include html5
+    # for some reason, the definition for output_format doesn't include html5
     #   even though it is listed in the documentation, ignoring
     return Markdown(extensions=exts, output_format='html5')  # type: ignore
 
 
-# page and file is basically a synonym here...
+# page and file is basically a synonym
 class MDParser:
     def __init__(self, files: list[str],
                  config: dict,
@@ -48,17 +48,16 @@ class MDParser:
                  db: Database):
         log.debug('initializing the md parser with %d files', len(files))
         self.files: list[str] = files
-
         self.config: dict = config
         self.dir_config: dict = dir_config
         self.db: Database = db
         self.md: Markdown = _get_md_obj()
 
+        # TODO: include updated_tags when when implemented
         self.all_files: list[Page] = []
         # updated and modified are synonyms here
         self.updated_files: list[Page] = []
         self.all_tags: list[tuple[str, str]] = []
-
 
     def parse_files(self) -> None:
         log.debug('parsing all files')
@@ -67,6 +66,7 @@ class MDParser:
             src_file: str = os.path.join(self.dir_config['src'], f)
             log.debug('path "%s"', src_file)
             # get flag if update is successful
+            # update is only used to get a separate list of only updated files
             file_updated: bool = self.db.update(src_file, remove=f'{self.dir_config["src"]}/')
 
             log.debug('parsing md into html')
@@ -89,6 +89,8 @@ class MDParser:
             self.all_files.append(page)
 
             # parse tags
+            # TODO: only parse tags if set in config
+            # TODO: separate all tags and only updated tags
             if page.tags is not None:
                 log.debug('parsing tags')
                 # add its tag to corresponding db entry if existent
@@ -97,10 +99,10 @@ class MDParser:
                 log.debug('add all tags to tag list')
                 for t in page.tags:
                     if t[0] not in list(map(itemgetter(0), self.all_tags)):
-                        log.debug('adding tag "%s" as it\'s not present in tag list', t[0])
+                        log.debug('adding tag "%s"', t[0])
                         self.all_tags.append(t)
                     else:
-                        log.debug('ignoring tag "%s" as it\'s present in tag list', t[0])
+                        log.debug('ignoring tag "%s"; already present', t[0])
             else:
                 log.debug('no tags to parse')
 

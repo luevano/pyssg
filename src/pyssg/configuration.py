@@ -22,21 +22,18 @@ def __check_well_formed_config(config: dict,
             log.error('config doesn\'t have "%s"', current_key)
             log.debug('key: %s; config.keys: %s', key, config.keys())
             sys.exit(1)
-
         # checks for dir_paths
         if key == 'dirs':
             if '/' not in config[key]:
                 log.error('config doesn\'t have "%s./"', current_key)
                 log.debug('key: %s; config.keys: %s', key, config[key].keys())
                 sys.exit(1)
-
             log.debug('checking "%s" fields for (%s) dir_paths', key, ', '.join(config[key].keys()))
             for dkey in config[key].keys():
                 new_current_key: str = f'{current_key}.{dkey}'
                 new_config_base: list[dict] = [config_base[1], config_base[1]]
                 __check_well_formed_config(config[key][dkey], new_config_base, new_current_key)
             continue
-
         # the case for elements that don't have nested elements
         if not config_base[0][key]:
             log.debug('"%s" doesn\'t need nested elements', current_key)
@@ -56,15 +53,11 @@ def get_parsed_config(path: str) -> list[dict]:
     log.debug('reading config file "%s"', path)
     config: list[dict] = get_parsed_yaml(path)
     mandatory_config: list[dict] = get_parsed_yaml('mandatory_config.yaml', 'pyssg.plt')
-
     log.info('found %s document(s) for configuration "%s"', len(config), path)
     log.debug('checking that config file is well formed (at least contains mandatory fields')
     # TODO: make it work with n yaml docs
     __check_well_formed_config(config[0], mandatory_config)
-    log.error('testing')
-    sys.exit(1)
     __expand_all_paths(config[0])
-
     return config
 
 
@@ -74,10 +67,8 @@ def get_static_config() -> dict[str, dict]:
     log.debug('reading and setting static config')
     config: dict = get_parsed_yaml('static_config.yaml', 'pyssg.plt')[0]
     # do I really need a lambda function...
-    current_time = lambda x : datetime.now(tz=timezone.utc).strftime(x)
-
+    time = lambda x : datetime.now(tz=timezone.utc).strftime(config['fmt'][x])
     config['info']['version'] = VERSION
-    config['info']['rss_run_date'] = current_time(config['fmt']['rss_date'])
-    config['info']['sitemap_run_date'] = current_time(config['fmt']['sitemap_date'])
-
+    config['info']['rss_run_date'] = time('rss_date')
+    config['info']['sitemap_run_date'] = time('sitemap_date')
     return config

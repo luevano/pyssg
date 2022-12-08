@@ -58,6 +58,7 @@ class Builder:
         self.html_files: list[str]
 
         # files and pages are synoyms
+        # TODO: include updated_tags when when implemented
         self.all_files: list[Page]
         self.updated_files: list[Page]
         self.all_tags: list[tuple[str, str]]
@@ -115,10 +116,10 @@ class Builder:
                 self.__render_tags('tag.html')
 
         default_plts: dict[str, str] = {'index': 'index.html',
-                                       'rss': 'rss.xml',
-                                       'sitemap': 'sitemap.xml'}
+                                        'rss': 'rss.xml',
+                                        'sitemap': 'sitemap.xml'}
         for opt in default_plts.keys():
-            if opt in self.dir_cfg:
+            if self.dir_cfg[opt]:
                 if isinstance(self.dir_cfg[opt], str):
                     self.__render_template(self.dir_cfg[opt],
                                            default_plts[opt],

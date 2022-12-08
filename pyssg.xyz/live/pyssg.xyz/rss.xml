@@ -36,7 +36,14 @@
       <guid isPermaLink="true">https://pyssg.xyz/test.html</guid>
       <pubDate>Mon, 05 Dec 2022 08:05:10 GMT</pubDate>
       <description>Index page for pyssg.xyz.</description>
-      <content:encoded><![CDATA[<p>This is a small test for the newly added pyssg.xyz.</p>]]></content:encoded>
+      <content:encoded><![CDATA[<p>This is a small test for the newly added pyssg.xyz.</p>
+<ul>
+<li>item 1</li>
+<li>item 2</li>
+</ul>
+<h2 id="subheader-1">subheader 1</h2>
+<p><strong>bold</strong></p>
+<p><em>italic</em></p>]]></content:encoded>
     </item>
   </channel>
 </rss>

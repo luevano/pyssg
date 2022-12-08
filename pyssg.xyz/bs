@@ -5,6 +5,5 @@ PYSSG_XYZ_DIR=$HOME/pyssg/pyssg.xyz
 
 pyssg --config $PYSSG_XYZ_DIR/config.yaml -b --debug
 
-exit 0
 echo "rsync: pushing (U) local (pyssg.xyz) to webserver (luevano.xyz). (pyssg.xyz)"
 rsync -rtuvPL --delete-after --exclude-from=$PYSSG_XYZ_DIR/.rsyncignore $PYSSG_XYZ_DIR/live/ luevanor:/var/www/pyssg.xyz/

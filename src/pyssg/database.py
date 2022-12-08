@@ -21,8 +21,10 @@ class Database:
 
     # updates the tags for a specific entry (file)
     #   file_name only contains the entry name (not an absolute path)
+    # TODO: make the function return true/false if updated
     def update_tags(self, file_name: str,
                     new_tags: list[str]) -> None:
+        # technically, I should ensure this function can only run if self.e is populated
         if file_name in self.e:
             log.debug('updating tags for entry "%s"', file_name)
             log.debug('entry "%s" old content: %s',
@@ -103,7 +105,6 @@ class Database:
         if not os.path.isfile(self.db_path):
             log.error('"%s" is not a file"', self.db_path)
             sys.exit(1)
-
         return True
 
     def _get_csv_rows(self) -> list[list[str]]:
@@ -112,7 +113,6 @@ class Database:
             csv_reader = csv.reader(f, delimiter=self.__COLUMN_DELIMITER)
             rows = list(csv_reader)
         log.debug('db contains %d rows', len(rows))
-
         return rows
 
     def read(self) -> None:
@@ -127,12 +127,10 @@ class Database:
             i: int = it + 1
             col_num: int = len(row)
             log.debug('row %d content: "%s"', i, row)
-
             if col_num != self.__COLUMN_NUM:
                 log.critical('row %d doesn\'t contain %s columns, contains %d'
                              ' columns: "%s"',
                              i, self.__COLUMN_NUM, col_num, row)
                 sys.exit(1)
-
             entry: DatabaseEntry = DatabaseEntry(row)
             self.e[entry.fname] = entry
