@@ -143,7 +143,7 @@ class Page:
                       ' "default_image" set in the config file')
 
         # if contains open graph elements
-        # TODO: better handle thsi part
+        # TODO: better handle this part
         try:
             # og_e = object graph entry
             og_elements: list[str] = self.meta['og']

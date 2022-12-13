@@ -80,7 +80,6 @@ def main() -> None:
     config['info'] = dict()
     config['info']['version'] = static_config['info']['version']
     config['info']['debug'] = str(args['debug'])
-    config['info']['force'] = str(args['force'])
 
     if args['init']:
         log.info('initializing the directory structure and copying over templates')

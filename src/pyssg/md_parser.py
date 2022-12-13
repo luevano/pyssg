@@ -53,21 +53,16 @@ class MDParser:
         self.db: Database = db
         self.md: Markdown = _get_md_obj()
 
-        # TODO: include updated_tags when when implemented
         self.all_files: list[Page] = []
-        # updated and modified are synonyms here
-        self.updated_files: list[Page] = []
         self.all_tags: list[tuple[str, str]] = []
 
     def parse_files(self) -> None:
         log.debug('parsing all files')
-        for f in self.files:
+        for i, f in enumerate(self.files):
             log.debug('parsing file "%s"', f)
             src_file: str = os.path.join(self.dir_config['src'], f)
             log.debug('path "%s"', src_file)
-            # get flag if update is successful
-            # update is only used to get a separate list of only updated files
-            file_updated: bool = self.db.update(src_file, remove=f'{self.dir_config["src"]}/')
+            self.db.update(src_file, remove=f'{self.dir_config["src"]}/')
 
             log.debug('parsing md into html')
             content: str = self.md.reset().convert(open(src_file).read())
@@ -81,19 +76,11 @@ class MDParser:
                               self.dir_config)
             page.parse_metadata()
 
-            # keep a separated list for all and updated pages
-            if file_updated:
-                log.debug('has been modified, adding to mod file list')
-                self.updated_files.append(page)
             log.debug('adding to file list')
             self.all_files.append(page)
 
-            # parse tags
-            # TODO: only parse tags if set in config
-            # TODO: separate all tags and only updated tags
-            if page.tags is not None:
-                log.debug('parsing tags')
-                # add its tag to corresponding db entry if existent
+            if self.dir_config['tags'] and page.tags is not None:
+                log.debug('parsing tags for "%s"', f)
                 self.db.update_tags(f, list(map(itemgetter(0), page.tags)))
 
                 log.debug('add all tags to tag list')
@@ -107,9 +94,8 @@ class MDParser:
                 log.debug('no tags to parse')
 
         log.debug('sorting all lists for consistency')
-        self.all_tags.sort(key=itemgetter(0))
-        self.updated_files.sort(reverse=True)
         self.all_files.sort(reverse=True)
+        self.all_tags.sort(key=itemgetter(0))
 
         pages_amount: int = len(self.all_files)
         # note that prev and next are switched because of the

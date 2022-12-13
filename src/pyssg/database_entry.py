@@ -20,15 +20,15 @@ class DatabaseEntry:
             if entry[4] != '-':
                 self.tags = entry[4].split(',')
 
-        log.debug('"%s" tag: [%s]', self.fname, ', '.join(self.tags))
+        log.debug('"%s" tags: %s', self.fname, self.tags)
 
     def __str__(self) -> str:
-        _return_str: str = '[{}, {}, {}, {}, [{}]]'\
+        _return_str: str = '[{}, {}, {}, {}, {}]'\
             .format(self.fname,
                     self.ctimestamp,
                     self.mtimestamp,
                     self.checksum,
-                    ', '.join(self.tags))
+                    self.tags)
         return _return_str
 
     # used for csv writing
@@ -39,6 +39,5 @@ class DatabaseEntry:
                 self.checksum,
                 ','.join(self.tags) if self.tags else '-']
 
-    # TODO: make the function return true/false if updated
     def update_tags(self, new_tags: list[str]) -> None:
         self.tags = new_tags

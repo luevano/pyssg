@@ -30,10 +30,6 @@ def get_parser() -> ArgumentParser:
                         help='''generates all HTML files by parsing MD files
                         present in source directory and copies over manually
                         written HTML files''')
-    parser.add_argument('-f', '--force',
-                        action='store_true',
-                        help='''force building all pages and not only the
-                        updated ones''')
     parser.add_argument('--debug',
                         action='store_true',
                         help='''change logging level from info to debug''')

@@ -58,9 +58,7 @@ class Builder:
         self.html_files: list[str]
 
         # files and pages are synoyms
-        # TODO: include updated_tags when when implemented
         self.all_files: list[Page]
-        self.updated_files: list[Page]
         self.all_tags: list[tuple[str, str]]
         self.common_vars: dict
 
@@ -94,7 +92,6 @@ class Builder:
 
         # just so i don't have to pass these vars to all the functions
         self.all_files = parser.all_files
-        self.updated_files = parser.updated_files
         self.all_tags = parser.all_tags
 
         # TODO: check if need to pass dirs.dir_path.files
@@ -147,31 +144,14 @@ class Builder:
         for file in self.html_files:
             src_file = os.path.join(self.dir_cfg['src'], file)
             dst_file = os.path.join(self.dir_cfg['dst'], file)
-            # always copy on force
-            if self.config['info']['force']:
-                log.debug('copying "%s"; forced', file)
-                copy_file(src_file, dst_file)
-                continue
-            # only copy files if they have been modified (or are new)
-            if self.db.update(src_file, remove=f'{self.dir_cfg["src"]}/'):
-                log.debug('copying "%s"; has been modified or is new', file)
-                copy_file(src_file, dst_file)
-                continue
-            log.debug('ignoring "%s"; hasn\'t been modified, not forced', file)
+            log.debug('copying "%s"', file)
+            copy_file(src_file, dst_file)
 
     def __render_pages(self, template_name: str) -> None:
         log.debug('rendering pages with template "%s"', template_name)
         page_vars: dict = deepcopy(self.common_vars)
-        temp_pages: list[Page]
-        # check if only updated should be created
-        if self.config['info']['force']:
-            log.debug('all html will be rendered, force is set to true')
-            temp_pages = self.all_files
-        else:
-            log.debug('only updated or new html will be rendered')
-            temp_pages = self.updated_files
 
-        for p in temp_pages:
+        for p in self.all_files:
             p_fname: str = p.name.replace('.md', '.html')
             log.debug('adding page "%s" to exposed vars for jinja', p_fname)
             page_vars['page'] = p
