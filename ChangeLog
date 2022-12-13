@@ -1,6 +1,21 @@
 CHANGES
 =======
 
+v0.8.0
+------
+
+* refactor code and update readme
+* remove force feature, unnecessary complexity
+* refactor code, small bug fixing and changes
+* refactor code, fix config checker and new files for pyssg.xyz
+* add extra configuration for more control, add pyssg.xyz example
+* forgot to change extension on argparser help text
+* migrate from INI to YAML, breaks compatibility
+* change syntax for accessing config variable
+* refactor database entries into its own class
+* refactor code and fix type checks
+* change python/twine command for the build command
+
 v0.7.3
 ------
 
