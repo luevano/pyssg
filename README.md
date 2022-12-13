@@ -6,30 +6,26 @@ Initially inspired by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and [`
 
 ## Features and to-do
 
-**Please note that since this is a WIP, there will be changes that will break your site setup (the database management, for example). Read the tag notes for any possible break between the version you're using and the one you're updating to.**
+**NOTE:** WIP, there will be changes that will break the setup.
 
 - [x] Build static site parsing `markdown` files ( `*.md` -> `*.html`)
-	- [x] ~~Using plain `*.html` files for templates.~~ Changed to Jinja templates.
-		- [x] Would like to change to something more flexible and easier to manage ([`jinja`](https://jinja.palletsprojects.com/en/3.0.x/), for example).
+	- [x] Uses [`jinja`](https://jinja.palletsprojects.com/en/3.0.x/) for templating.
 	- [x] Preserves hand-made `*.html` files.
-	- [x] Tag functionality.
-	- [ ] Open Graph (and similar) support. (Technically, this works if you add the correct metadata to the `*.md` files and use the variables available for Jinja)
+	- [x] Tag functionality, useful for blog-style sites.
+	- [ ] Open Graph (and similar) support.
+		- Technically, this works if you add the correct metadata to the `*.md` files and use the variables available for Jinja.
 - [x] Build `sitemap.xml` file.
 	- [ ] Include manually added `*.html` files.
 - [x] Build `rss.xml` file.
-	- [ ] Join the `static_url` to all relative URLs found to comply with the [RSS 2.0 spec](https://validator.w3.org/feed/docs/rss2.html) (this would be added to the parsed HTML text extracted from the MD files, so it would be available to the created `*.html` and `*.xml` files). Note that depending on the reader, it will append the URL specified in the RSS file or use the [`xml:base`](https://www.rssboard.org/news/151/relative-links) specified ([newsboat](https://newsboat.org/) parses `xml:base`).
+	- [ ] Join the `static_url` to all relative URLs found to comply with the [RSS 2.0 spec](https://validator.w3.org/feed/docs/rss2.html).
+		- This would be added to the parsed HTML text extracted from the MD files, so it would be available to the created `*.html` and `*.xml` files. Note that depending on the reader, it will append the URL specified in the RSS file or use the [`xml:base`](https://www.rssboard.org/news/151/relative-links) specified (for example, [newsboat](https://newsboat.org/) parses `xml:base`).
 	- [ ] Include manually added `*.html` files.
-- [x] Only build page if `*.md` is new or updated.
-	- [ ] Extend this to tag pages and index (right now all tags and index is built no matter if no new/updated file is present).
-- [x] Configuration file. ~~as an alternative to using command line flags (configuration file options are prioritized).~~
-	- [x] ~~Use [`configparser`](https://docs.python.org/3/library/configparser.html) instead of custom config handler.~~
-	- [x] Migrate to YAML instead of INI, as it is way more flexible. Uses [`PyYAML`](https://pyyaml.org/).
-- [x] Avoid the program to freak out when there are directories created in advance.
-- [x] Provide more meaningful error messages when you are missing mandatory metadata in your `*.md` files.
-- [ ] More complex directory structure to support multiple subdomains and different types of pages.
+- [x] YAML for configuration file, uses [`PyYAML`](https://pyyaml.org/).
+	- [ ] Handle multiple "documents".
+	- [ ] More complex directory structure to support multiple subdomains and different types of pages.
 - [ ] Option/change to using an SQL database instead of the custom solution.
 - [x] Checksum checking because the timestamp of the file is not enough.
-- [ ] Better management of the markdown extensions.
+- [ ] Use external markdown extensions.
 
 ### Markdown features
 
@@ -50,13 +46,13 @@ This program uses the base [`markdown` syntax](https://daringfireball.net/projec
 
 ## Installation
 
-Just install it with `pip`:
+Install with `pip`:
 
 ```sh
 pip install pyssg
 ```
 
-Will add a PKBUILD (and possibly submit it to the AUR) sometime later.
+Probably will add a PKBUILD (and possibly submit it to the AUR) in the future.
 
 ## Usage
 
@@ -84,18 +80,21 @@ pyssg -i
 
 4. Place your `*.md` files somewhere inside the source directory. It accepts sub-directories.
 
-- Remember to add the mandatory meta-data keys to your `.md` files, these are:
+- Recommended (no longer mandatory) metadata keys that can be added to the top of `.md` files:
 
 ```
 title: the title of your blog entry or whatever
 author: your name or online handle
+	another name maybe for multiple authors?
 lang: the language the entry is written on
 summary: a summary of the entry
+tags: english
+	short
+	tutorial
+	etc
 ```
 
 - You can add more meta-data keys as long as it is [Python-Markdown compliant](https://python-markdown.github.io/extensions/meta_data/), and these will ve [available as Jinja variables](#available-jinja-variables).
-
-- Also strongly recomended to add the `tags` metadata so that `pyssg` generates some nice filtering tags.
 
 5. Build the `*.html` with:
 
@@ -104,8 +103,6 @@ pyssg -b
 ```
 
 - After this, you have ready to deploy `*.html` files.
-
-- For now, the building option also creates the `rss.xml` and `sitemap.xml` files based on templates, including only all converted `*.md` files (and processed tags in case of the sitemap), meaning that separate `*.html` files should be included manually in the template.
 
 ## Config file
 
@@ -116,9 +113,9 @@ variable: &variable_reference_name "value"
 other_variable: !join [*variable_reference_name, "other_value", 1]
 ```
 
-Which would produce `other_variable: "valueother_value1`. Also environment variables will be expanded internally.
+Which would produce `other_variable: "valueother_value1"`. Also environment variables will be expanded internally.
 
-At least the following config items should be present in the config:
+The following is a list of config items that need to be present in the config unless stated otherwise:
 
 ```yaml
 %YAML 1.2
@@ -131,14 +128,38 @@ path:
   src: !join [*root, "src"] # $HOME/path/to/src
   dst: "$HOME/some/other/path/to/dst"
   plt: "plt"
+  db: !join [*root, "src/", "db.psv"]
 url:
   main: "https://example.com"
 fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
   list_date: "%b %d"
   list_sep_date: "%B %Y"
+dirs:
+  /: # root "dir_path", whatever is sitting directly under "src"
+	cfg:
+	  plt: "page.html"
+	  # the template can be specified instead of just True/False, a default template will used
+	  tags: False
+	  index: True
+	  rss: True
+	  sitemap: True
+	  exclude_dirs: ["articles", "blog"] # optional; list of subdirectories to exclude when parsing the / dir_path
+# below are other example "dir_paths", can be named anything, only the / (above) is mandatory
+  articles:
+    cfg:
+	  plt: "page.html"
+	  tags: True
+	  index: True
+	  rss: True
+	  sitemap: True
+  blog:
+    cfg:
+	  # ...
 ...
 ```
+
+The config under `dirs` are just per-subdirectory configuration of directories under `src`. Only the `/` "dir_path" is required as it is the config for the root `src` path files.
 
 The following will be added on runtime:
 
@@ -161,13 +182,16 @@ You can add any other option/section that you can later use in the Jinja templat
 
 ## Available Jinja variables
 
-These variables are exposed to use within the templates. The below list is in the form of *variable (type) (available from): description*. `section/option` describe config file section and option and `object.attribute` corresponding object and it's attribute.
+These variables are exposed to use within the templates. The below list is displayed in the form of *variable (type) (available from): description*. `field1/field2/field3/...` describe config file section from the YAML file and option and `object.attribute` corresponding object and it's attribute.
 
 - `config` (`dict`) (all): parsed config file plus the added options internally (as described in [config file](#config-file)).
+- `dir_config` (`dict`) (all*): parsed dir_config file plus the added options internally (as described in [config file](#config-file)). *This is for all of the specific "dir_path" files, as per configured in the YAML file `dirs.dir_path.cfg` (for exmaple `dirs./.cfg` for the required dir_path).
 - `all_pages` (`list(Page)`) (all): list of all the pages, sorted by creation time, reversed.
 - `page` (`Page`) (`page.html`): contains the following attributes (genarally these are parsed from the metadata in the `*.md` files):
 	- `title` (`str`): title of the page.
-	- `author` (`str`): author of the page.
+	- `author` (`list[str]`): list of authors of the page.
+	- `lang` (`str`): page language, used for the general `html` tag `lang` attribute.
+	- `summary` (`str`): summary of the page, as specified in the `*.md` file.
 	- `content` (`str`): actual content of the page, this is the `html`.
 	- `cdatetime` (`str`): creation datetime object of the page.
 	- `cdate` (`str`): formatted `cdatetime` as the config option `fmt/date`.
@@ -181,8 +205,6 @@ These variables are exposed to use within the templates. The below list is in th
 	- `mdate_list_sep` (`str`): formatted `mdatetime` as the config option `fmt/list_sep_date`.
 	- `mdate_rss` (`str`): formatted `mdatetime` as required by rss.
 	- `mdate_sitemap` (`str`): formatted `mdatetime` as required by sitemap.
-	- `summary` (`str`): summary of the page, as specified in the `*.md` file.
-	- `lang` (`str`): page language, used for the general `html` tag `lang` attribute.
 	- `tags` (`list(tuple(str))`): list of tuple of tags of the page, containing the name and the url of the tag, in that order. Defaults to empty list.
 	- `url` (`str`): url of the page, this already includes the `url/main` from config file.
 	- `image_url` (`str`): image url of the page, this already includes the `url/static`. Defaults to the `url/default_image` config option.

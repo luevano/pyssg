@@ -55,7 +55,6 @@ def get_parsed_config(path: str) -> list[dict]:
     mandatory_config: list[dict] = get_parsed_yaml('mandatory_config.yaml', 'pyssg.plt')
     log.info('found %s document(s) for configuration "%s"', len(config), path)
     log.debug('checking that config file is well formed (at least contains mandatory fields')
-    # TODO: make it work with n yaml docs
     __check_well_formed_config(config[0], mandatory_config)
     __expand_all_paths(config[0])
     return config

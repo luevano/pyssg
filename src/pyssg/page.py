@@ -28,7 +28,7 @@ class Page:
 
         # data from self.meta
         self.title: str
-        self.author: str
+        self.author: list[str]
         self.summary: str
         self.lang: str
         self.cdatetime: datetime
@@ -61,23 +61,22 @@ class Page:
     def __lt__(self, other):
         return self.ctimestamp < other.ctimestamp
 
-    def __get_mandatory_meta(self, meta: str) -> str:
-        try:
-            log.debug('parsing required metadata "%s"', meta)
-            return self.meta[meta][0]
-        except KeyError:
-            log.error('failed to parse mandatory metadata "%s" from file "%s"',
-                      meta, os.path.join(self.dir_config['src'], self.name))
-            sys.exit(1)
+    def __get_meta(self, var: str, or_else: str | list[str]) -> str | list[str]:
+        if var in self.meta:
+            log.debug('getting metadata "%s"', var)
+            return self.meta[var]
+        else:
+            log.debug('getting metadata "%s" failed, using optional value "%s"', var, or_else)
+            return or_else
 
     # parses meta from self.meta, for og, it prioritizes,
     #   the actual og meta
     def parse_metadata(self):
         log.debug('parsing metadata for file "%s"', self.name)
-        self.title = self.__get_mandatory_meta('title')
-        self.author = self.__get_mandatory_meta('author')
-        self.summary = self.__get_mandatory_meta('summary')
-        self.lang = self.__get_mandatory_meta('lang')
+        self.title = self.__get_meta('title', [''])[0]
+        self.author = list(self.__get_meta('author', ['']))
+        self.summary = self.__get_meta('summary', [''])[0]
+        self.lang = self.__get_meta('lang', ['en'])[0]
 
         log.debug('parsing timestamp')
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
@@ -103,16 +102,17 @@ class Page:
         else:
             log.debug('not parsing modified timestamp, hasn\'t been modified')
 
-        try:
-            tags_only: list[str] = self.meta['tags']
+        if self.dir_config['tags']:
             log.debug('parsing tags')
-            tags_only.sort()
+            tags_only: list[str] = list(self.__get_meta('tags', []))
+            if tags_only:
+                tags_only.sort()
 
-            for t in tags_only:
-                # need to specify dir_config['url'] as it is a hardcoded tag url
-                self.tags.append((t, f'{self.dir_config["url"]}/tag/@{t}.html'))
-        except KeyError:
-            log.debug('not parsing tags, doesn\'t have any')
+                for t in tags_only:
+                    # need to specify dir_config['url'] as it is a hardcoded tag url
+                    self.tags.append((t, f'{self.dir_config["url"]}/tag/@{t}.html'))
+            else:
+                log.debug('no tags to parse')
 
         log.debug('parsing url')
         # no need to specify dir_config['url'] as self.name already contains the relative url
@@ -120,14 +120,13 @@ class Page:
         log.debug('final url "%s"', self.url)
 
         log.debug('parsing image url')
+        default_image_url: str = ''
+        if 'default_image' in self.config['url']:
+            log.debug('"default_image" url found, will use if no "image_url" is found')
+            default_image_url = self.config['url']['default_image']
+
         image_url: str
-        if 'image_url' in self.meta:
-            image_url = self.meta['image_url'][0]
-        elif 'default_image' in self.config['url']:
-            log.debug('using default image, no image_url metadata found')
-            image_url = self.config['url']['default_image']
-        else:
-            image_url = ''
+        image_url = self.__get_meta('image_url', [default_image_url])[0]
 
         if image_url != '':
             if 'static' in self.config['url']:
@@ -144,9 +143,9 @@ class Page:
 
         # if contains open graph elements
         # TODO: better handle this part
-        try:
-            # og_e = object graph entry
-            og_elements: list[str] = self.meta['og']
+        # og_e = object graph entry
+        og_elements: list[str] = list(self.__get_meta('og', []))
+        if og_elements:
             log.debug('parsing og metadata')
             for og_e in og_elements:
                 kv: list[str] = og_e.split(',', 1)
@@ -159,5 +158,6 @@ class Page:
 
                 log.debug('og element: ("%s", "%s")', k, v)
                 self.og[k] = v
-        except KeyError:
-            log.debug('no og metadata found')
+
+        else:
+            log.debug('no tags to parse')
