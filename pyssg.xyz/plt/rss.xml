@@ -6,19 +6,19 @@
     <title>{{config['title']}}</title>
     <link>{{config['url']['main']}}</link>
     <atom:link href="{{config['url']['main']}}/rss.xml" rel="self" type="application/rss+xml"/>
-    <description>Short site description.</description>
+    <description>{{config['description']}}</description>
     <language>en-us</language>
     <category>Blog</category>
-    <copyright>Copyright 2021 Somebody</copyright>
-    <managingEditor>some@one.com (Sombody)</managingEditor>
-    <webMaster>some@one.com (Sombody)</webMaster>
+    <copyright>Copyright 2023 {{config['author']}}</copyright>
+    <managingEditor>{{config['author_email']}} ({{config['author']}})</managingEditor>
+    <webMaster>{{config['author_email']}} ({{config['author']}})</webMaster>
     <pubDate>{{config['info']['rss_run_date']}}</pubDate>
     <lastBuildDate>{{config['info']['rss_run_date']}}</lastBuildDate>
     <generator>pyssg v{{config['info']['version']}}</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <ttl>30</ttl>
     <image>
-      <url>{{config['url']['static']}}/images/blog.png</url>
+      <url>{{config['url']['static']}}/{{config['url']['default_image']}}</url>
       <title>{{config['title']}}</title>
       <link>{{config['url']['main']}}</link>
     </image>

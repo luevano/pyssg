@@ -1,22 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="theme-dark" lang="en"
+  prefix="og: https://ogp.me/ns#">
   <head>
-    <meta charset="utf-8">
     <base href="https://static.pyssg.xyz">
-    <title>Index -- pyssg</title>
-  </head>
-  <body>
-  <h1>Index -- pyssg</h1>
-  <p>Some text here.</p>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="images/icons/favicon.ico">
+<title>pyssg</title>
+<meta name="description" content="PySSG, the python static site generator official website."/>
+<link rel="alternate" type="application/rss+xml" href="https://pyssg.xyz/rss.xml" title="pyssg RSS">
 
-  <p>Tags:
+    <!-- general style -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="fork-awesome/css/fork-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="font-awesome/css/all.min.css">
+
+    <!-- theme related -->
+    <script type="text/javascript" src="scripts/theme.js"></script>
+    <link id="theme-css" rel="stylesheet" type="text/css" href="css/theme.css">
+
+    <!-- og meta -->
+  <meta property="og:title" content="pyssg"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="https://pyssg.xyz/index.html"/>
+  <meta property="og:image" content="https://static.pyssg.xyzimages/default.png"/>
+  <meta property="og:description" content="PySSG, the python static site generator official website."/>
+  <meta property="og:locale" content="en"/>
+  <meta property="og:site_name" content="pyssg"/>
+  </head>
+
+  <body>
+    <header>
+        <nav>
+  <ul>
+    <li>
+      <a href="https://pyssg.xyz"><i class="fas fa-home" alt="Home"></i><span>Home</span></a>
+    </li>
+
+    <li><i class="fab fa-git" alt="Git"></i><span>Git</span>
+      <ul>
+        <li><a href="https://git.luevano.xyz/" target="_blank"><i class="fab fa-git-alt" alt="Git-alt"></i></a></li>
+
+        <li><a href="https://github.com/luevano" target="_blank"><i class="fab fa-github" alt="Github"></i></a></li>
+
+        <li><a href="https://gitlab.com/dluevano" target="_blank"><i class="fab fa-gitlab" alt="Gitlab"></i></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<button class="theme-switcher" onclick="toggleTheme()"><i class="fas fa-moon"></i><i class="fas fa-sun"></i></button>
+
+    </header>
+
+    <main>
+  <h1></h1>
+
+  <p>
+    Welcome to the official pyssg website. This is as of now serving as a testing ground when I'm making changes to it.
   </p>
 
-  <h2>Articles</h2>
-  <ul>
-        <h3>December 2022</h3>
-    <li>Dec 05 - <a href="https://pyssg.xyz/subdir/test2.html">Test file in subdir</a></li>
-    <li>Dec 05 - <a href="https://pyssg.xyz/test.html">Index</a></li>
-  </ul>
+  <p>
+    Get the RSS feed: <a target="_blank" href="https://pyssg.xyz/rss.xml">https://pyssg.xyz/rss.xml</a>
+  </p>
+    </main>
+
+    <footer>
+        <span>
+  <i class="fas fa-address-card" alt="Contact"></i>
+  <a href="https://pyssg.xyz/contact.html">Contact</a>
+</span>
+
+<span>
+  <i class="fas fa-donate" alt="Donate"></i>
+  <a href="https://pyssg.xyz/donate.html">Donate</a>
+</span>
+
+<span>
+  <i class="fas fa-rss" alt="RSS"></i>
+  <a target="_blank" href="https://pyssg.xyz/rss.xml">RSS</a>
+</span>
+
+<br>
+<span class="created-with">
+  <i class="fas fa-hammer" alt="Hammer"></i>
+  Created with <a href="https://github.com/luevano/pyssg">pyssg</a>
+</span>
+
+<br>
+<span class="copyright">
+  Copyright <i class="far fa-copyright" alt="Copyright"></i> 2023 David Luévano Alvarado
+</span>
+
+    </footer>
   </body>
 </html>

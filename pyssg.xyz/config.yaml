@@ -3,6 +3,10 @@
 define: &root_path "$HOME/pyssg/pyssg.xyz/"
 
 title: "pyssg"
+author: "David Luévano Alvarado"
+author_email: "david@luevano.xyz"
+description: "PySSG, the python static site generator official website."
+lang: "en"
 path:
   src: !join [*root_path, "src/pyssg.xyz"]
   dst: !join [*root_path, "live/pyssg.xyz"]
@@ -19,17 +23,10 @@ fmt:
 dirs:
   /:
     cfg:
-      plt: "page.html"
+      plt: "root_index.html"
       tags: False
       index: False
-      rss: False
-      sitemap: False
+      rss: True
+      sitemap: True
       exclude_dirs: []
-  articles:
-    cfg:
-      plt: "page.html"
-      tags: True
-      index: False
-      rss: False
-      sitemap: False
 ...

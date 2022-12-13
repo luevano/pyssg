@@ -1,0 +1,31 @@
+{%extends "base.html"%}
+{%block html_lang%}{{config['lang']}}{%endblock html_lang%}
+{%block head_title%}
+<title>{{config['title']}}</title>
+{%endblock head_title%}
+{%block head_description%}
+<meta name="description" content="{{config['description']}}"/>
+{%endblock head_description%}
+{%block head_rss%}
+<link rel="alternate" type="application/rss+xml" href="{{config['url']['main']}}/rss.xml" title="{{config['title']}} RSS">
+{%endblock head_rss%}
+{%block head_og%}
+  <meta property="og:title" content="{{config['title']}}"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="{{config['url']['main']}}/index.html"/>
+  <meta property="og:image" content="{{config['url']['static']}}{{config['url']['default_image']}}"/>
+  <meta property="og:description" content="{{config['description']}}"/>
+  <meta property="og:locale" content="{{config['lang']}}"/>
+  <meta property="og:site_name" content="{{config['title']}}"/>
+{%endblock head_og%}
+{%block body_content%}
+  <h1>{{config['info']['title']}}</h1>
+
+  <p>
+    Welcome to the official pyssg website. This is as of now serving as a testing ground when I'm making changes to it.
+  </p>
+
+  <p>
+    Get the RSS feed: <a target="_blank" href="{{config['url']['main']}}/rss.xml">{{config['url']['main']}}/rss.xml</a>
+  </p>
+{%endblock body_content%}

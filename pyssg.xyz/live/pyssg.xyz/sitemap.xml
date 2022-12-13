@@ -3,14 +3,8 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
     <url>
-      <loc>https://pyssg.xyz/subdir/test2.html</loc>
-      <lastmod>2022-12-05</lastmod>
-      <changefreq>weekly</changefreq>
-      <priority>1.0</priority>
-    </url>
-    <url>
-      <loc>https://pyssg.xyz/test.html</loc>
-      <lastmod>2022-12-08</lastmod>
+      <loc>https://pyssg.xyz/index.html</loc>
+      <lastmod>2022-12-13</lastmod>
       <changefreq>weekly</changefreq>
       <priority>1.0</priority>
     </url>
