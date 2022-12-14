@@ -23,7 +23,7 @@ fmt:
 dirs:
   /:
     cfg:
-      plt: "root_index.html"
+      plt: "root_page.html"
       tags: False
       index: False
       rss: True

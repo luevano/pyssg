@@ -23,12 +23,21 @@
       <link>https://pyssg.xyz</link>
     </image>
     <item>
-      <title></title>
+      <title>404 Not found</title>
+      <link>https://pyssg.xyz/404.html</link>
+      <guid isPermaLink="true">https://pyssg.xyz/404.html</guid>
+      <pubDate>Wed, 14 Dec 2022 02:34:31 GMT</pubDate>
+      <description></description>
+      <content:encoded><![CDATA[<p>The requested URL doesn&rsquo;t exist. Remove any &ldquo;www.&rdquo; at the beginning of the URL.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title>pyssg</title>
       <link>https://pyssg.xyz/index.html</link>
       <guid isPermaLink="true">https://pyssg.xyz/index.html</guid>
       <pubDate>Tue, 13 Dec 2022 04:37:03 GMT</pubDate>
       <description></description>
-      <content:encoded><![CDATA[]]></content:encoded>
+      <content:encoded><![CDATA[<p>Welcome to the official pyssg website. This is as of now serving as a testing ground when I&rsquo;m making changes to it.</p>
+<p>Get the RSS feed: <a href="https://pyssg.xyz/rss.xml">https://pyssg.xyz/rss.xml</a></p>]]></content:encoded>
     </item>
   </channel>
 </rss>
