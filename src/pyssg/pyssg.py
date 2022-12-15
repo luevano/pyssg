@@ -72,46 +72,49 @@ def main() -> None:
     log.debug('reading config files')
     config_all: list[dict] = get_parsed_config(config_path)
     static_config: dict = get_static_config()
-
-    # easier to add static into config than changing existing code
-    config: dict = config_all[0]
-    config['fmt']['rss_date'] = static_config['fmt']['rss_date']
-    config['fmt']['sitemap_date'] = static_config['fmt']['sitemap_date']
-    config['info'] = dict()
-    config['info']['version'] = static_config['info']['version']
-    config['info']['debug'] = str(args['debug'])
+    log.debug('applying static_config for each config document')
+    for config in config_all:
+        config['fmt']['rss_date'] = static_config['fmt']['rss_date']
+        config['fmt']['sitemap_date'] = static_config['fmt']['sitemap_date']
+        config['info'] = dict()
+        config['info']['version'] = static_config['info']['version']
+        config['info']['debug'] = str(args['debug'])
 
     if args['init']:
         log.info('initializing the directory structure and copying over templates')
-        create_dir(config['path']['src'])
-        # dst gets created on builder
-        # create_dir(config['path']['dst'])
-        create_dir(config['path']['plt'])
-        files: list[str] = ['index.html',
-                            'page.html',
-                            'tag.html',
-                            'rss.xml',
-                            'sitemap.xml']
-        log.debug('list of files to copy over: (%s)', ', '.join(files))
-        for f in files:
-            plt_file: str = os.path.join(config['path']['plt'], f)
-            with rpath('pyssg.plt', f) as p:
-                copy_file(str(p), plt_file)
+        for config in config_all:
+            log.info('initializing directories for "%s"', config['title'])
+            create_dir(config['path']['src'])
+            # dst gets created on builder
+            # create_dir(config['path']['dst'])
+            create_dir(config['path']['plt'])
+            files: list[str] = ['index.html',
+                                'page.html',
+                                'tag.html',
+                                'rss.xml',
+                                'sitemap.xml']
+            log.debug('list of files to copy over: (%s)', ', '.join(files))
+            for f in files:
+                plt_file: str = os.path.join(config['path']['plt'], f)
+                with rpath('pyssg.plt', f) as p:
+                    copy_file(str(p), plt_file)
         log.info('finished initialization')
         sys.exit(0)
 
 
     if args['build']:
         log.info('building the html files')
-        db: Database = Database(config['path']['db'])
-        db.read()
+        for config in config_all:
+            log.info('building html for "%s"', config['title'])
+            db: Database = Database(config['path']['db'])
+            db.read()
 
-        log.debug('building all dir_paths found in config')
-        for dir_path in config['dirs'].keys():
-            log.debug('building for "%s"', dir_path)
-            builder: Builder = Builder(config, db, dir_path)
-            builder.build()
+            log.debug('building all dir_paths found in config')
+            for dir_path in config['dirs'].keys():
+                log.debug('building for "%s"', dir_path)
+                builder: Builder = Builder(config, db, dir_path)
+                builder.build()
 
-        db.write()
+            db.write()
         log.info('finished building the html files')
         sys.exit(0)
