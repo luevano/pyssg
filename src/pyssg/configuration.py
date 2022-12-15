@@ -51,13 +51,14 @@ def __expand_all_paths(config: dict) -> None:
 # not necessary to type deeper than the first dict
 def get_parsed_config(path: str) -> list[dict]:
     log.debug('reading config file "%s"', path)
-    config: list[dict] = get_parsed_yaml(path)
+    config_all: list[dict] = get_parsed_yaml(path)
     mandatory_config: list[dict] = get_parsed_yaml('mandatory_config.yaml', 'pyssg.plt')
-    log.info('found %s document(s) for configuration "%s"', len(config), path)
+    log.info('found %s document(s) for configuration "%s"', len(config_all), path)
     log.debug('checking that config file is well formed (at least contains mandatory fields')
-    __check_well_formed_config(config[0], mandatory_config)
-    __expand_all_paths(config[0])
-    return config
+    for config in config_all:
+        __check_well_formed_config(config, mandatory_config)
+        __expand_all_paths(config)
+    return config_all
 
 
 # not necessary to type deeper than the first dict,

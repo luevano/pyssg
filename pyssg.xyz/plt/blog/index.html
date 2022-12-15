@@ -1,32 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <base href="{{config['url']['static']}}">
-    <title>Index -- {{config['title']}}</title>
-  </head>
-  <body>
-  <h1>Index -- {{config['title']}}</h1>
-  <p>Some text here.</p>
+{%extends "base.html"%}
 
-  <p>Tags:
-  {%for t in all_tags%}
-    <a href="{{t[1]}}">{{t[0]}}</a>{{", " if not loop.last else ""}}
-  {%endfor%}
-  </p>
+{%block html_lang%}
+{{config['lang']}}
+{%endblock html_lang%}
 
-  <h2>Articles</h2>
-  <ul>
-  {%for p in all_pages%}
-    {%if loop.previtem%}
-      {%if loop.previtem.cdate_list_sep !=p.cdate_list_sep%}
-        <h3>{{p.cdate_list_sep}}</h3>
-      {%endif%}
-    {%else%}
-        <h3>{{p.cdate_list_sep}}</h3>
+{%block head_title%}
+<title>Index -- {{config['title']}}</title>
+{%endblock head_title%}
+
+{%block head_description%}
+<meta name="description" content="{{config['description']}}"/>
+{%endblock head_description%}
+
+{%block head_rss%}
+<link rel="alternate" type="application/rss+xml" href="{{config['url']['main']}}/rss.xml" title="{{config['title']}} RSS">
+{%endblock head_rss%}
+
+{%block head_extra%}
+{%endblock head_extra%}
+
+{%block head_og%}
+  <meta property="og:title" content="{{config['title']}}"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:url" content="{{config['url']['main']}}/index.html"/>
+  <meta property="og:image" content="{{config['url']['static']}}/{{config['url']['default_image']}}"/>
+  <meta property="og:description" content="{{config['description']}}"/>
+  <meta property="og:locale" content="{{config['lang']}}"/>
+  <meta property="og:site_name" content="{{config['title']}}"/>
+{%endblock head_og%}
+
+{%block body_header%}
+{%import 'body/header.html' as body_header%}
+{{body_header.print(config)}}
+{%endblock body_header%}
+
+{%block body_content%}
+<h1>Index -- {{config['title']}}</h1>
+<p>Some text here.</p>
+
+<p>Tags:
+{%for t in all_tags%}
+  <a href="{{t[1]}}">{{t[0]}}</a>{{", " if not loop.last else ""}}
+{%endfor%}
+</p>
+
+<h2>Articles</h2>
+<ul>
+{%for p in all_pages%}
+  {%if loop.previtem%}
+    {%if loop.previtem.cdate_list_sep !=p.cdate_list_sep%}
+      <h3>{{p.cdate_list_sep}}</h3>
     {%endif%}
-    <li>{{p.cdate_list}} - <a href="{{p.url}}">{{p.title}}</a></li>
-  {%endfor%}
-  </ul>
-  </body>
-</html>
+  {%else%}
+      <h3>{{p.cdate_list_sep}}</h3>
+  {%endif%}
+  <li>{{p.cdate_list}} - <a href="{{p.url}}">{{p.title}}</a></li>
+{%endfor%}
+</ul>
+{%endblock body_content%}
+
+{%block body_footer%}
+{%import 'body/footer.html' as body_footer%}
+{{body_footer.contact(config)}}
+{{body_footer.donate(config)}}
+{{body_footer.rss(config)}}
+<br>
+{{body_footer.created_with()}}
+<br>
+{{body_footer.copyright()}}
+{%endblock body_footer%}

@@ -44,16 +44,14 @@ class Page:
         self.cdate_rss: str
         self.cdate_sitemap: str
 
-        self.mdate: str
-        self.mdate_list: str
-        self.mdate_list_sep: str
-        self.mdate_rss: str
-        self.mdate_sitemap: str
+        self.mdate: str | None = None
+        self.mdate_list: str | None = None
+        self.mdate_list_sep: str | None = None
+        self.mdate_rss: str | None = None
+        self.mdate_sitemap: str | None = None
 
-        # later assigned references to next and previous pages
-        #   not always assigned (tail ends), and the None helps check it, ignoring
-        self.next: Page = None  # type: ignore
-        self.previous: Page = None  # type: ignore
+        self.next: Page | None = None
+        self.previous: Page | None = None
 
         # also from self.meta, but for og metadata
         self.og: dict[str, str] = dict()

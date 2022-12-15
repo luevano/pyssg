@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+    <url>
+      <loc>https://blog.pyssg.xyz/a/second.html</loc>
+      <lastmod>2022-12-15</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>1.0</priority>
+    </url>
+    <url>
+      <loc>https://blog.pyssg.xyz/first.html</loc>
+      <lastmod>2022-12-15</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>1.0</priority>
+    </url>
+
+    <url>
+      <loc>https://blog.pyssg.xyz/tag/@english.html</loc>
+      <lastmod></lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.5</priority>
+    </url>
+    <url>
+      <loc>https://blog.pyssg.xyz/tag/@multiple-author.html</loc>
+      <lastmod></lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.5</priority>
+    </url>
+    <url>
+      <loc>https://blog.pyssg.xyz/tag/@short.html</loc>
+      <lastmod></lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.5</priority>
+    </url>
+    <url>
+      <loc>https://blog.pyssg.xyz/tag/@test.html</loc>
+      <lastmod></lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.5</priority>
+    </url>
+    <url>
+      <loc>https://blog.pyssg.xyz/tag/@update.html</loc>
+      <lastmod></lastmod>
+      <changefreq>daily</changefreq>
+      <priority>0.5</priority>
+    </url>
+</urlset>

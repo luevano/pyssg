@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>pyssg blog</title>
+    <link>https://blog.pyssg.xyz</link>
+    <atom:link href="https://blog.pyssg.xyz/rss.xml" rel="self" type="application/rss+xml"/>
+    <description>PySSG blog, the python static site generator official blog.</description>
+    <language>en-us</language>
+    <category>Blog</category>
+    <copyright>Copyright 2023 David Luévano Alvarado</copyright>
+    <managingEditor>david@luevano.xyz (David Luévano Alvarado)</managingEditor>
+    <webMaster>david@luevano.xyz (David Luévano Alvarado)</webMaster>
+    <pubDate></pubDate>
+    <lastBuildDate></lastBuildDate>
+    <generator>pyssg v0.8.0</generator>
+    <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+    <ttl>30</ttl>
+    <image>
+      <url>https://static.pyssg.xyz/images/default.png</url>
+      <title>pyssg blog</title>
+      <link>https://blog.pyssg.xyz</link>
+    </image>
+    <item>
+      <title>Second blog post for testing purposes</title>
+      <link>https://blog.pyssg.xyz/a/second.html</link>
+      <guid isPermaLink="true">https://blog.pyssg.xyz/a/second.html</guid>
+      <pubDate>Thu, 15 Dec 2022 04:17:11 GMT</pubDate>
+      <category>English</category>
+      <category>Multiple-author</category>
+      <category>Short</category>
+      <category>Test</category>
+      <category>Update</category>
+      <description>This is just a post used for testing (the second).</description>
+      <content:encoded><![CDATA[<p>A second &ldquo;blog entry&rdquo; for testing purposes which uses multiple authors and is inside a subdirectory.</p>
+<p>Added a modification here after first submission.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title>First blog post for testing purposes</title>
+      <link>https://blog.pyssg.xyz/first.html</link>
+      <guid isPermaLink="true">https://blog.pyssg.xyz/first.html</guid>
+      <pubDate>Thu, 15 Dec 2022 03:51:51 GMT</pubDate>
+      <category>English</category>
+      <category>Short</category>
+      <category>Test</category>
+      <category>Update</category>
+      <description>This is just a post used for testing.</description>
+      <content:encoded><![CDATA[<p>Even though I have this &ldquo;blog&rdquo; subdomain and page setup, doesn&rsquo;t mean I&rsquo;ll be blogging for pyssg, this is just to serve as an example for the types of sites that pyssg can be used for.</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>
