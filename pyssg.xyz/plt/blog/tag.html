@@ -42,13 +42,13 @@
 <ul>
 {%for p in tag_pages%}
   {%if loop.previtem%}
-    {%if loop.previtem.cdatetime.strftime(config['fmt']['list_sep_date']) != p.cdatetime.strftime(config['fmt']['list_sep_date'])%}
-      <h3>{{p.cdatetime.strftime(config['fmt']['list_sep_date'])}}</h3>
+    {%if loop.previtem.cdate('list_sep_date') != p.cdate('list_sep_date')%}
+      <h3>{{p.cdate('list_sep_date')}}</h3>
     {%endif%}
   {%else%}
-      <h3>{{p.cdatetime.strftime(config['fmt']['list_sep_date'])}}</h3>
+      <h3>{{p.cdate('list_sep_date')}}</h3>
   {%endif%}
-  <li>{{p.cdatetime.strftime(config['fmt']['list_date'])}} - <a href="{{p.url}}">{{p.title}}</a></li>
+  <li>{{p.cdate('list_date')}} - <a href="{{p.url}}">{{p.title}}</a></li>
 {%endfor%}
 </ul>
 {%endblock body_content%}

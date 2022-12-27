@@ -59,6 +59,23 @@ class Page:
             log.debug('getting metadata "%s" failed, using optional value "%s"', var, or_else)
             return or_else
 
+    def cdate(self, format: str) -> str:
+        if format in self.config['fmt']:
+            return self.cdatetime.strftime(self.config['fmt'][format])
+        else:
+            log.warning('format "%s" not found in config["fmt"], returning empty string', format)
+            return ''
+
+    def mdate(self, format: str) -> str:
+        if self.mdatetime is None:
+            log.warning('no mdatetime found, can\'t return a formatted string')
+            return ''
+        if format in self.config['fmt']:
+            return self.mdatetime.strftime(self.config['fmt'][format]) # type: ignore
+        else:
+            log.warning('format "%s" not found in config["fmt"], returning empty string', format)
+            return ''
+
     # parses meta from self.meta, for og, it prioritizes,
     #   the actual og meta
     def parse_metadata(self):
@@ -70,16 +87,14 @@ class Page:
 
         log.debug('parsing timestamp')
         self.cdatetime = datetime.fromtimestamp(self.ctimestamp, tz=timezone.utc)
-        cdate = lambda x : self.cdatetime.strftime(self.config['fmt'][x])
-        self.cdate_rss = cdate('rss_date')
-        self.cdate_sitemap = cdate('sitemap_date')
+        self.cdate_rss = self.cdate('rss_date')
+        self.cdate_sitemap = self.cdate('sitemap_date')
 
         if self.mtimestamp != 0.0:
             log.debug('parsing modified timestamp')
             self.mdatetime = datetime.fromtimestamp(self.mtimestamp, tz=timezone.utc)
-            mdate = lambda x : self.mdatetime.strftime(self.config['fmt'][x]) # type: ignore
-            self.mdate_rss = mdate('rss_date')
-            self.mdate_sitemap = mdate('sitemap_date')
+            self.mdate_rss = self.mdate('rss_date')
+            self.mdate_sitemap = self.mdate('sitemap_date')
         else:
             log.debug('not parsing modified timestamp, hasn\'t been modified')
 

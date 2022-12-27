@@ -8,9 +8,9 @@
   <body>
     <h1>{{page.title}}</h1>
     <p>By {{page.author}}</p>
-    <p>Created: {{page.cdatetime.strftime(config['fmt']['date'])}}</p>
+    <p>Created: {{page.cdate('date')}}</p>
     {%if page.mdatetime is not none%}
-      <p>Modified: {{page.mdatetime.strftime(config['fmt']['date'])}}</p>
+      <p>Modified: {{page.mdate('date')}}</p>
     {%endif%}
 
     {{page.content}}

@@ -193,10 +193,12 @@ These variables are exposed to use within the templates. The below list is displ
 	- `lang` (`str`): page language, used for the general `html` tag `lang` attribute.
 	- `summary` (`str`): summary of the page, as specified in the `*.md` file.
 	- `content` (`str`): actual content of the page, this is the `html`.
-	- `cdatetime` (`str`): creation datetime object of the page.
+	- `cdatetime` (`datetime.datetime`): creation datetime object of the page.
+	- `cdate` (`method`): method thtat takes the name of the `fmt.FMT` and applies it to the `cdatetime` object.
 	- `cdate_rss` (`str`): formatted `cdatetime` as required by rss.
 	- `cdate_sitemap` (`str`): formatted `cdatetime` as required by sitemap.
-	- `mdatetime` (`str`): modification datetime object of the page. Defaults to `None`.
+	- `mdatetime` (`datetime.datetime`): modification datetime object of the page. Defaults to `None`.
+	- `mdate` (`method`): method thtat takes the name of the `fmt.FMT` and applies it to the `mdatetime` object.
 	- `mdate_rss` (`str`): formatted `mdatetime` as required by rss.
 	- `mdate_sitemap` (`str`): formatted `mdatetime` as required by sitemap.
 	- `tags` (`list(tuple(str))`): list of tuple of tags of the page, containing the name and the url of the tag, in that order. Defaults to empty list.
