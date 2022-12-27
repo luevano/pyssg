@@ -1,6 +1,15 @@
 CHANGES
 =======
 
+v0.8.1
+------
+
+* add more files, fixed bugs related to multiple documents in yaml config
+* add new files for pyssg.xyz, add multiple document support
+* add pyssg.xyz configs and templates
+* update pyssg.xyz site files
+* fix for twine upload to pypi
+
 v0.8.0
 ------
 

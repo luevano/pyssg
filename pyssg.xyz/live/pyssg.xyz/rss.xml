@@ -14,7 +14,7 @@
     <webMaster>david@luevano.xyz (David Luévano Alvarado)</webMaster>
     <pubDate></pubDate>
     <lastBuildDate></lastBuildDate>
-    <generator>pyssg v0.8.0</generator>
+    <generator>pyssg v0.8.1</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <ttl>30</ttl>
     <image>
@@ -38,7 +38,7 @@
       <description></description>
       <content:encoded><![CDATA[<p>Welcome to the official pyssg website. This is as of now serving as a testing ground when I&rsquo;m making changes to it.</p>
 <h2 id="blog">Blog</h2>
-<p>You can find the blog (actually just a mock) <a href="https://blog.luevano.xyz">here</a>.</p>
+<p>You can find the blog (actually just a mock) <a href="https://blog.pyssg.xyz">here</a>.</p>
 <p>Get the RSS feed: <a href="https://pyssg.xyz/rss.xml">https://pyssg.xyz/rss.xml</a></p>]]></content:encoded>
     </item>
   </channel>

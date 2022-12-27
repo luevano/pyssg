@@ -74,10 +74,10 @@ class Builder:
         self.dirs = get_dir_structure(self.dir_cfg['src'],
                                       self.dir_cfg['exclude_dirs'])
         self.md_files = get_file_list(self.dir_cfg['src'],
-                                      tuple('.md'),
+                                      ('.md',),
                                       self.dir_cfg['exclude_dirs'])
         self.html_files = get_file_list(self.dir_cfg['src'],
-                                        tuple('.html'),
+                                        ('.html',),
                                         self.dir_cfg['exclude_dirs'])
 
         self.__create_dir_structure()

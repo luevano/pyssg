@@ -48,13 +48,13 @@
 <ul>
 {%for p in all_pages%}
   {%if loop.previtem%}
-    {%if loop.previtem.cdate_list_sep !=p.cdate_list_sep%}
-      <h3>{{p.cdate_list_sep}}</h3>
+    {%if loop.previtem.cdatetime.strftime(config['fmt']['list_sep_date']) != p.cdatetime.strftime(config['fmt']['list_sep_date'])%}
+      <h3>{{p.cdatetime.strftime(config['fmt']['list_sep_date'])}}</h3>
     {%endif%}
   {%else%}
-      <h3>{{p.cdate_list_sep}}</h3>
+      <h3>{{p.cdatetime.strftime(config['fmt']['list_sep_date'])}}</h3>
   {%endif%}
-  <li>{{p.cdate_list}} - <a href="{{p.url}}">{{p.title}}</a></li>
+  <li>{{p.cdatetime.strftime(config['fmt']['list_date'])}} - <a href="{{p.url}}">{{p.title}}</a></li>
 {%endfor%}
 </ul>
 {%endblock body_content%}

@@ -10,8 +10,6 @@ url:
   main:
 fmt:
   date:
-  list_date:
-  list_sep_date:
 dirs:
   /:
 ...

@@ -22,7 +22,6 @@ class Page:
         self.mtimestamp: float = mtime
         self.content: str = html
         self.meta: dict = meta
-        # TODO: need to fix this to use the dir_config stuff
         self.config: dict = config
         self.dir_config: dict = dir_config
 
@@ -32,21 +31,14 @@ class Page:
         self.summary: str
         self.lang: str
         self.cdatetime: datetime
-        self.mdatetime: datetime
+        self.mdatetime: datetime | None = None
         self.tags: list[tuple[str, str]] = []
 
         # constructed
         self.url: str
         self.image_url: str
-        self.cdate: str
-        self.cdate_list: str
-        self.cdate_list_sep: str
         self.cdate_rss: str
         self.cdate_sitemap: str
-
-        self.mdate: str | None = None
-        self.mdate_list: str | None = None
-        self.mdate_list_sep: str | None = None
         self.mdate_rss: str | None = None
         self.mdate_sitemap: str | None = None
 
@@ -77,24 +69,15 @@ class Page:
         self.lang = self.__get_meta('lang', ['en'])[0]
 
         log.debug('parsing timestamp')
-        self.cdatetime = datetime.fromtimestamp(self.ctimestamp,
-                                                 tz=timezone.utc)
-        # these could be actual function
+        self.cdatetime = datetime.fromtimestamp(self.ctimestamp, tz=timezone.utc)
         cdate = lambda x : self.cdatetime.strftime(self.config['fmt'][x])
-        mdate = lambda x : self.mdatetime.strftime(self.config['fmt'][x])
-
-        self.cdate = cdate('date')
-        self.cdate_list = cdate('list_date')
-        self.cdate_list_sep = cdate('list_sep_date')
         self.cdate_rss = cdate('rss_date')
         self.cdate_sitemap = cdate('sitemap_date')
 
         if self.mtimestamp != 0.0:
             log.debug('parsing modified timestamp')
             self.mdatetime = datetime.fromtimestamp(self.mtimestamp, tz=timezone.utc)
-            self.mdate = mdate('date')
-            self.mdate_list = mdate('list_date')
-            self.mdate_list_sep = mdate('list_sep_date')
+            mdate = lambda x : self.mdatetime.strftime(self.config['fmt'][x]) # type: ignore
             self.mdate_rss = mdate('rss_date')
             self.mdate_sitemap = mdate('sitemap_date')
         else:

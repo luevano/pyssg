@@ -12,9 +12,7 @@ def get_file_list(path: str,
                   exts: tuple[str],
                   exclude_dirs: list[str] = []) -> list[str]:
     log.debug('retrieving file list in path "%s" that contain file'
-              ' extensions (%s) except directories (%s)',
-              path, ', '.join(exts),
-              ', '.join(exclude_dirs))
+              ' extensions %s except directories %s', path, exts, exclude_dirs)
     file_list: list[str] = []
     for root, dirs, files in os.walk(path):
         if exclude_dirs != []:
@@ -29,7 +27,7 @@ def get_file_list(path: str,
                           file, path, file_name)
             else:
                 log.debug('ignoring file "%s" as it doesn\'t contain'
-                          ' any of the extensions (%s)', file, ', '.join(exts))
+                          ' any of the extensions %s', file, exts)
     return file_list
 
 
