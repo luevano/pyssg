@@ -6,4 +6,4 @@ Welcome to the official pyssg website. This is as of now serving as a testing gr
 
 You can find the blog (actually just a mock) [here](https://blog.pyssg.xyz).
 
-Get the RSS feed: [https://pyssg.xyz/rss.xml](https://pyssg.xyz/rss.xml)
+Get the RSS feed: [https://blog.pyssg.xyz/rss.xml](https://blog.pyssg.xyz/rss.xml)
