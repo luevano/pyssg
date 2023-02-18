@@ -101,7 +101,6 @@ def main() -> None:
         log.info('finished initialization')
         sys.exit(0)
 
-
     if args['build']:
         log.info('building the html files')
         for config in config_all:

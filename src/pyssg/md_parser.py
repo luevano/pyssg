@@ -1,6 +1,5 @@
 import os
 from operator import itemgetter
-from markdown import Markdown
 from logging import Logger, getLogger
 
 from markdown import Markdown
@@ -71,8 +70,8 @@ class MDParser:
                               self.db.e[f].ctimestamp,
                               self.db.e[f].mtimestamp,
                               content,
-                              self.md.toc, # type: ignore
-                              self.md.toc_tokens, # type: ignore
+                              self.md.toc,  # type: ignore
+                              self.md.toc_tokens,  # type: ignore
                               self.md.Meta,  # type: ignore
                               self.config,
                               self.dir_config)

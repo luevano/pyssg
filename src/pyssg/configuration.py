@@ -1,6 +1,5 @@
 import sys
 from importlib.metadata import version
-from importlib.resources import path as rpath
 from datetime import datetime, timezone
 from logging import Logger, getLogger
 
@@ -67,8 +66,7 @@ def get_static_config() -> dict[str, dict]:
     log.debug('reading and setting static config')
     config: dict = get_parsed_yaml('static_config.yaml', 'pyssg.plt')[0]
     # do I really need a lambda function...
-    time = lambda x : datetime.now(tz=timezone.utc).strftime(config['fmt'][x])
     config['info']['version'] = VERSION
-    config['info']['rss_run_date'] = time('rss_date')
-    config['info']['sitemap_run_date'] = time('sitemap_date')
+    config['info']['rss_run_date'] = datetime.now(tz=timezone.utc).strftime(config['fmt']['rss_date'])
+    config['info']['sitemap_run_date'] = datetime.now(tz=timezone.utc).strftime(config['fmt']['sitemap_date'])
     return config

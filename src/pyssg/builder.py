@@ -1,6 +1,5 @@
 import os
 import sys
-import pprint
 from copy import deepcopy
 from operator import itemgetter
 from logging import Logger, getLogger

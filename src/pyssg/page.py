@@ -1,4 +1,3 @@
-import os
 import sys
 from datetime import datetime, timezone
 from logging import Logger, getLogger
@@ -75,7 +74,7 @@ class Page:
             log.warning('no mdatetime found, can\'t return a formatted string')
             return ''
         if format in self.config['fmt']:
-            return self.mdatetime.strftime(self.config['fmt'][format]) # type: ignore
+            return self.mdatetime.strftime(self.config['fmt'][format])  # type: ignore
         else:
             log.warning('format "%s" not found in config["fmt"], returning empty string', format)
             return ''

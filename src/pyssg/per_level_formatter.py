@@ -1,5 +1,6 @@
 from logging import Formatter, LogRecord, DEBUG, INFO, WARNING, ERROR, CRITICAL
 
+
 # only reason for this class is to get info formatting as normal text
 #   and everything else with more info and with colors
 class PerLevelFormatter(Formatter):

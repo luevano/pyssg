@@ -36,7 +36,7 @@ class Database:
             sys.exit(1)
 
     def update(self, file_name: str,
-               remove: str='') -> None:
+               remove: str = '') -> None:
         log.debug('updating entry for file "%s"', file_name)
         f: str = file_name
         tags: list[str] = []
@@ -55,7 +55,7 @@ class Database:
         # three cases, 1) entry didn't exist,
         # 2) entry has been mod and,
         # 3) entry hasn't been mod
-        #1)
+        # 1)
         if f not in self.e:
             log.debug('entry "%s" didn\'t exist, adding with defaults', f)
             self.e[f] = DatabaseEntry([f, time, 0.0, checksum, tags])

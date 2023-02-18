@@ -1,7 +1,6 @@
 import yaml
 from yaml import SafeLoader
 from yaml.nodes import SequenceNode
-from io import TextIOWrapper
 from importlib.resources import path as rpath
 from logging import Logger, getLogger
 
@@ -22,7 +21,7 @@ def __read_raw_yaml(path: str) -> list[dict]:
     return all_docs
 
 
-def get_parsed_yaml(resource: str, package: str='') -> list[dict]:
+def get_parsed_yaml(resource: str, package: str = '') -> list[dict]:
     if package == '':
         log.debug('parsing yaml; reading "%s"', resource)
         return __read_raw_yaml(resource)
