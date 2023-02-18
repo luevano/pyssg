@@ -14,7 +14,7 @@
     <webMaster>david@luevano.xyz (David Luévano Alvarado)</webMaster>
     <pubDate></pubDate>
     <lastBuildDate></lastBuildDate>
-    <generator>pyssg v0.8.2</generator>
+    <generator>pyssg v0.8.4.dev1</generator>
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <ttl>30</ttl>
     <image>
@@ -22,6 +22,44 @@
       <title>pyssg blog</title>
       <link>https://blog.pyssg.xyz</link>
     </image>
+    <item>
+      <title>Table of contents test</title>
+      <link>https://blog.pyssg.xyz/toc_test.html</link>
+      <guid isPermaLink="true">https://blog.pyssg.xyz/toc_test.html</guid>
+      <pubDate>Sat, 18 Feb 2023 21:50:15 GMT</pubDate>
+      <category>English</category>
+      <category>Short</category>
+      <category>Test</category>
+      <category>Update</category>
+      <description>This is just a post used for testing.</description>
+      <content:encoded><![CDATA[<p>This is just a table of content test</p>
+<h1 id="table-of-contents">Table of contents</h1>
+<div class="toc">
+<ul>
+<li><a href="#table-of-contents">Table of contents</a></li>
+<li><a href="#hello">Hello</a><ul>
+<li><a href="#no">No</a></li>
+</ul>
+</li>
+<li><a href="#test">Test?</a><ul>
+<li><a href="#second">Second</a><ul>
+<li><a href="#test-2">Test 2?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="hello">Hello</h1>
+<p>Anyone there?</p>
+<h2 id="no">No</h2>
+<p>Nobody.</p>
+<h1 id="test">Test?</h1>
+<p>Don&rsquo;t know how many of these I&rsquo;ll &ldquo;test&rdquo;.</p>
+<h2 id="second">Second</h2>
+<h3 id="test-2">Test 2?</h3>
+<p>Last one</p>]]></content:encoded>
+    </item>
     <item>
       <title>Second blog post for testing purposes</title>
       <link>https://blog.pyssg.xyz/a/second.html</link>
