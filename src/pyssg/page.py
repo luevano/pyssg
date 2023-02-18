@@ -12,6 +12,8 @@ class Page:
                  ctime: float,
                  mtime: float,
                  html: str,
+                 toc: str,
+                 toc_tokens: list[str],
                  meta: dict,
                  config: dict,
                  dir_config: dict) -> None:
@@ -21,6 +23,8 @@ class Page:
         self.ctimestamp: float = ctime
         self.mtimestamp: float = mtime
         self.content: str = html
+        self.toc: str = toc
+        self.toc_tokens: list[str] = toc_tokens
         self.meta: dict = meta
         self.config: dict = config
         self.dir_config: dict = dir_config

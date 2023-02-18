@@ -35,7 +35,7 @@ This program uses the base [`markdown` syntax](https://daringfireball.net/projec
 - Meta-Data.
 - Sane Lists.
 - SmartyPants.
-- Table of Contents.
+- Table of Contents. (With defaults as specified [here](https://python-markdown.github.io/extensions/toc/))
 - WikiLinks.
 - [yafg - Yet Another Figure Generator](https://git.sr.ht/~ferruck/yafg)
 - [Markdown Checklist](https://github.com/FND/markdown-checklist)
@@ -137,25 +137,25 @@ fmt:
   list_sep_date: "%B %Y"
 dirs:
   /: # root "dir_path", whatever is sitting directly under "src"
-	cfg:
-	  plt: "page.html"
-	  # the template can be specified instead of just True/False, a default template will used
-	  tags: False
-	  index: True
-	  rss: True
-	  sitemap: True
-	  exclude_dirs: ["articles", "blog"] # optional; list of subdirectories to exclude when parsing the / dir_path
+    cfg:
+      plt: "page.html"
+      # the template can be specified instead of just True/False, a default template will used
+      tags: False
+      index: True
+      rss: True
+      sitemap: True
+      exclude_dirs: ["articles", "blog"] # optional; list of subdirectories to exclude when parsing the / dir_path
 # below are other example "dir_paths", can be named anything, only the / (above) is mandatory
   articles:
     cfg:
-	  plt: "page.html"
-	  tags: True
-	  index: True
-	  rss: True
-	  sitemap: True
+      plt: "page.html"
+      tags: True
+      index: True
+      rss: True
+      sitemap: True
   blog:
     cfg:
-	  # ...
+      # ...
 ...
 ```
 
@@ -178,7 +178,7 @@ sitemap_run_date: # date the program was run, formatted with 'fmt.sitemap_date'
 ...
 ```
 
-You can add any other option/section that you can later use in the Jinja templates via the exposed config object. URL's shouldn't have the trailing slash `/`
+You can add any other option/section that you can later use in the Jinja templates via the exposed config object. URL's shouldn't have the trailing slash `/`.
 
 ## Available Jinja variables
 
@@ -193,6 +193,8 @@ These variables are exposed to use within the templates. The below list is displ
 	- `lang` (`str`): page language, used for the general `html` tag `lang` attribute.
 	- `summary` (`str`): summary of the page, as specified in the `*.md` file.
 	- `content` (`str`): actual content of the page, this is the `html`.
+    - `toc` (`str`): table of contents as taken from `md.toc`.
+    - `toc_tokens` (`list(dict)`): table of contents tokens as taken from `md.toc_tokens`.
 	- `cdatetime` (`datetime.datetime`): creation datetime object of the page.
 	- `cdate` (`method`): method thtat takes the name of the `fmt.FMT` and applies it to the `cdatetime` object.
 	- `cdate_rss` (`str`): formatted `cdatetime` as required by rss.
