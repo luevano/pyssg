@@ -24,17 +24,17 @@ def main() -> None:
         arg_parser.print_usage()
         # even if it's an error, print it as info
         #   as it is not critical, only config related
-        log.info(message)
+        log.info(f'pyssg: error: {message}, --help for more')
         sys.exit(1)
 
     # -1 as first argument is program path
     num_args = len(sys.argv) - 1
     if num_args == 2 and args['config']:
-        _log_perror('pyssg: error: only config argument passed, --help for more')
+        _log_perror('only config argument passed')
     elif not num_args > 0 or (num_args == 1 and args['debug']):
-        _log_perror('pyssg: error: no arguments passed, --help for more')
+        _log_perror('no arguments passed')
     elif num_args == 3 and (args['debug'] and args['config']):
-        _log_perror("pyssg: error: no arguments passed other than 'debug' and 'config', --help for more")
+        _log_perror('no arguments passed other than "debug" and "config"')
 
     if args['version']:
         log.info('pyssg v%s', VERSION)
