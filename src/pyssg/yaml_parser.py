@@ -13,6 +13,10 @@ def __join_constructor(loader: SafeLoader, node: SequenceNode) -> str:
     return ''.join([str(i) for i in seq])
 
 
+def setup_custom_yaml() -> None:
+    SafeLoader.add_constructor('!join', __join_constructor)
+
+
 def __read_raw_yaml(path: str) -> list[dict]:
     all_docs: list[dict] = []
     with open(path, 'r') as f:
@@ -28,6 +32,3 @@ def get_parsed_yaml(resource: str, package: str = '') -> list[dict]:
     log.debug('parsing yaml; reading "%s.%s"', package, resource)
     with rpath(package, resource) as p:
         return __read_raw_yaml(str(p))
-
-
-SafeLoader.add_constructor('!join', __join_constructor)
