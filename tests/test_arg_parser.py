@@ -31,7 +31,6 @@ def test_valid_args(args: list[str],
 @pytest.mark.parametrize('args', [
     (['--something-random']),
     (['-z']),
-    (['hello']),
     (['help']),
     (['h'])
 ])

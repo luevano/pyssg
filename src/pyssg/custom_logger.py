@@ -1,4 +1,11 @@
-from logging import Formatter, LogRecord, DEBUG, INFO, WARNING, ERROR, CRITICAL
+import sys
+from logging import (Logger, StreamHandler, Formatter, LogRecord,
+                     DEBUG, INFO, WARNING, ERROR, CRITICAL,
+                     getLogger)
+
+LOG_LEVEL: int = INFO
+# 'pyssg' es the name of the root logger
+LOGGER_NAME: str = 'pyssg'
 
 
 # only reason for this class is to get info formatting as normal text
@@ -27,3 +34,12 @@ class PerLevelFormatter(Formatter):
         formatter: Formatter = Formatter(
             fmt=fmt, datefmt=self.__DATE_FMT, style='%')
         return formatter.format(record)
+
+
+def setup_logger(name: str = LOGGER_NAME, level: int = LOG_LEVEL) -> None:
+    logger: Logger = getLogger(name)
+    handler: StreamHandler = StreamHandler(sys.stdout)
+    logger.setLevel(level)
+    handler.setLevel(level)
+    handler.setFormatter(PerLevelFormatter())
+    logger.addHandler(handler)
