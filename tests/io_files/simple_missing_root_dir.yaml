@@ -17,12 +17,6 @@ fmt:
   list_date: "%b %d"
   list_sep_date: "%B %Y"
 dirs:
-  /:
-    cfg:
-      plt: "page.html"
-      tags: False
-      index: False
-      rss: False
-      sitemap: False
-      exclude_dirs: []
+# test missing /:
+  something:
 ...

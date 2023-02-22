@@ -2,6 +2,7 @@ import sys
 from importlib.metadata import version
 from datetime import datetime, timezone
 from logging import Logger, getLogger
+from typing import Any
 
 from .utils import get_expanded_path
 from .yaml_parser import get_parsed_yaml
@@ -23,15 +24,23 @@ def __check_well_formed_config(config: dict,
             sys.exit(1)
         # checks for dir_paths
         if key == 'dirs':
-            if '/' not in config[key]:
-                log.error('config doesn\'t have "%s./"', current_key)
-                log.debug('key: %s; config.keys: %s', key, config[key].keys())
+            try:
+                config[key].keys()
+            except AttributeError:
+                log.error('config doesn\'t have any dirs configs (dirs.*)')
                 sys.exit(1)
-            log.debug('checking "%s" fields for (%s) dir_paths', key, ', '.join(config[key].keys()))
+            if '/' not in config[key]:
+                log.debug('key: %s; config.keys: %s', key, config[key].keys())
+                log.error('config doesn\'t have "%s./"', current_key)
+                sys.exit(1)
+            log.debug('checking "%s" fields for (%s) dir_paths',
+                      key, ', '.join(config[key].keys()))
             for dkey in config[key].keys():
                 new_current_key: str = f'{current_key}.{dkey}'
                 new_config_base: list[dict] = [config_base[1], config_base[1]]
-                __check_well_formed_config(config[key][dkey], new_config_base, new_current_key)
+                __check_well_formed_config(config[key][dkey],
+                                           new_config_base,
+                                           new_current_key)
             continue
         # the case for elements that don't have nested elements
         if not config_base[0][key]:
@@ -48,12 +57,14 @@ def __expand_all_paths(config: dict) -> None:
 
 
 # not necessary to type deeper than the first dict
-def get_parsed_config(path: str) -> list[dict]:
+def get_parsed_config(path: str,
+                      mc_package: str = 'mandatory_config.yaml',
+                      plt_resource: str = 'pyssg.plt') -> list[dict]:
     log.debug('reading config file "%s"', path)
     config_all: list[dict] = get_parsed_yaml(path)
-    mandatory_config: list[dict] = get_parsed_yaml('mandatory_config.yaml', 'pyssg.plt')
-    log.info('found %s document(s) for configuration "%s"', len(config_all), path)
-    log.debug('checking that config file is well formed (at least contains mandatory fields')
+    mandatory_config: list[dict] = get_parsed_yaml(mc_package, plt_resource)
+    log.info('found %s document(s) for config "%s"', len(config_all), path)
+    log.debug('checking that config file is well formed')
     for config in config_all:
         __check_well_formed_config(config, mandatory_config)
         __expand_all_paths(config)
@@ -62,11 +73,15 @@ def get_parsed_config(path: str) -> list[dict]:
 
 # not necessary to type deeper than the first dict,
 #   static config means config that shouldn't be changed by the user
-def get_static_config() -> dict[str, dict]:
+def get_static_config(sc_package: str = 'static_config.yaml',
+                      plt_resource: str = 'pyssg.plt') -> dict[str, dict]:
     log.debug('reading and setting static config')
-    config: dict = get_parsed_yaml('static_config.yaml', 'pyssg.plt')[0]
-    # do I really need a lambda function...
+    config: dict[str, Any] = get_parsed_yaml(sc_package, plt_resource)[0]
+
+    def __time(fmt: str) -> str:
+        return datetime.now(tz=timezone.utc).strftime(config['fmt'][fmt])
+
     config['info']['version'] = VERSION
-    config['info']['rss_run_date'] = datetime.now(tz=timezone.utc).strftime(config['fmt']['rss_date'])
-    config['info']['sitemap_run_date'] = datetime.now(tz=timezone.utc).strftime(config['fmt']['sitemap_date'])
+    config['info']['rss_run_date'] = __time('rss_date')
+    config['info']['sitemap_run_date'] = __time('sitemap_date')
     return config

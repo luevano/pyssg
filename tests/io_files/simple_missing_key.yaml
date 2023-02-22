@@ -2,7 +2,8 @@
 ---
 define: &root "$PYSSG_HOME/pyssg/site_example/"
 
-title: "Example site"
+# test missing mandatory key
+# title: "Example site"
 path:
   src: !join [*root, "src"]
   dst: !join [*root, "dst"]

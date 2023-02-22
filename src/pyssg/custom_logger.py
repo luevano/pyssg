@@ -2,6 +2,7 @@ import sys
 from logging import (Logger, StreamHandler, Formatter, LogRecord,
                      DEBUG, INFO, WARNING, ERROR, CRITICAL,
                      getLogger)
+from typing import TextIO
 
 LOG_LEVEL: int = INFO
 # 'pyssg' es the name of the root logger
@@ -38,7 +39,7 @@ class PerLevelFormatter(Formatter):
 
 def setup_logger(name: str = LOGGER_NAME, level: int = LOG_LEVEL) -> None:
     logger: Logger = getLogger(name)
-    handler: StreamHandler = StreamHandler(sys.stdout)
+    handler: StreamHandler[TextIO] = StreamHandler(sys.stdout)
     logger.setLevel(level)
     handler.setLevel(level)
     handler.setFormatter(PerLevelFormatter())

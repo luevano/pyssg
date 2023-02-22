@@ -8,7 +8,8 @@ testpaths = [
     "tests",
 ]
 env = [
-    "PYMDVAR_TEST_1=1"
+    "PYMDVAR_TEST_1=1",
+    "PYSSG_HOME=/tmp/pyssg"
 ]
 
 [tool.mypy]

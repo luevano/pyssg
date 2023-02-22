@@ -1,6 +1,5 @@
 import pytest
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
-from typing import Callable
+from logging import Logger, DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 
 @pytest.mark.parametrize('log_level, starts_with, message', [
@@ -13,7 +12,7 @@ from typing import Callable
 def test_log_levels(log_level: int,
                     starts_with: str,
                     message: str,
-                    logger: Callable,
+                    logger: Logger,
                     capture_stdout: dict[str, str | int]) -> None:
     logger.log(log_level, message)
     assert str(capture_stdout['stdout']).startswith(starts_with)
