@@ -20,7 +20,8 @@ def get_file_list(path: str,
             dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for file in files:
             if file.endswith(exts):
-                # [1:] is required to remove the '/' at the beginning after replacing
+                # [1:] is required to remove the '/'
+                #   at the beginning after replacing
                 file_name: str = os.path.join(root, file).replace(path, '')[1:]
                 file_list.append(file_name)
                 log.debug('added file "%s" without "%s" part: "%s"',
@@ -44,7 +45,8 @@ def get_dir_structure(path: str,
             if root in dir_list:
                 dir_list.remove(root)
                 log.debug('removed dir "%s" as it already is in the list', root)
-            # not removing the 'path' part here, as comparisons with 'root' would fail
+            # not removing the 'path' part here,
+            #   as comparisons with 'root' would fail
             joined_dir: str = os.path.join(root, d)
             dir_list.append(joined_dir)
             log.debug('added dir "%s" to the list', joined_dir)
@@ -53,19 +55,29 @@ def get_dir_structure(path: str,
     return [d.replace(path, '')[1:] for d in dir_list]
 
 
+# TODO: probably change it so it returns a bool, easier to check
 def create_dir(path: str, p: bool = False, silent=False) -> None:
+    log_msg: str = ''
     try:
         if p:
             os.makedirs(path)
         else:
             os.mkdir(path)
+        log_msg = f'created directory "{path}"'
         if not silent:
-            log.info('created directory "%s"', path)
+            log.info(log_msg)
+        log.debug(log_msg)
     except FileExistsError:
+        log_msg = f'directory "{path}" exists, ignoring'
         if not silent:
-            log.info('directory "%s" already exists, ignoring', path)
+            log.info(log_msg)
+        log.debug(log_msg)
 
 
+# TODO: change this as it doesn't take directories into account,
+#   a file can be copied into a directory, need to get the filename
+#   and use it when copying
+# TODO: probably change it so it returns a bool, easier to check
 def copy_file(src: str, dst: str) -> None:
     if not os.path.exists(dst):
         shutil.copy2(src, dst)

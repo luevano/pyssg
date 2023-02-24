@@ -1,7 +1,8 @@
 import os
 import sys
 import pytest
-from typing import Callable
+from pathlib import Path
+from typing import Any, Callable
 from pytest import MonkeyPatch
 from argparse import ArgumentParser
 from datetime import datetime, timezone
@@ -70,3 +71,48 @@ def get_fmt_time() -> Callable[..., str]:
     def fmt_time(fmt: str) -> str:
         return datetime.now(tz=timezone.utc).strftime(fmt)
     return fmt_time
+
+
+@pytest.fixture
+def simple_dict() -> dict[str, Any]:
+    return {'define': '$PYSSG_HOME/pyssg/site_example/',
+            'title': 'Example site',
+            'path': {
+                'src': '/tmp/pyssg/pyssg/site_example/src',
+                'dst': '/tmp/pyssg/pyssg/site_example/dst',
+                'plt': '/tmp/pyssg/pyssg/site_example/plt',
+                'db': '/tmp/pyssg/pyssg/site_example/.files'},
+            'url': {
+                'main': 'https://example.com',
+                'static': 'https://static.example.com',
+                'default_image': 'images/default.png'},
+            'fmt': {
+                'date': '%a, %b %d, %Y @ %H:%M %Z',
+                'list_date': '%b %d',
+                'list_sep_date': '%B %Y'},
+            'dirs': {
+                '/': {
+                    'cfg': {
+                        'plt': 'page.html',
+                        'tags': False,
+                        'index': False,
+                        'rss': False,
+                        'sitemap': False,
+                        'exclude_dirs': []}}}}
+
+
+@pytest.fixture(scope='function')
+def tmp_dir_structure(tmp_path: Path) -> Path:
+    root: Path = tmp_path/'dir_str'
+    # order matters
+    dirs: list[Path] = [root,
+                        root/'first',
+                        root/'first/f1',
+                        root/'first/f1/f2',
+                        root/'second',
+                        root/'second/s1']
+    for i, d in enumerate(dirs):
+        d.mkdir()
+        for ext in ['txt', 'md', 'html']:
+            (d/f'f{i}.{ext}').write_text('sample')
+    return root
