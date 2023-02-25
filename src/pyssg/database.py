@@ -20,8 +20,9 @@ class Database:
         self.e: dict[str, DatabaseEntry] = dict()
 
     def update_tags(self, file_name: str,
-                    new_tags: list[str]) -> None:
-        # technically, I should ensure this function can only run if self.e is populated
+                    new_tags: set[str]) -> None:
+        # technically, I should ensure this function can only run
+        #   if self.e is populated
         if file_name in self.e:
             log.debug('updating tags for entry "%s"', file_name)
             log.debug('entry "%s" old tags: %s',
@@ -39,7 +40,7 @@ class Database:
                remove: str = '') -> None:
         log.debug('updating entry for file "%s"', file_name)
         f: str = file_name
-        tags: list[str] = []
+        tags: set[str] = set()
         if remove != '':
             f = file_name.replace(remove, '')
             log.debug('removed "%s" from "%s": "%s"', remove, file_name, f)
@@ -49,8 +50,8 @@ class Database:
         log.debug('time for "%s": %s', file_name, time)
 
         # calculate current checksum, also needs actual file name
-        checksum: str = get_checksum(file_name)
-        log.debug('checksum for "%s": "%s"', file_name, checksum)
+        cksm: str = get_checksum(file_name)
+        log.debug('checksum for "%s": "%s"', file_name, cksm)
 
         # three cases, 1) entry didn't exist,
         # 2) entry has been mod and,
@@ -58,7 +59,7 @@ class Database:
         # 1)
         if f not in self.e:
             log.debug('entry "%s" didn\'t exist, adding with defaults', f)
-            self.e[f] = DatabaseEntry([f, time, 0.0, checksum, tags])
+            self.e[f] = DatabaseEntry((f, time, 0.0, cksm, tags))
             return
 
         # old_e is old entity
@@ -66,10 +67,10 @@ class Database:
         log.debug('entry "%s" old content: %s', f, old_e)
 
         # 2)
-        if checksum != old_e.checksum:
+        if cksm != old_e.checksum:
             log.debug('entry "%s" has been modified, updating', f)
-            self.e[f] = DatabaseEntry([f, old_e.ctimestamp, time, checksum, tags])
-            log.debug('entry "%s" new content: (%s, %s, %s, (%s))', f, self.e[f])
+            self.e[f] = DatabaseEntry((f, old_e.ctimestamp, time, cksm, tags))
+            log.debug('entry "%s" new content: %s', f, self.e[f])
             return
         # 3)
         else:
@@ -96,7 +97,7 @@ class Database:
             sys.exit(1)
         return True
 
-    def _get_csv_rows(self) -> list[list[str]]:
+    def _get_raw_csv_rows(self) -> list[list[str]]:
         rows: list[list[str]]
         with open(self.db_path, 'r') as f:
             csv_reader = csv.reader(f, delimiter=self.__COLUMN_DELIMITER)
@@ -110,7 +111,7 @@ class Database:
         if not self._db_path_exists():
             return
 
-        rows: list[list[str]] = self._get_csv_rows()
+        rows: list[list[str]] = self._get_raw_csv_rows()
         # l=list of values in entry
         log.debug('parsing rows from db')
         for it, row in enumerate(rows):
@@ -122,5 +123,11 @@ class Database:
                              ' columns: "%s"',
                              i, self.__COLUMN_NUM, col_num, row)
                 sys.exit(1)
-            entry: DatabaseEntry = DatabaseEntry(row)
+            # actual value types
+            r: tuple[str, float, float, str, str] = (str(row[0]),
+                                                     float(row[1]),
+                                                     float(row[2]),
+                                                     str(row[3]),
+                                                     str(row[4]))
+            entry: DatabaseEntry = DatabaseEntry(r)
             self.e[entry.fname] = entry

@@ -151,7 +151,7 @@ def test_dir_structure(tmp_dir_structure: Path,
     (('md',), ['first'], ['f0.md', 'second/f4.md', 'second/s1/f5.md']),
     (('md',), ['first', 's1'], ['f0.md', 'second/f4.md']),
     (('md',), ['f2', 's1'], ['f0.md', 'second/f4.md',
-                             'first/f1.md', 'first/f1/f2.md',]),
+                             'first/f1.md', 'first/f1/f2.md',])
 ])
 def test_file_list(tmp_dir_structure: Path,
                    exts: tuple[str],
