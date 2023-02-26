@@ -113,7 +113,7 @@ def test_update_entry_new_entry_fname_only(tmp_db: Path,
     fname: str = f'{tmp_src_dir}/new.md'
     deb: tuple[str, int, str] = ('pyssg.database',
                                  DEBUG,
-                                 f'entry "new.md" didn\'t exist, adding with'
+                                 'entry "new.md" didn\'t exist, adding with'
                                  ' defaults')
     db: Database = Database(str(tmp_db))
     db.read()
@@ -128,7 +128,7 @@ def test_update_entry_no_mod(tmp_db: Path,
     fname: str = f'{tmp_src_dir}/first.md'
     deb: tuple[str, int, str] = ('pyssg.database',
                                  DEBUG,
-                                 f'entry "first.md" hasn\'t been modified')
+                                 'entry "first.md" hasn\'t been modified')
     db: Database = Database(str(tmp_db))
     db.read()
     db.update(fname, f'{tmp_src_dir}/')
@@ -144,7 +144,7 @@ def test_update_entry_modified(tmp_db: Path,
         f.write('Added modification.\n')
     deb: tuple[str, int, str] = ('pyssg.database',
                                  DEBUG,
-                                 f'entry "a/second.md" new content: ')
+                                 'entry "a/second.md" new content: ')
     db: Database = Database(str(tmp_db))
     db.read()
     db.update(fname, f'{tmp_src_dir}/')
