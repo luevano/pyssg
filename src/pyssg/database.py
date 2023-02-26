@@ -26,11 +26,11 @@ class Database:
         if file_name in self.e:
             log.debug('updating tags for entry "%s"', file_name)
             log.debug('entry "%s" old tags: %s',
-                      file_name, self.e[file_name])
+                      file_name, self.e[file_name].tags)
 
             self.e[file_name].update_tags(new_tags)
             log.debug('entry "%s" new tags: %s',
-                      file_name, self.e[file_name])
+                      file_name, self.e[file_name].tags)
         else:
             log.error('can\'t update tags for entry "%s",'
                       ' as it is not present in db', file_name)
@@ -62,20 +62,19 @@ class Database:
             self.e[f] = DatabaseEntry((f, time, 0.0, cksm, tags))
             return
 
-        # old_e is old entity
-        old_e: DatabaseEntry = self.e[f]
-        log.debug('entry "%s" old content: %s', f, old_e)
+        # oe is old entity
+        oe: DatabaseEntry = self.e[f]
+        log.debug('entry "%s" old content: %s', f, oe)
 
         # 2)
-        if cksm != old_e.checksum:
-            log.debug('entry "%s" has been modified, updating', f)
-            self.e[f] = DatabaseEntry((f, old_e.ctimestamp, time, cksm, tags))
+        if cksm != oe.checksum:
+            log.debug('entry "%s" has been modified, updating; '
+                      'using old tags', f)
+            self.e[f] = DatabaseEntry((f, oe.ctimestamp, time, cksm, oe.tags))
             log.debug('entry "%s" new content: %s', f, self.e[f])
-            return
         # 3)
         else:
             log.debug('entry "%s" hasn\'t been modified', f)
-            return
 
     def write(self) -> None:
         log.debug('writing db')
@@ -93,7 +92,7 @@ class Database:
                         ' ignore if it\'s the first run', self.db_path)
             return False
         if not os.path.isfile(self.db_path):
-            log.error('"%s" is not a file"', self.db_path)
+            log.error('"%s" is not a file', self.db_path)
             sys.exit(1)
         return True
 

@@ -82,7 +82,7 @@ class MDParser:
 
             if self.dir_config['tags'] and page.tags is not None:
                 log.debug('parsing tags for "%s"', f)
-                self.db.update_tags(f, list(map(itemgetter(0), page.tags)))
+                self.db.update_tags(f, set(map(itemgetter(0), page.tags)))
 
                 log.debug('add all tags to tag list')
                 for t in page.tags:
