@@ -12,19 +12,15 @@ Initially inspired by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and [`
 	- [x] Uses [`jinja`](https://jinja.palletsprojects.com/en/3.0.x/) for templating.
 	- [x] Preserves hand-made `*.html` files.
 	- [x] Tag functionality, useful for blog-style sites.
-	- [ ] Open Graph (and similar) support.
-		- Technically, this works if you add the correct metadata to the `*.md` files and use the variables available for Jinja.
 - [x] Build `sitemap.xml` file.
 	- [ ] Include manually added `*.html` files.
 - [x] Build `rss.xml` file.
-	- [ ] Join the `static_url` to all relative URLs found to comply with the [RSS 2.0 spec](https://validator.w3.org/feed/docs/rss2.html).
-		- This would be added to the parsed HTML text extracted from the MD files, so it would be available to the created `*.html` and `*.xml` files. Note that depending on the reader, it will append the URL specified in the RSS file or use the [`xml:base`](https://www.rssboard.org/news/151/relative-links) specified (for example, [newsboat](https://newsboat.org/) parses `xml:base`).
 	- [ ] Include manually added `*.html` files.
 - [x] YAML for configuration file, uses [`PyYAML`](https://pyyaml.org/).
-	- [ ] Handle multiple "documents".
-	- [ ] More complex directory structure to support multiple subdomains and different types of pages.
+	- [x] Handle multiple "documents". `PyYAML` supports this.
+	- [x] More complex directory structure to support multiple subdomains and different types of pages. This is supported by using mupltiple "documents" in the `yaml` config file.
+- [x] File checksum checking for modification of files.
 - [ ] Option/change to using an SQL database instead of the custom solution.
-- [x] Checksum checking because the timestamp of the file is not enough.
 - [ ] Use external markdown extensions.
 
 ### Markdown features
@@ -37,6 +33,7 @@ This program uses the base [`markdown` syntax](https://daringfireball.net/projec
 - SmartyPants.
 - Table of Contents. (With defaults as specified [here](https://python-markdown.github.io/extensions/toc/))
 - WikiLinks.
+- [pymdvar](https://github.com/luevano/pymdvar) (made by me).
 - [yafg - Yet Another Figure Generator](https://git.sr.ht/~ferruck/yafg)
 - [Markdown Checklist](https://github.com/FND/markdown-checklist)
 - [PyMdown Extensions](https://facelessuser.github.io/pymdown-extensions/)
@@ -196,19 +193,18 @@ These variables are exposed to use within the templates. The below list is displ
     - `toc` (`str`): table of contents as taken from `md.toc`.
     - `toc_tokens` (`list(dict)`): table of contents tokens as taken from `md.toc_tokens`.
 	- `cdatetime` (`datetime.datetime`): creation datetime object of the page.
-	- `cdate` (`method`): method thtat takes the name of the `fmt.FMT` and applies it to the `cdatetime` object.
+	- `cdate` (`method`): method that takes the name of the `fmt.FMT` and applies it to the `cdatetime` object.
 	- `cdate_rss` (`str`): formatted `cdatetime` as required by rss.
 	- `cdate_sitemap` (`str`): formatted `cdatetime` as required by sitemap.
 	- `mdatetime` (`datetime.datetime`): modification datetime object of the page. Defaults to `None`.
-	- `mdate` (`method`): method thtat takes the name of the `fmt.FMT` and applies it to the `mdatetime` object.
+	- `mdate` (`method`): method that takes the name of the `fmt.FMT` and applies it to the `mdatetime` object.
 	- `mdate_rss` (`str`): formatted `mdatetime` as required by rss.
 	- `mdate_sitemap` (`str`): formatted `mdatetime` as required by sitemap.
 	- `tags` (`list(tuple(str))`): list of tuple of tags of the page, containing the name and the url of the tag, in that order. Defaults to empty list.
 	- `url` (`str`): url of the page, this already includes the `url/main` from config file.
 	- `image_url` (`str`): image url of the page, this already includes the `url/static`. Defaults to the `url/default_image` config option.
 	- `next/previous` (`Page`): reference to the next or previous page object (containing all these attributes). Defaults to `None`.
-	- `og` (`dict(str, str)`): dict for object graph metadata.
-	- `meta` (`dict(str, list(str))`): meta dict as obtained from python-markdown, in case you use a meta tag not yet supported, it will be available there.
+	- `meta` (`dict(str, list(str))`): meta dict as obtained from python-markdown, in case you use a meta tag not directly supported, it will be available there.
 - `tag` (`tuple(str)`) (`tag.html`): tuple of name and url of the current tag.
 - `tag_pages` (`list(Page)`) (`tag.html`): similar to `all_pages` but contains all the pages for the current tag.
 - `all_tags` (`list(tuple(str))`) (all): similar to `page.tags` but contains all the tags.

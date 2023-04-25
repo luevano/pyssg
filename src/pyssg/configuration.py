@@ -12,6 +12,7 @@ DEFAULT_CONFIG_PATH: str = '$XDG_CONFIG_HOME/pyssg/config.yaml'
 VERSION: str = version('pyssg')
 
 
+# TODO: add checking for extensions config (such as pymdvar)
 def __check_well_formed_config(config: dict[str, Any],
                                config_base: list[dict[str, Any]],
                                prefix_key: str = '') -> None:
@@ -80,6 +81,7 @@ def get_static_config(sc_package: str = 'static_config.yaml',
     log.debug('reading and setting static config')
     config: dict[str, Any] = get_parsed_yaml(sc_package, plt_resource)[0]
 
+    # TODO: move this to utils and update the tests
     def __time(fmt: str) -> str:
         return datetime.now(tz=timezone.utc).strftime(config['fmt'][fmt])
 

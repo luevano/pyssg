@@ -33,13 +33,14 @@ def test_path_expansion_failure(path: str) -> None:
     assert system_exit.value.code == 1
 
 
-def test_checksum(test_dir: str, simple_yaml: str) -> None:
-    path: str = f'{test_dir}/io_files/{simple_yaml}'
-    simple_yaml_checksum: str = 'd4f0a3ed56fd530d3ea485dced25534c'
+def test_checksum(sample_files_path: str) -> None:
+    path: str = f'{sample_files_path}/checksum.txt'
+    simple_yaml_checksum: str = '437b5a0e20d32fc14944c1c00d066303'
     checksum: str = get_checksum(path)
     assert checksum == simple_yaml_checksum
 
 
+# TODO: actually check the existence of the files and not just the log
 def test_copy_file(tmp_path: Path, caplog: LogCaptureFixture) -> None:
     src: Path = tmp_path/'src'
     dst: Path = tmp_path/'dst'
@@ -55,7 +56,9 @@ def test_copy_file(tmp_path: Path, caplog: LogCaptureFixture) -> None:
     assert caplog.record_tuples[-1] == inf
 
 
-def test_copy_file_failure(tmp_path: Path, caplog: LogCaptureFixture) -> None:
+# TODO: actually check the existence of the files and not just the log
+def test_copy_file_already_exists(tmp_path: Path,
+                                  caplog: LogCaptureFixture) -> None:
     src: Path = tmp_path/'src'
     dst: Path = tmp_path/'dst'
     src.mkdir()
@@ -82,7 +85,9 @@ def test_create_dir(tmp_path: Path, caplog: LogCaptureFixture) -> None:
     assert caplog.record_tuples[-1] == inf
 
 
-def test_create_dir_failure(tmp_path: Path, caplog: LogCaptureFixture) -> None:
+# TODO: actually check the existence of the files and not just the log
+def test_create_dir_already_exists(tmp_path: Path,
+                                   caplog: LogCaptureFixture) -> None:
     path: Path = tmp_path/'new_dir'
     inf: tuple[str, int, str] = ('pyssg.utils',
                                  INFO,
@@ -106,7 +111,9 @@ def test_create_dirs(tmp_path: Path, caplog: LogCaptureFixture) -> None:
     assert caplog.record_tuples[-1] == inf
 
 
-def test_create_dirs_failure(tmp_path: Path, caplog: LogCaptureFixture) -> None:
+# TODO: actually check the existence of the files and not just the log
+def test_create_dirs_already_exists(tmp_path: Path,
+                                    caplog: LogCaptureFixture) -> None:
     path: Path = tmp_path/'new_dir'
     sub_path: Path = path/'sub_dir'
     inf: tuple[str, int, str] = ('pyssg.utils',
@@ -131,7 +138,7 @@ def test_dir_structure(tmp_dir_structure: Path,
                        exclude: list[str],
                        exp_dir_str: list[str]) -> None:
     dir_str: list[str] = get_dir_structure(str(tmp_dir_structure), exclude)
-    # order doesn't matter
+    # order doesn't matter, only for checking that both lists contain the same
     assert sorted(dir_str) == sorted(exp_dir_str)
 
 
@@ -158,5 +165,5 @@ def test_file_list(tmp_dir_structure: Path,
                    exclude_dirs: list[str],
                    exp_flist: list[str]) -> None:
     flist: list[str] = get_file_list(str(tmp_dir_structure), exts, exclude_dirs)
-    # order doesn't matter
+    # order doesn't matter, only for checking that both lists contain the same
     assert sorted(flist) == sorted(exp_flist)

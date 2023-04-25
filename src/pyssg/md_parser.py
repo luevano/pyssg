@@ -4,6 +4,7 @@ from logging import Logger, getLogger
 
 from markdown import Markdown
 from yafg import YafgExtension
+from pymdvar import VariableExtension
 from markdown_checklist.extension import ChecklistExtension
 
 from .database import Database
@@ -12,13 +13,17 @@ from .page import Page
 log: Logger = getLogger(__name__)
 
 
-def _get_md_obj() -> Markdown:
+# TODO: add configuration testing for extensions config (pymdvar for ex)
+def get_md_obj(variables: dict[str, str] = dict(),
+               enable_env: bool = False) -> Markdown:
     exts: list = ['extra',
                   'meta',
                   'sane_lists',
                   'smarty',
                   'toc',
                   'wikilinks',
+                  VariableExtension(variables=variables,
+                                    enable_env=enable_env),
                   # stripTitle generates an error when True,
                   # if there is no title attr
                   YafgExtension(stripTitle=False,
@@ -50,7 +55,7 @@ class MDParser:
         self.config: dict = config
         self.dir_config: dict = dir_config
         self.db: Database = db
-        self.md: Markdown = _get_md_obj()
+        self.md: Markdown = get_md_obj()
 
         self.all_files: list[Page] = []
         self.all_tags: list[tuple[str, str]] = []
@@ -65,7 +70,8 @@ class MDParser:
 
             log.debug('parsing md into html')
             content: str = self.md.reset().convert(open(src_file).read())
-            # ignoring md.Meta type as it is not yet defined (because it is from an extension)
+            # ignoring md.Meta type as it is not yet defined
+            #   (because it is from an extension)
             page: Page = Page(f,
                               self.db.e[f].ctimestamp,
                               self.db.e[f].mtimestamp,

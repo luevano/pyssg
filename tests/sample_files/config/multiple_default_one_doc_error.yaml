@@ -10,12 +10,8 @@ path:
   db: !join [*root, ".files"]
 url:
   main: "https://example.com"
-  static: "https://static.example.com"
-  default_image: "images/default.png"
 fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
-  list_date: "%b %d"
-  list_sep_date: "%B %Y"
 dirs:
   /:
     cfg:
@@ -24,7 +20,6 @@ dirs:
       index: False
       rss: False
       sitemap: False
-      exclude_dirs: []
 ...
 ---
 define: &root "$PYSSG_HOME/pyssg/site_example/"
@@ -37,12 +32,8 @@ path:
   db: !join [*root, ".files"]
 url:
   main: "https://example.com"
-  static: "https://static.example.com"
-  default_image: "images/default.png"
 fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
-  list_date: "%b %d"
-  list_sep_date: "%B %Y"
 dirs:
   # just removing all paths as it will cause an error
 ...

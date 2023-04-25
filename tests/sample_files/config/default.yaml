@@ -10,12 +10,14 @@ path:
   db: !join [*root, ".files"]
 url:
   main: "https://example.com"
-  static: "https://static.example.com"
-  default_image: "images/default.png"
 fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
-  list_date: "%b %d"
-  list_sep_date: "%B %Y"
 dirs:
-# test missing dirs
+  /:
+    cfg:
+      plt: "page.html"
+      tags: False
+      index: False
+      rss: False
+      sitemap: False
 ...

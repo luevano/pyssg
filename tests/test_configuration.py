@@ -7,10 +7,10 @@ from pyssg.configuration import get_static_config, get_parsed_config
 
 # this test is a bit sketchy, as the way the datetimes are calculated could vary
 #   by milliseconds or even have a difference in seconds
-def test_static_default(rss_date_fmt: str,
-                        sitemap_date_fmt: str,
-                        get_fmt_time: Callable[..., str],
-                        version: str) -> None:
+def test_static_config(rss_date_fmt: str,
+                       sitemap_date_fmt: str,
+                       get_fmt_time: Callable[..., str],
+                       version: str) -> None:
     rss_run_date: str = get_fmt_time(rss_date_fmt)
     sitemap_run_date: str = get_fmt_time(sitemap_date_fmt)
     sc_dict: dict[str, Any] = {'fmt': {'rss_date': rss_date_fmt,
@@ -22,21 +22,21 @@ def test_static_default(rss_date_fmt: str,
     assert static_config == sc_dict
 
 
-def test_simple(test_dir: str,
-                simple_yaml: str,
-                simple_dict: dict[str, Any]) -> None:
-    yaml_path: str = f'{test_dir}/io_files/{simple_yaml}'
+def test_default_config(sample_files_path: str,
+                        default_yaml: str,
+                        default_config_dict: dict[str, Any]) -> None:
+    yaml_path: str = f'{sample_files_path}/config/{default_yaml}'
     yaml: list[dict[str, Any]] = get_parsed_config(yaml_path)
     assert len(yaml) == 1
-    assert yaml[0] == simple_dict
+    assert yaml[0] == default_config_dict
 
 
-def test_simple_mising_key(test_dir: str,
-                           caplog: LogCaptureFixture) -> None:
+def test_default_config_mising_mandatory_key(sample_files_path: str,
+                                             caplog: LogCaptureFixture) -> None:
     err: tuple[str, int, str] = ('pyssg.configuration',
                                  ERROR,
                                  'config doesn\'t have "title"')
-    yaml_path: str = f'{test_dir}/io_files/simple_missing_key.yaml'
+    yaml_path: str = f'{sample_files_path}/config/default_missing_mandatory_key.yaml'
     with pytest.raises(SystemExit) as system_exit:
         get_parsed_config(yaml_path)
     assert system_exit.type == SystemExit
@@ -44,12 +44,12 @@ def test_simple_mising_key(test_dir: str,
     assert caplog.record_tuples[-1] == err
 
 
-def test_simple_mising_dirs(test_dir: str,
-                            caplog: LogCaptureFixture) -> None:
+def test_default_config_mising_dirs(sample_files_path: str,
+                                    caplog: LogCaptureFixture) -> None:
     err: tuple[str, int, str] = ('pyssg.configuration',
                                  ERROR,
                                  'config doesn\'t have any dirs (dirs.*)')
-    yaml_path: str = f'{test_dir}/io_files/simple_missing_dirs.yaml'
+    yaml_path: str = f'{sample_files_path}/config/default_missing_dirs.yaml'
     with pytest.raises(SystemExit) as system_exit:
         get_parsed_config(yaml_path)
     assert system_exit.type == SystemExit
@@ -57,12 +57,12 @@ def test_simple_mising_dirs(test_dir: str,
     assert caplog.record_tuples[-1] == err
 
 
-def test_simple_root_dir(test_dir: str,
-                         caplog: LogCaptureFixture) -> None:
+def test_default_config_root_dir(sample_files_path: str,
+                                 caplog: LogCaptureFixture) -> None:
     err: tuple[str, int, str] = ('pyssg.configuration',
                                  ERROR,
                                  'config doesn\'t have "dirs./"')
-    yaml_path: str = f'{test_dir}/io_files/simple_missing_root_dir.yaml'
+    yaml_path: str = f'{sample_files_path}/config/default_missing_root_dir.yaml'
     with pytest.raises(SystemExit) as system_exit:
         get_parsed_config(yaml_path)
     assert system_exit.type == SystemExit
@@ -71,24 +71,24 @@ def test_simple_root_dir(test_dir: str,
 
 
 # this really just tests that both documents in the yaml file are read,
-#   multiple.yaml is just simple.yaml with the same document twice,
-#   shouldn't be an issue as the yaml package handles this
-def test_multiple(test_dir: str, simple_dict: dict[str, Any]) -> None:
-    yaml_path: str = f'{test_dir}/io_files/multiple.yaml'
+#   both documents are the same (the default.yaml)
+def test_multiple_default_config(sample_files_path: str,
+                                 default_config_dict: dict[str, Any]) -> None:
+    yaml_path: str = f'{sample_files_path}/config/multiple_default.yaml'
     yaml: list[dict[str, Any]] = get_parsed_config(yaml_path)
     assert len(yaml) == 2
-    assert yaml[0] == simple_dict
-    assert yaml[1] == simple_dict
+    assert yaml[0] == default_config_dict
+    assert yaml[1] == default_config_dict
 
 
 # also, this just tests that the checks for a well formed config file are
 #   processed for all documents
-def test_multiple_one_doc_error(test_dir: str,
-                                caplog: LogCaptureFixture) -> None:
+def test_multiple_default_config_one_doc_error(sample_files_path: str,
+                                               caplog: LogCaptureFixture) -> None:
     err: tuple[str, int, str] = ('pyssg.configuration',
                                  ERROR,
                                  'config doesn\'t have any dirs (dirs.*)')
-    yaml_path: str = f'{test_dir}/io_files/multiple_one_doc_error.yaml'
+    yaml_path: str = f'{sample_files_path}/config/multiple_default_one_doc_error.yaml'
     with pytest.raises(SystemExit) as system_exit:
         get_parsed_config(yaml_path)
     assert system_exit.type == SystemExit

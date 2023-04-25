@@ -31,18 +31,18 @@ def sitemap_date_fmt():
 
 
 @pytest.fixture(scope='session')
-def test_dir() -> str:
-    return str(os.path.dirname(os.path.abspath(__file__)))
+def sample_files_path() -> str:
+    return f'{str(os.path.dirname(os.path.abspath(__file__)))}/sample_files'
 
 
 @pytest.fixture(scope='session')
-def test_resource() -> str:
-    return 'tests.io_files'
+def config_resource() -> str:
+    return 'tests.sample_files.config'
 
 
 @pytest.fixture(scope='session')
-def simple_yaml() -> str:
-    return 'simple.yaml'
+def default_yaml() -> str:
+    return 'default.yaml'
 
 
 @pytest.fixture(scope='session')
@@ -76,7 +76,7 @@ def get_fmt_time() -> Callable[..., str]:
 
 
 @pytest.fixture
-def simple_dict() -> dict[str, Any]:
+def default_config_dict() -> dict[str, Any]:
     return {'define': '$PYSSG_HOME/pyssg/site_example/',
             'title': 'Example site',
             'path': {
@@ -85,13 +85,9 @@ def simple_dict() -> dict[str, Any]:
                 'plt': '/tmp/pyssg/pyssg/site_example/plt',
                 'db': '/tmp/pyssg/pyssg/site_example/.files'},
             'url': {
-                'main': 'https://example.com',
-                'static': 'https://static.example.com',
-                'default_image': 'images/default.png'},
+                'main': 'https://example.com'},
             'fmt': {
-                'date': '%a, %b %d, %Y @ %H:%M %Z',
-                'list_date': '%b %d',
-                'list_sep_date': '%B %Y'},
+                'date': '%a, %b %d, %Y @ %H:%M %Z'},
             'dirs': {
                 '/': {
                     'cfg': {
@@ -99,13 +95,12 @@ def simple_dict() -> dict[str, Any]:
                         'tags': False,
                         'index': False,
                         'rss': False,
-                        'sitemap': False,
-                        'exclude_dirs': []}}}}
+                        'sitemap': False}}}}
 
 
 @pytest.fixture(scope='function')
 def tmp_dir_structure(tmp_path: Path) -> Path:
-    root: Path = tmp_path/'dir_str'
+    root: Path = tmp_path/'dir_structure'
     # order matters
     dirs: list[Path] = [root,
                         root/'first',
@@ -165,12 +160,12 @@ def tmp_db_wrong_col_num(tmp_path: Path) -> Path:
 
 @pytest.fixture(scope='function')
 def tmp_src_dir(tmp_path: Path,
-                test_dir: str) -> Path:
+                sample_files_path: str) -> Path:
     src: Path = tmp_path/'src'
     src_a: Path = src/'a'
     src.mkdir()
     src_a.mkdir()
-    src_test: str = f'{test_dir}/io_files/md'
+    src_test: str = f'{sample_files_path}/md'
 
     files: list[str] = ['first.md', 'new.md', 'a/second.md']
     for f in files:

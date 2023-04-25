@@ -6,8 +6,9 @@ from pyssg.database import Database
 from pyssg.database_entry import DatabaseEntry
 
 
-def test_read_database_no_db(test_dir: str, caplog: LogCaptureFixture) -> None:
-    path: str = f'{test_dir}/non_existent_db.psv'
+def test_read_database_no_db(sample_files_path: str,
+                             caplog: LogCaptureFixture) -> None:
+    path: str = f'{sample_files_path}/non_existent_db.psv'
     war: tuple[str, int, str] = ('pyssg.database',
                                  WARNING,
                                  f'"{path}" doesn\'t exist, will be created '
@@ -18,9 +19,9 @@ def test_read_database_no_db(test_dir: str, caplog: LogCaptureFixture) -> None:
     assert caplog.record_tuples[-1] == war
 
 
-def test_read_database_not_a_file(test_dir: str,
+def test_read_database_not_a_file(sample_files_path: str,
                                   caplog: LogCaptureFixture) -> None:
-    path: str = test_dir
+    path: str = sample_files_path
     err: tuple[str, int, str] = ('pyssg.database',
                                  ERROR,
                                  f'"{path}" is not a file')

@@ -6,3 +6,4 @@ yafg>=0.3
 pymdown-extensions>=9.9.2
 pymdvar>=1.0.3
 PyYAML>=6.0
+validators>=0.20.0
