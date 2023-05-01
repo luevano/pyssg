@@ -50,7 +50,7 @@ class Page:
         return self.ctimestamp < other.ctimestamp
 
     def __get_meta(self, var: str,
-                   or_else: str | list[str] = '') -> str | list[str] | Any:
+                   or_else: str | list[str] = ['']) -> str | list[str] | Any:
         if var in self.meta:
             log.debug('getting metadata "%s"', var)
             return self.meta[var]
@@ -84,10 +84,10 @@ class Page:
     # parses meta from self.meta
     def parse_metadata(self):
         log.debug('parsing metadata for file "%s"', self.name)
-        self.title = str(self.__get_meta('title'))
-        self.author = list(self.__get_meta('author', ['']))
-        self.summary = str(self.__get_meta('summary'))
-        self.lang = str(self.__get_meta('lang', 'en'))
+        self.title = str(self.__get_meta('title')[0])
+        self.author = list(self.__get_meta('author'))
+        self.summary = str(self.__get_meta('summary')[0])
+        self.lang = str(self.__get_meta('lang', ['en'])[0])
 
         log.debug('parsing timestamp')
         self.cdatetime = self.from_timestamp(self.ctimestamp)

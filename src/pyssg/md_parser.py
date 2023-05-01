@@ -1,6 +1,7 @@
 import os
 from operator import itemgetter
 from logging import Logger, getLogger
+from typing import Any
 
 from markdown import Markdown
 from yafg import YafgExtension
@@ -14,8 +15,8 @@ log: Logger = getLogger(__name__)
 
 
 # TODO: add configuration testing for extensions config (pymdvar for ex)
-def get_md_obj(variables: dict[str, str] = dict(),
-               enable_env: bool = False) -> Markdown:
+def get_md_obj(variables: dict[str, str],
+               enable_env: bool) -> Markdown:
     exts: list = ['extra',
                   'meta',
                   'sane_lists',
@@ -55,7 +56,19 @@ class MDParser:
         self.config: dict = config
         self.dir_config: dict = dir_config
         self.db: Database = db
-        self.md: Markdown = get_md_obj()
+        # TODO: actually add extensions support, for now only pymdvar is configured
+        self.pymdvar_vars: dict[str, str] = dict()
+        self.pymdvar_enable_env: bool = False
+        if 'exts' in config and 'pymdvar' in config['exts']:
+            pymdvar: dict[str, Any] = config['exts']['pymdvar']
+            if 'variables' in pymdvar and type(pymdvar['variables']) == dict:
+                self.pymdvar_vars = pymdvar['variables']
+            if 'enable_env' in pymdvar and type(pymdvar['enable_env']) == bool:
+                self.pymdvar_enable_env = pymdvar['enable_env']
+        log.warning('pymdvar_variables: %s', self.pymdvar_vars)
+        log.warning('pymdvar_enable_env: %s', self.pymdvar_enable_env)
+
+        self.md: Markdown = get_md_obj(self.pymdvar_vars, self.pymdvar_enable_env)
 
         self.all_files: list[Page] = []
         self.all_tags: list[tuple[str, str]] = []
