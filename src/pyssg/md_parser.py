@@ -7,6 +7,7 @@ from markdown import Markdown
 from yafg import YafgExtension
 from pymdvar import VariableExtension
 from markdown_checklist.extension import ChecklistExtension
+from markdown.extensions.toc import TocExtension
 
 from .database import Database
 from .page import Page
@@ -21,8 +22,9 @@ def get_md_obj(variables: dict[str, str],
                   'meta',
                   'sane_lists',
                   'smarty',
-                  'toc',
                   'wikilinks',
+                  TocExtension(permalink=True,
+                               baselevel=2),
                   VariableExtension(variables=variables,
                                     enable_env=enable_env),
                   # stripTitle generates an error when True,
@@ -65,8 +67,8 @@ class MDParser:
                 self.pymdvar_vars = pymdvar['variables']
             if 'enable_env' in pymdvar and type(pymdvar['enable_env']) == bool:
                 self.pymdvar_enable_env = pymdvar['enable_env']
-        log.warning('pymdvar_variables: %s', self.pymdvar_vars)
-        log.warning('pymdvar_enable_env: %s', self.pymdvar_enable_env)
+        log.debug('pymdvar_variables: %s', self.pymdvar_vars)
+        log.debug('pymdvar_enable_env: %s', self.pymdvar_enable_env)
 
         self.md: Markdown = get_md_obj(self.pymdvar_vars, self.pymdvar_enable_env)
 

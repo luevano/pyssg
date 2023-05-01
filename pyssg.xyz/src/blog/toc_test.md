@@ -7,25 +7,25 @@ tags: test
     short
     update
 
-This is just a table of content test
+This is just a table of content test. This uses the `[TOC]` markdown syntax, as described at [python-markdown toc](https://python-markdown.github.io/extensions/toc/).
 
-# Table of contents
+## Table of contents
 [TOC]
 
-# Hello
+## Hello
 
 Anyone there?
 
-## No
+### No
 
 Nobody.
 
-# Test?
+## Test?
 
 Don't know how many of these I'll "test".
 
-## Second
+### Second
 
-### Test 2?
+#### Test 2?
 
 Last one

@@ -14,7 +14,7 @@ path:
   db: !join [*root_path, "db.psv"]
 url:
   main: "https://pyssg.xyz"
-  static: "https://static.pyssg.xyz"
+  static: "https://static.luevano.xyz"
   default_image: "images/default.png"
 fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
@@ -29,6 +29,11 @@ dirs:
       rss: False
       sitemap: True
       exclude_dirs: []
+exts:
+  pymdvar:
+    variables:
+      SURL: "https://static.luevano.xyz"
+    enable_env: False
 ...
 ---
 define: &root_path "$HOME/pyssg/pyssg.xyz/"
@@ -45,7 +50,7 @@ path:
   db: !join [*root_path, "db_blog.psv"]
 url:
   main: "https://blog.pyssg.xyz"
-  static: "https://static.pyssg.xyz"
+  static: "https://static.luevano.xyz"
   default_image: "images/default.png"
 fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
@@ -60,4 +65,9 @@ dirs:
       rss: True
       sitemap: True
       exclude_dirs: []
+exts:
+  pymdvar:
+    variables:
+      SURL: "https://static.luevano.xyz"
+    enable_env: False
 ...

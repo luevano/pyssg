@@ -1,9 +1,10 @@
 title: pyssg
 
-Welcome to the official pyssg website. This is as of now serving as a testing ground when I'm making changes to it.
+Welcome to the official pyssg website. For now this is just used as testing grounds for pyssg changes.
 
 ## Blog
 
-You can find the blog (actually just a mock) [here](https://blog.pyssg.xyz).
-
-Get the RSS feed: [https://blog.pyssg.xyz/rss.xml](https://blog.pyssg.xyz/rss.xml)
+- Mock blog where I test some features: [pyssg blog](https://blog.pyssg.xyz)
+RSS: [https://blog.pyssg.xyz/rss.xml](https://blog.pyssg.xyz/rss.xml)
+- Personal blog that I normally use: [Luévano's blog](https://blog.luevano.xyz)
+RSS: [https://blog.luevano.xyz/rss.xml](https://blog.luevano.xyz/rss.xml)

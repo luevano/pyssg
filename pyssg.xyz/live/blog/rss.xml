@@ -18,7 +18,7 @@
     <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
     <ttl>30</ttl>
     <image>
-      <url>https://static.pyssg.xyz/images/default.png</url>
+      <url>https://static.luevano.xyz/images/default.png</url>
       <title>pyssg blog</title>
       <link>https://blog.pyssg.xyz</link>
     </image>
@@ -32,8 +32,8 @@
       <category>Test</category>
       <category>Update</category>
       <description>This is just a post used for testing.</description>
-      <content:encoded><![CDATA[<p>This is just a table of content test</p>
-<h1 id="table-of-contents">Table of contents</h1>
+      <content:encoded><![CDATA[<p>This is just a table of content test. This uses the <code>[TOC]</code> markdown syntax, as described at <a href="https://python-markdown.github.io/extensions/toc/">python-markdown toc</a>.</p>
+<h3 id="table-of-contents">Table of contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h3>
 <div class="toc">
 <ul>
 <li><a href="#table-of-contents">Table of contents</a></li>
@@ -50,14 +50,14 @@
 </li>
 </ul>
 </div>
-<h1 id="hello">Hello</h1>
+<h3 id="hello">Hello<a class="headerlink" href="#hello" title="Permanent link">&para;</a></h3>
 <p>Anyone there?</p>
-<h2 id="no">No</h2>
+<h4 id="no">No<a class="headerlink" href="#no" title="Permanent link">&para;</a></h4>
 <p>Nobody.</p>
-<h1 id="test">Test?</h1>
+<h3 id="test">Test?<a class="headerlink" href="#test" title="Permanent link">&para;</a></h3>
 <p>Don&rsquo;t know how many of these I&rsquo;ll &ldquo;test&rdquo;.</p>
-<h2 id="second">Second</h2>
-<h3 id="test-2">Test 2?</h3>
+<h4 id="second">Second<a class="headerlink" href="#second" title="Permanent link">&para;</a></h4>
+<h5 id="test-2">Test 2?<a class="headerlink" href="#test-2" title="Permanent link">&para;</a></h5>
 <p>Last one</p>]]></content:encoded>
     </item>
     <item>
