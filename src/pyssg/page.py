@@ -7,14 +7,14 @@ log: Logger = getLogger(__name__)
 
 class Page:
     def __init__(self, name: str,
-                       ctime: float,
-                       mtime: float,
-                       html: str,
-                       toc: str,
-                       toc_tokens: list[str],
-                       meta: dict[str, Any],
-                       config: dict[str, Any],
-                       dir_config: dict[str, Any]) -> None:
+                 ctime: float,
+                 mtime: float,
+                 html: str,
+                 toc: str,
+                 toc_tokens: list[str],
+                 meta: dict[str, Any],
+                 config: dict[str, Any],
+                 dir_config: dict[str, Any]) -> None:
         log.debug('initializing a page object with name "%s"', name)
         # initial data
         self.name: str = name
@@ -38,7 +38,6 @@ class Page:
 
         # constructed
         self.url: str
-        self.image_url: str
         self.cdate_rss: str
         self.cdate_sitemap: str
         self.mdate_rss: str | None = None
@@ -60,30 +59,29 @@ class Page:
                       var, or_else)
             return or_else
 
-    def cdate(self, format: str) -> str:
+    # these date/cdate/mdate might be a bit overcomplicated
+
+    def __date(self, dt: datetime, format: str) -> str:
         if format in self.config['fmt']:
-            return self.cdatetime.strftime(self.config['fmt'][format])
+            return dt.strftime(self.config['fmt'][format])
         else:
             log.warning('format "%s" not found in config, returning '
                         'empty string', format)
             return ''
+
+    def cdate(self, format: str) -> str:
+        return self.__date(self.cdatetime, format)
 
     def mdate(self, format: str) -> str:
         if self.mdatetime is None:
             log.warning('no mdatetime found, can\'t return a formatted string')
             return ''
-        if format in self.config['fmt']:
-            return self.mdatetime.strftime(self.config['fmt'][format])
-        else:
-            log.warning('format "%s" not found in config, returning '
-                        'empty string', format)
-            return ''
+        return self.__date(self.mdatetime, format)
 
     def from_timestamp(self, timestamp: float) -> datetime:
         return datetime.fromtimestamp(timestamp, tz=timezone.utc)
 
-    # parses meta from self.meta, for og, it prioritizes,
-    #   the actual og meta
+    # parses meta from self.meta
     def parse_metadata(self):
         log.debug('parsing metadata for file "%s"', self.name)
         self.title = str(self.__get_meta('title'))
@@ -124,26 +122,3 @@ class Page:
         name_html: str = self.name.replace(".md", ".html")
         self.url = f'{self.config["url"]["main"]}/{name_html}'
         log.debug('final url "%s"', self.url)
-
-        log.debug('parsing image url')
-        default_image_url: str = ''
-        if 'default_image' in self.config['url']:
-            log.debug('"default_image" url found, will use if no "image_url" '
-                      'is found')
-            default_image_url = self.config['url']['default_image']
-
-        image_url: str
-        image_url = str(self.__get_meta('image_url', default_image_url))
-
-        if image_url != '':
-            if 'static' in self.config['url']:
-                self.image_url = f'{self.config["url"]["static"]}/{image_url}'
-            else:
-                log.debug('no static url set, using main url')
-                self.image_url = f'{self.config["url"]["main"]}/{image_url}'
-            log.debug('final image url "%s"', self.image_url)
-        else:
-            self.image_url = ''
-            log.debug('no image url set for the page, could be because no'
-                      ' "image_url" was found in the metadata and/or no '
-                      ' "default_image" set in the config file')

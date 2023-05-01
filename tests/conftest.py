@@ -9,10 +9,12 @@ from argparse import ArgumentParser
 from datetime import datetime, timezone
 from importlib.metadata import version as v
 from logging import Logger, getLogger, DEBUG
+from copy import deepcopy
 
 from pyssg.arg_parser import get_parser
 from pyssg.custom_logger import setup_logger
 from pyssg.database_entry import DatabaseEntry
+from pyssg.page import Page
 
 
 @pytest.fixture(scope='session')
@@ -56,7 +58,7 @@ def logger() -> Logger:
     return getLogger(__name__)
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def capture_stdout(monkeypatch: MonkeyPatch) -> dict[str, str | int]:
     buffer: dict[str, str | int] = {'stdout': '', 'write_calls': 0}
 
@@ -68,15 +70,15 @@ def capture_stdout(monkeypatch: MonkeyPatch) -> dict[str, str | int]:
     return buffer
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def get_fmt_time() -> Callable[..., str]:
     def fmt_time(fmt: str) -> str:
         return datetime.now(tz=timezone.utc).strftime(fmt)
     return fmt_time
 
 
-@pytest.fixture
-def default_config_dict() -> dict[str, Any]:
+@pytest.fixture(scope='function')
+def default_config() -> dict[str, Any]:
     return {'define': '$PYSSG_HOME/pyssg/site_example/',
             'title': 'Example site',
             'path': {
@@ -96,6 +98,18 @@ def default_config_dict() -> dict[str, Any]:
                         'index': False,
                         'rss': False,
                         'sitemap': False}}}}
+
+
+@pytest.fixture(scope='function')
+def root_dir_config() -> dict[str, Any]:
+    return {'plt': 'page.html',
+            'tags': False,
+            'index': False,
+            'rss': False,
+            'sitemap': False,
+            'src': '/tmp/pyssg/pyssg/site_example/src',
+            'dst': '/tmp/pyssg/pyssg/site_example/dst',
+            'url': 'https://example.com'}
 
 
 @pytest.fixture(scope='function')
@@ -171,3 +185,61 @@ def tmp_src_dir(tmp_path: Path,
     for f in files:
         shutil.copy2(f'{src_test}/{f}', f'{str(src)}/{f}')
     return src
+
+
+@pytest.fixture(scope='function')
+def page_simple(default_config: dict[str, Any],
+                root_dir_config: dict[str, Any],
+                rss_date_fmt: str,
+                sitemap_date_fmt: str) -> Page:
+    # adding the fmt as it is added on the code before being passed to the page
+    config: dict[str, Any] = deepcopy(default_config)
+    config['fmt']['rss_date'] = rss_date_fmt
+    config['fmt']['sitemap_date'] = sitemap_date_fmt
+
+    return Page(
+        name='simple.md',
+        ctime=1682418172.291993,
+        mtime=0.0,
+        html='<p>Simple converted md with nothing but this text.</p>',
+        toc='<div class="toc">\n<ul></ul>\n</div>\n',
+        toc_tokens=[],
+        meta=dict(),
+        config=config,
+        dir_config=root_dir_config
+    )
+
+
+# this is basically page_simple with extras
+@pytest.fixture(scope='function')
+def page_simple_modified(default_config: dict[str, Any],
+                         root_dir_config: dict[str, Any],
+                         rss_date_fmt: str,
+                         sitemap_date_fmt: str) -> Page:
+    config: dict[str, Any] = deepcopy(default_config)
+    config['fmt']['rss_date'] = rss_date_fmt
+    config['fmt']['sitemap_date'] = sitemap_date_fmt
+
+    dir_config: dict[str, Any] = deepcopy(root_dir_config)
+    dir_config['tags'] = True
+    tags: list[str] = ['blog', 'english', 'etc']
+
+    basic_meta: dict[str, Any] = {
+        'title': 'Example title',
+        'author': 'Single Author',
+        'summary': 'Some summary.',
+        'lang': 'es',
+        'tags': tags
+    }
+
+    return Page(
+        name='simple_modified.md',
+        ctime=1682418300.291993,
+        mtime=1682418350.291993,
+        html='<p>Simple converted md with nothing but this text, modified.</p>',
+        toc='<div class="toc">\n<ul></ul>\n</div>\n',
+        toc_tokens=[],
+        meta=basic_meta,
+        config=config,
+        dir_config=dir_config
+    )

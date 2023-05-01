@@ -24,11 +24,11 @@ def test_static_config(rss_date_fmt: str,
 
 def test_default_config(sample_files_path: str,
                         default_yaml: str,
-                        default_config_dict: dict[str, Any]) -> None:
+                        default_config: dict[str, Any]) -> None:
     yaml_path: str = f'{sample_files_path}/config/{default_yaml}'
     yaml: list[dict[str, Any]] = get_parsed_config(yaml_path)
     assert len(yaml) == 1
-    assert yaml[0] == default_config_dict
+    assert yaml[0] == default_config
 
 
 def test_default_config_mising_mandatory_key(sample_files_path: str,
@@ -73,12 +73,12 @@ def test_default_config_root_dir(sample_files_path: str,
 # this really just tests that both documents in the yaml file are read,
 #   both documents are the same (the default.yaml)
 def test_multiple_default_config(sample_files_path: str,
-                                 default_config_dict: dict[str, Any]) -> None:
+                                 default_config: dict[str, Any]) -> None:
     yaml_path: str = f'{sample_files_path}/config/multiple_default.yaml'
     yaml: list[dict[str, Any]] = get_parsed_config(yaml_path)
     assert len(yaml) == 2
-    assert yaml[0] == default_config_dict
-    assert yaml[1] == default_config_dict
+    assert yaml[0] == default_config
+    assert yaml[1] == default_config
 
 
 # also, this just tests that the checks for a well formed config file are
