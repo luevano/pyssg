@@ -6,7 +6,7 @@ Initially inspired by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and [`
 
 ## Features and to-do
 
-**NOTE:** WIP, there will be changes that will break the setup.
+**NOTE:** WIP, there will be changes that will break `pyssg` generations/config setup.
 
 - [x] Build static site parsing `markdown` files ( `*.md` -> `*.html`)
 	- [x] Uses [`jinja`](https://jinja.palletsprojects.com/en/3.0.x/) for templating.
@@ -17,11 +17,12 @@ Initially inspired by Roman Zolotarev's [`ssg5`](https://rgz.ee/bin/ssg5) and [`
 - [x] Build `rss.xml` file.
 	- [ ] Include manually added `*.html` files.
 - [x] YAML for configuration file, uses [`PyYAML`](https://pyyaml.org/).
-	- [x] Handle multiple "documents". `PyYAML` supports this.
-	- [x] More complex directory structure to support multiple subdomains and different types of pages. This is supported by using mupltiple "documents" in the `yaml` config file.
+	- [x] Support for multiple "documents". `PyYAML` supports this. In `pyssg` context, it means it can generate multiple websites (I personally use it for subdomains).
+	- [x] Support for more complex directory structure to support configuration on a per directory basis.
 - [x] File checksum checking for modification of files.
 - [ ] Option/change to using an SQL database instead of the custom solution.
 - [ ] Use external markdown extensions.
+  - [x] So far only extension configuration is for my own extension [pymdvar](https://github.com/luevano/pymdvar).
 
 ### Markdown features
 
@@ -31,7 +32,8 @@ This program uses the base [`markdown` syntax](https://daringfireball.net/projec
 - Meta-Data.
 - Sane Lists.
 - SmartyPants.
-- Table of Contents. (With defaults as specified [here](https://python-markdown.github.io/extensions/toc/))
+- Table of Contents.
+  - With `permalink=True` and `baselevel=2`, for more: [python-markdown toc](https://python-markdown.github.io/extensions/toc/).
 - WikiLinks.
 - [pymdvar](https://github.com/luevano/pymdvar) (made by me).
 - [yafg - Yet Another Figure Generator](https://git.sr.ht/~ferruck/yafg)
@@ -75,7 +77,7 @@ pyssg -i
 
 - Strongly recommended to edit the `rss.xml` template.
 
-4. Place your `*.md` files somewhere inside the source directory. It accepts sub-directories.
+4. Place your `*.md` files somewhere inside the source directory. It accepts sub-directories. Optionally configure for subdirectories if they are to be treated a bit different.
 
 - Recommended (no longer mandatory) metadata keys that can be added to the top of `.md` files:
 
@@ -91,7 +93,7 @@ tags: english
 	etc
 ```
 
-- You can add more meta-data keys as long as it is [Python-Markdown compliant](https://python-markdown.github.io/extensions/meta_data/), and these will ve [available as Jinja variables](#available-jinja-variables).
+- You can add more meta-data keys as long as it is [Python-Markdown compliant](https://python-markdown.github.io/extensions/meta_data/), and these will ve [available as Jinja variables](#available-jinja-variables) in the `meta` object (`dict[str, Any]`).
 
 5. Build the `*.html` with:
 
@@ -99,7 +101,7 @@ tags: english
 pyssg -b
 ```
 
-- After this, you have ready to deploy `*.html` files.
+- After this, you have ready to deploy `*.html` files from the `dst` directory.
 
 ## Config file
 
@@ -110,7 +112,9 @@ variable: &variable_reference_name "value"
 other_variable: !join [*variable_reference_name, "other_value", 1]
 ```
 
-Which would produce `other_variable: "valueother_value1"`. Also environment variables will be expanded internally.
+Which would produce `other_variable: "valueother_value1"`. Also **environment variables will be expanded internally**.
+
+**Note**: URL's shouldn't have the trailing slash `/`.
 
 The following is a list of config items that need to be present in the config unless stated otherwise:
 
@@ -128,37 +132,65 @@ path:
   db: !join [*root, "src/", "db.psv"]
 url:
   main: "https://example.com"
+  # I personally use a "static" url for images/scripts/css/etc, not necessary
+  static: "https://static.example.com"
 fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
-  list_date: "%b %d"
-  list_sep_date: "%B %Y"
+  list_date: "%b %d" # not necessary
+  list_sep_date: "%B %Y" # not necessary
 dirs:
   /: # root "dir_path", whatever is sitting directly under "src"
     cfg:
-      plt: "page.html"
-      # the template can be specified instead of just True/False, a default template will used
+      plt: "page.html" # each page template, relative to path/plt
       tags: False
       index: True
       rss: True
       sitemap: True
-      exclude_dirs: ["articles", "blog"] # optional; list of subdirectories to exclude when parsing the / dir_path
-# below are other example "dir_paths", can be named anything, only the / (above) is mandatory
-  articles:
-    cfg:
-      plt: "page.html"
-      tags: True
-      index: True
-      rss: True
-      sitemap: True
-  blog:
-    cfg:
-      # ...
+      exclude_dirs: ["articles", "blog"] # optional; list of subdirs to exclude when parsing this "dir_path"
 ...
 ```
 
-The config under `dirs` are just per-subdirectory configuration of directories under `src`. Only the `/` "dir_path" is required as it is the config for the root `src` path files.
+So far only [pymdvar](https://github.com/luevano/pymdvar) can be configured by including the following to the config:
 
-The following will be added on runtime:
+```yaml
+exts:
+  pymdvar:
+    variables:
+      SOME_VAR: "some value"
+      some_other_variable: 123
+    enable_env: True # to read environment variables
+```
+
+The config under `dirs` are just per-subdirectory configuration of directories under `src`, which I called "dir_paths" for lack of creativity. Only the `/` "dir_path" is required as it is the config for the root `src` path files. Mandatory config items for each "dir_path":
+
+```yaml
+cfg:
+  plt: "template.html"
+  tags: True
+  index: True
+  rss: True
+  sitemap: True
+  exclude: [] # not necessary
+```
+
+So that extra "dir_paths" can be added under `dirs`:
+
+```yaml
+dirs:
+  /:
+    cfg:
+      ...
+  articles:
+    cfg:
+      ...
+  gallery:
+    cfg:
+      ...
+  etc:
+    ...
+```
+
+The following will be added on runtime to the configuration:
 
 ```yaml
 %YAML 1.2
@@ -169,20 +201,20 @@ fmt:
 info:
   version: "x.y.z" # current 'pyssg' version (0.5.1.dev16, for example)
   debug: True/False # depending if --debug was used when executing
-  force: True/False # depending if --force was used when executing
 rss_run_date: # date the program was run, formatted with 'fmt.rss_date'
 sitemap_run_date: # date the program was run, formatted with 'fmt.sitemap_date'
 ...
 ```
 
-You can add any other option/section that you can later use in the Jinja templates via the exposed config object. URL's shouldn't have the trailing slash `/`.
+You can add any other option/section that you can later use in the Jinja templates via the exposed config object.
+
 
 ## Available Jinja variables
 
 These variables are exposed to use within the templates. The below list is displayed in the form of *variable (type) (available from): description*. `field1/field2/field3/...` describe config file section from the YAML file and option and `object.attribute` corresponding object and it's attribute.
 
-- `config` (`dict`) (all): parsed config file plus the added options internally (as described in [config file](#config-file)).
-- `dir_config` (`dict`) (all*): parsed dir_config file plus the added options internally (as described in [config file](#config-file)). *This is for all of the specific "dir_path" files, as per configured in the YAML file `dirs.dir_path.cfg` (for exmaple `dirs./.cfg` for the required dir_path).
+- `config` (`dict[str, Any]`) (all): parsed config file plus the added options internally (as described in [config file](#config-file)).
+- `dir_config` (`dict[str, Any]`) (all*): parsed dir_config file plus the added options internally (as described in [config file](#config-file)). *This is for all of the specific "dir_path" files, as per configured in the YAML file `dirs.dir_path.cfg` (for exmaple `dirs./.cfg` for the required dir_path).
 - `all_pages` (`list(Page)`) (all): list of all the pages, sorted by creation time, reversed.
 - `page` (`Page`) (`page.html`): contains the following attributes (genarally these are parsed from the metadata in the `*.md` files):
 	- `title` (`str`): title of the page.
@@ -191,20 +223,19 @@ These variables are exposed to use within the templates. The below list is displ
 	- `summary` (`str`): summary of the page, as specified in the `*.md` file.
 	- `content` (`str`): actual content of the page, this is the `html`.
     - `toc` (`str`): table of contents as taken from `md.toc`.
-    - `toc_tokens` (`list(dict)`): table of contents tokens as taken from `md.toc_tokens`.
+    - `toc_tokens` (`list[dict[str, Any]]`): table of contents tokens as taken from `md.toc_tokens`.
 	- `cdatetime` (`datetime.datetime`): creation datetime object of the page.
-	- `cdate` (`method`): method that takes the name of the `fmt.FMT` and applies it to the `cdatetime` object.
+	- `cdate` (`method(FMT: str)`): takes the name of the `fmt.FMT` and applies it to the `cdatetime` object.
 	- `cdate_rss` (`str`): formatted `cdatetime` as required by rss.
 	- `cdate_sitemap` (`str`): formatted `cdatetime` as required by sitemap.
 	- `mdatetime` (`datetime.datetime`): modification datetime object of the page. Defaults to `None`.
-	- `mdate` (`method`): method that takes the name of the `fmt.FMT` and applies it to the `mdatetime` object.
+	- `mdate` (`method(FMT: str)`): takes the name of the `fmt.FMT` and applies it to the `mdatetime` object.
 	- `mdate_rss` (`str`): formatted `mdatetime` as required by rss.
 	- `mdate_sitemap` (`str`): formatted `mdatetime` as required by sitemap.
-	- `tags` (`list(tuple(str))`): list of tuple of tags of the page, containing the name and the url of the tag, in that order. Defaults to empty list.
+	- `tags` (`list[tuple[str]]`): list of tuple of tags of the page, containing the name and the url of the tag, respectively. Defaults to empty list.
 	- `url` (`str`): url of the page, this already includes the `url/main` from config file.
-	- `image_url` (`str`): image url of the page, this already includes the `url/static`. Defaults to the `url/default_image` config option.
 	- `next/previous` (`Page`): reference to the next or previous page object (containing all these attributes). Defaults to `None`.
-	- `meta` (`dict(str, list(str))`): meta dict as obtained from python-markdown, in case you use a meta tag not directly supported, it will be available there.
-- `tag` (`tuple(str)`) (`tag.html`): tuple of name and url of the current tag.
-- `tag_pages` (`list(Page)`) (`tag.html`): similar to `all_pages` but contains all the pages for the current tag.
-- `all_tags` (`list(tuple(str))`) (all): similar to `page.tags` but contains all the tags.
+	- `meta` (`dict[str, list[str]]`): meta dict as obtained from `python-markdown`, in case you use a meta tag not directly supported, it will be available there.
+- `tag` (`tuple[str]`) (`tag.html`): tuple of name and url of the current tag.
+- `tag_pages` (`list[Page]`) (`tag.html`): similar to `all_pages` but contains all the pages for the current tag.
+- `all_tags` (`list[tuple[str]]`) (all): similar to `page.tags` but contains all the tags.
