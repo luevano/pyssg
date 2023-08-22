@@ -14,6 +14,7 @@ from .page import Page
 log: Logger = getLogger(__name__)
 
 
+# TODO: need to better handle when using dir_path other than "/", as the "dir_path" is removed
 class Builder:
     def __init__(self, config: dict,
                  db: Database,
