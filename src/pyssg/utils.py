@@ -3,6 +3,7 @@ import sys
 import shutil
 from hashlib import md5
 from logging import Logger, getLogger
+from datetime import datetime, timezone
 
 log: Logger = getLogger(__name__)
 
@@ -106,3 +107,8 @@ def get_expanded_path(path: str) -> str:
         sys.exit(1)
     log.debug('expanded path "%s" to "%s"', path, expanded_path)
     return expanded_path
+
+
+def get_time_now(fmt: str, tz: timezone=timezone.utc) -> str:
+    return datetime.now(tz=tz).strftime(fmt)
+

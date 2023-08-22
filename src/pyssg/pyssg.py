@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 from .arg_parser import get_parser
 from .utils import create_dir, copy_file, get_expanded_path
-from .configuration import get_parsed_config, get_static_config, DEFAULT_CONFIG_PATH, VERSION
+from .configuration import get_parsed_config, VERSION
 from .database import Database
 from .builder import Builder
 
@@ -18,6 +18,7 @@ def main() -> None:
     arg_parser: ArgumentParser = get_parser()
     args: dict[str, Union[str, bool]] = vars(arg_parser.parse_args())
 
+    # TODO: move this logic to the logger
     # too messy to place at utils.py, don't want to be
     #   passing the arg parser around
     def _log_perror(message: str) -> None:
@@ -40,6 +41,7 @@ def main() -> None:
         log.info('pyssg v%s', VERSION)
         sys.exit(0)
 
+    # TODO: move this logic to the logger
     if args['debug']:
         # need to modify the root logger specifically,
         #   as it is the one that holds the config
@@ -50,68 +52,56 @@ def main() -> None:
             handler.setLevel(DEBUG)
         log.debug('changed logging level to DEBUG')
 
-    config_path: str = str(args['config']) if args['config'] else DEFAULT_CONFIG_PATH
-    # only needed for the DEFAULT_CONFIG_PATH
-    config_path = get_expanded_path(config_path)
-    config_dir, _ = os.path.split(config_path)
-    log.debug('checked config file path, final config path "%s"', config_path)
-
-    if args['copy_default_config']:
-        log.info('copying default config file')
-        create_dir(config_dir)
+    # TODO: modify init arg in argparser
+    if args['init']:
+        init_dir: str = os.path.normpath(get_expanded_path(str(args['init'])))
+        log.info('initializing directory structure and copying templates')
+        create_dir(init_dir)
         with rpath('pyssg.plt', 'default.yaml') as p:
-            copy_file(str(p), config_path)
+            copy_file(str(p), os.path.join(init_dir, 'config.yaml'))
+        create_dir(os.path.join(init_dir, 'src'))
+        create_dir(os.path.join(init_dir, 'dst'))
+        create_dir(os.path.join(init_dir, 'plt'))
+        files: list[str] = ['index.html',
+                            'page.html',
+                            'tag.html',
+                            'rss.xml',
+                            'sitemap.xml',
+                            'entry.md']
+        log.debug('list of files to copy over: (%s)', ', '.join(files))
+        for f in files:
+            plt_file: str = os.path.join(os.path.join(init_dir, 'plt'), f)
+            with rpath('pyssg.plt', f) as p:
+                copy_file(str(p), plt_file)
+        log.info('finished initialization')
         sys.exit(0)
+
+    config_path: str = get_expanded_path(str((args['config']))) \
+                        if args['config'] else 'config.yaml'
 
     if not os.path.exists(config_path):
         log.error('config file does\'t exist in path "%s"; make sure'
-                  ' the path is correct; use --copy-default-config if it\'s the'
+                  ' the path is correct; use --init <dir> if it\'s the'
                   ' first time if you haven\'t already', config_path)
         sys.exit(1)
 
     log.debug('reading config files')
-    config_all: list[dict] = get_parsed_config(config_path)
-    static_config: dict = get_static_config()
-    log.debug('applying static_config for each config document')
-    for config in config_all:
-        config['fmt']['rss_date'] = static_config['fmt']['rss_date']
-        config['fmt']['sitemap_date'] = static_config['fmt']['sitemap_date']
-        config['info'] = dict()
-        config['info']['version'] = static_config['info']['version']
-        config['info']['debug'] = str(args['debug'])
+    config: list[dict] = get_parsed_config(config_path)
+    print(config)
 
-    if args['init']:
-        log.info('initializing the directory structure and copying over templates')
-        for config in config_all:
-            log.info('initializing directories for "%s"', config['title'])
-            create_dir(config['path']['src'])
-            # dst gets created on builder
-            # create_dir(config['path']['dst'])
-            create_dir(config['path']['plt'])
-            files: list[str] = ['index.html',
-                                'page.html',
-                                'tag.html',
-                                'rss.xml',
-                                'sitemap.xml']
-            log.debug('list of files to copy over: (%s)', ', '.join(files))
-            for f in files:
-                plt_file: str = os.path.join(config['path']['plt'], f)
-                with rpath('pyssg.plt', f) as p:
-                    copy_file(str(p), plt_file)
-        log.info('finished initialization')
-        sys.exit(0)
-
+    log.debug('exiting due to testing')
+    sys.exit(0)
     if args['build']:
         log.info('building the html files')
-        for config in config_all:
-            log.info('building html for "%s"', config['title'])
-            db: Database = Database(config['path']['db'])
+        for conf in config:
+            log.info('building html for "%s"', conf['title'])
+            db: Database = Database(conf['path']['db'])
             db.read()
 
-            log.debug('building all dir_paths found in config')
-            for dir_path in config['dirs'].keys():
+            log.debug('building all dir_paths found in conf')
+            for dir_path in conf['dirs'].keys():
                 log.debug('building for "%s"', dir_path)
-                builder: Builder = Builder(config, db, dir_path)
+                builder: Builder = Builder(conf, db, dir_path)
                 builder.build()
 
             db.write()
