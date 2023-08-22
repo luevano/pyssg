@@ -1,1 +1,0 @@
-The content of this file is irrelevant as it is only to test the checksum function.
