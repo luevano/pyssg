@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 from importlib.resources import path as rpath
 from typing import Union
 from logging import Logger, getLogger, DEBUG
@@ -8,7 +9,7 @@ from argparse import ArgumentParser
 from pyssg.arg_parser import get_parser
 from pyssg.utils import create_dir, copy_file, get_expanded_path
 from pyssg.cfg.configuration import get_parsed_config, VERSION
-from pyssg.database import Database
+from pyssg.db.database import Database
 from pyssg.builder import Builder
 
 log: Logger = getLogger(__name__)
@@ -79,27 +80,35 @@ def main() -> None:
                         if args['config'] else 'config.yaml'
 
     if not os.path.exists(config_path):
-        log.error('config file does\'t exist in path "%s"; make sure'
-                  ' the path is correct; use --init <dir> if it\'s the'
-                  ' first time if you haven\'t already', config_path)
-        sys.exit(1)
+        _log_perror(f'config file "{config_path}" doesn\'t exist')
 
-    log.debug('reading config files')
+    log.debug('reading config file')
     config: list[dict] = get_parsed_config(config_path)
-    print(config)
+    print(json.dumps(config, sort_keys=True, indent=2))
 
     if args['build']:
         log.info('building the html files')
-        # TODO: move from filesystem database to sqlite3
         db: Database = Database(config[0]['path']['db'])
-        db.read()
+
+        print(db.select_all())
+
+        fname: str = "t2"
+        ctime: float = 1.0
+        mtime: float = 2.0
+        chksm: str = "xxx"
+        tags: tuple | None = ("t1", "t2", "t3")
+        # tags = None
+
+        db.insert(fname, ctime, chksm, tags)
+        # db.update(fname, mtime, chksm, tags)
+        print(db.select_all())
 
         # TODO: change logic from "dir_paths" to single config
-        log.debug('building all dir_paths found in conf')
-        for dir_path in config[0]['dirs'].keys():
-            log.debug('building for "%s"', dir_path)
-            builder: Builder = Builder(config[0], db, dir_path)
-            builder.build()
+        # log.debug('building all dir_paths found in conf')
+        # for dir_path in config[0]['dirs'].keys():
+        #     log.debug('building for "%s"', dir_path)
+        #     builder: Builder = Builder(config[0], db, dir_path)
+        #     builder.build()
 
         db.write()
         log.info('finished building the html files')
