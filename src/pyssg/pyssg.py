@@ -5,11 +5,11 @@ from typing import Union
 from logging import Logger, getLogger, DEBUG
 from argparse import ArgumentParser
 
-from .arg_parser import get_parser
-from .utils import create_dir, copy_file, get_expanded_path
-from .configuration import get_parsed_config, VERSION
-from .database import Database
-from .builder import Builder
+from pyssg.arg_parser import get_parser
+from pyssg.utils import create_dir, copy_file, get_expanded_path
+from pyssg.cfg.configuration import get_parsed_config, VERSION
+from pyssg.database import Database
+from pyssg.builder import Builder
 
 log: Logger = getLogger(__name__)
 
@@ -52,25 +52,24 @@ def main() -> None:
             handler.setLevel(DEBUG)
         log.debug('changed logging level to DEBUG')
 
-    # TODO: modify init arg in argparser
     if args['init']:
-        init_dir: str = os.path.normpath(get_expanded_path(str(args['init'])))
+        idir: str = os.path.normpath(get_expanded_path(str(args['init'])))
         log.info('initializing directory structure and copying templates')
-        create_dir(init_dir)
+        create_dir(idir)
         with rpath('pyssg.plt', 'default.yaml') as p:
-            copy_file(str(p), os.path.join(init_dir, 'config.yaml'))
-        create_dir(os.path.join(init_dir, 'src'))
-        create_dir(os.path.join(init_dir, 'dst'))
-        create_dir(os.path.join(init_dir, 'plt'))
+            copy_file(str(p), os.path.join(idir, 'config.yaml'))
+        create_dir(os.path.join(idir, 'src'))
+        create_dir(os.path.join(idir, 'dst'))
+        create_dir(os.path.join(idir, 'plt'))
         files: list[str] = ['index.html',
                             'page.html',
                             'tag.html',
                             'rss.xml',
                             'sitemap.xml',
                             'entry.md']
-        log.debug('list of files to copy over: (%s)', ', '.join(files))
+        log.debug('list of files to copy over: %s', files)
         for f in files:
-            plt_file: str = os.path.join(os.path.join(init_dir, 'plt'), f)
+            plt_file: str = os.path.join(os.path.join(idir, 'plt'), f)
             with rpath('pyssg.plt', f) as p:
                 copy_file(str(p), plt_file)
         log.info('finished initialization')
@@ -89,21 +88,19 @@ def main() -> None:
     config: list[dict] = get_parsed_config(config_path)
     print(config)
 
-    log.debug('exiting due to testing')
-    sys.exit(0)
     if args['build']:
         log.info('building the html files')
-        for conf in config:
-            log.info('building html for "%s"', conf['title'])
-            db: Database = Database(conf['path']['db'])
-            db.read()
+        # TODO: move from filesystem database to sqlite3
+        db: Database = Database(config[0]['path']['db'])
+        db.read()
 
-            log.debug('building all dir_paths found in conf')
-            for dir_path in conf['dirs'].keys():
-                log.debug('building for "%s"', dir_path)
-                builder: Builder = Builder(conf, db, dir_path)
-                builder.build()
+        # TODO: change logic from "dir_paths" to single config
+        log.debug('building all dir_paths found in conf')
+        for dir_path in config[0]['dirs'].keys():
+            log.debug('building for "%s"', dir_path)
+            builder: Builder = Builder(config[0], db, dir_path)
+            builder.build()
 
-            db.write()
+        db.write()
         log.info('finished building the html files')
         sys.exit(0)

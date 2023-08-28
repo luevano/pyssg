@@ -1,6 +1,6 @@
-from .pyssg import main
-from .custom_logger import setup_logger
-from .yaml_parser import setup_custom_yaml
+from pyssg.pyssg import main
+from pyssg.custom_logger import setup_logger
+from pyssg.cfg.yaml_parser import setup_custom_yaml
 
 
 setup_logger()

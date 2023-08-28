@@ -1,11 +1,7 @@
 import yaml
 from yaml import SafeLoader
 from yaml.nodes import SequenceNode
-from importlib.resources import path as rpath
-from logging import Logger, getLogger
 from typing import Any
-
-log: Logger = getLogger(__name__)
 
 
 # required to concat values in yaml using !join [value, value, ...]
