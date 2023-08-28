@@ -81,12 +81,13 @@ def copy_file(src: str, dst: str) -> None:
 
 # as seen in SO: https://stackoverflow.com/a/1131238
 def get_checksum(path: str) -> str:
-    log.debug('calculating md5 checksum for "%s"', path)
     file_hash = md5()
     with open(path, "rb") as f:
         while chunk := f.read(4096):
             file_hash.update(chunk)
-    return file_hash.hexdigest()
+    out: str = file_hash.hexdigest()
+    log.debug('md5 checksum of "%s": %s', path, out)
+    return out
 
 
 def get_expanded_path(path: str) -> str:
@@ -97,6 +98,12 @@ def get_expanded_path(path: str) -> str:
         sys.exit(1)
     log.debug('expanded path "%s" to "%s"', path, epath)
     return epath
+
+
+def get_file_stats(path: str) -> tuple[str, float]:
+    time: float = os.stat(path).st_mtime
+    chksm: str = get_checksum(path)
+    return (chksm, time)
 
 
 def get_time_now(fmt: str, tz: timezone=timezone.utc) -> str:

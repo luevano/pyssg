@@ -1,6 +1,7 @@
 import os
 from operator import itemgetter
 from logging import Logger, getLogger
+import sys
 from typing import Any
 
 from markdown import Markdown
@@ -9,8 +10,9 @@ from pymdvar import VariableExtension
 from markdown_checklist.extension import ChecklistExtension
 from markdown.extensions.toc import TocExtension
 
-from .database import Database
-from .page import Page
+from pyssg.db.database import Database
+from pyssg.page import Page
+from pyssg.utils import get_file_stats
 
 log: Logger = getLogger(__name__)
 
@@ -30,11 +32,11 @@ def get_md_obj(variables: dict[str, str],
                   # stripTitle generates an error when True,
                   # if there is no title attr
                   YafgExtension(stripTitle=False,
-                                figureClass="",
-                                figcaptionClass="",
+                                figureClass='',
+                                figcaptionClass='',
                                 figureNumbering=False,
-                                figureNumberClass="number",
-                                figureNumberText="Figure"),
+                                figureNumberClass='number',
+                                figureNumberText='Figure'),
                   ChecklistExtension(),
                   'pymdownx.mark',
                   'pymdownx.caret',
@@ -76,20 +78,32 @@ class MDParser:
         self.all_tags: list[tuple[str, str]] = []
 
     def parse_files(self) -> None:
-        log.debug('parsing all files')
         for i, f in enumerate(self.files):
             log.debug('parsing file "%s"', f)
-            src_file: str = os.path.join(self.dir_config['src'], f)
-            log.debug('path "%s"', src_file)
-            self.db.update(src_file, remove=f'{self.dir_config["src"]}/')
+            path: str = os.path.join(self.dir_config['src'], f)
+            content: str = self.md.reset().convert(open(path).read())
+            fstats = get_file_stats(path)
+            chksm: str = fstats[0]
+            time: float = fstats[1]
 
+            entry: tuple
+            # old entry
+            oentry: tuple | None = self.db.select(f)
+            if not oentry:
+                entry = self.db.insert(f, time, chksm)
+            else:
+                oe_chksm: str = oentry[3]
+                if chksm != oe_chksm:
+                    entry = self.db.update(f, time, chksm)
+                else:
+                    entry = oentry
+            
             log.debug('parsing md into html')
-            content: str = self.md.reset().convert(open(src_file).read())
             # ignoring md.Meta type as it is not yet defined
             #   (because it is from an extension)
             page: Page = Page(f,
-                              self.db.e[f].ctimestamp,
-                              self.db.e[f].mtimestamp,
+                              entry[1],
+                              entry[2],
                               content,
                               self.md.toc,  # type: ignore
                               self.md.toc_tokens,  # type: ignore
@@ -101,19 +115,19 @@ class MDParser:
             log.debug('adding to file list')
             self.all_files.append(page)
 
-            if self.dir_config['tags'] and page.tags is not None:
-                log.debug('parsing tags for "%s"', f)
-                self.db.update_tags(f, set(map(itemgetter(0), page.tags)))
+            if self.dir_config['tags']:
+                if page.tags is None:
+                    self.db.update_tags(f)
+                else:
+                    tags: tuple = tuple(set(map(itemgetter(0), page.tags)))
+                    if tags != entry[4]:
+                        self.db.update_tags(f, tags)
 
                 log.debug('add all tags to tag list')
                 for t in page.tags:
                     if t[0] not in list(map(itemgetter(0), self.all_tags)):
-                        log.debug('adding tag "%s"', t[0])
                         self.all_tags.append(t)
-                    else:
-                        log.debug('ignoring tag "%s"; already present', t[0])
-            else:
-                log.debug('no tags to parse')
+                        log.debug('added tag "%s"', t[0])
 
         log.debug('sorting all lists for consistency')
         self.all_files.sort(reverse=True)

@@ -120,5 +120,5 @@ class Page:
         # no need to specify dir_config['url'] as self.name already
         #   contains the relative url
         name_html: str = self.name.replace(".md", ".html")
-        self.url = f'{self.config["url"]["main"]}/{name_html}'
+        self.url = f'{self.config["url"]["base"]}/{name_html}'
         log.debug('final url "%s"', self.url)

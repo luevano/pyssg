@@ -1,4 +1,3 @@
-import json
 import sqlite3
 from logging import Logger, getLogger
 from sqlite3 import PARSE_DECLTYPES, Connection, Cursor
@@ -19,18 +18,15 @@ class Database:
         # create statements are always commited
         self.query(CREATE_FILES_TABLE)
 
-
     # commits the transactions, closes connection and cursor
     def write(self) -> None:
         self.con.commit()
         self.cur.close()
         self.con.close()
 
-
     def query(self, sql: str,
               params: dict | Sequence = ()) -> list[Any]:
         return self.cur.execute(sql, params).fetchall()
-
 
     # commit query, doesn't wait until calling con.commit()
     def cquery(self, sql: str,
@@ -40,39 +36,40 @@ class Database:
             out = self.query(sql, params)
         return out
 
-
     def select(self, fname: str) -> tuple | None:
         out: list[Any]
         out = self.query(SELECT_FILE, (fname,))
+        log.debug("select %s", out)
         return out[0] if out else None
-
 
     def select_all(self) -> list[Any] | None:
         out: list[Any] = self.query(SELECT_FILE_ALL)
+        log.debug("select_all %s", out)
         return out if out else None
-
 
     def insert(self, fname: str,
                ctime: float,
                checksum: str,
-               tags: tuple | None = None) -> None:
+               tags: tuple | None = None) -> tuple:
         params: tuple = (fname, ctime, checksum, tags)
         out: tuple = self.query(INSERT_FILE, params)[0]
         log.debug("insert %s", out)
-
+        return out
 
     def update(self, fname: str,
                mtime: float,
                checksum: str,
-               tags: tuple | None = None) -> None:
+               tags: tuple | None = None) -> tuple:
         params: tuple = (mtime, checksum, tags, fname)
         out: tuple = self.query(UPDATE_FILE, params)[0]
         log.debug("update %s", out)
+        return out
 
 
     def update_tags(self, fname: str,
-                    tags: tuple | None = None) -> None:
+                    tags: tuple | None = None) -> tuple:
         params: tuple = (tags, fname)
         out: tuple = self.query(UPDATE_FILE_TAGS, params)[0]
-        log.debug("update %s", out)
+        log.debug("update_tags %s", out)
+        return out
 

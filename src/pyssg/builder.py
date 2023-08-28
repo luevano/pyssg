@@ -6,10 +6,10 @@ from logging import Logger, getLogger
 
 from jinja2 import Environment, Template, FileSystemLoader as FSLoader
 
-from .utils import get_file_list, get_dir_structure, create_dir, copy_file
-from .database import Database
-from .md_parser import MDParser
-from .page import Page
+from pyssg.utils import get_file_list, get_dir_structure, create_dir, copy_file
+from pyssg.db.database import Database
+from pyssg.md_parser import MDParser
+from pyssg.page import Page
 
 log: Logger = getLogger(__name__)
 
@@ -18,32 +18,27 @@ log: Logger = getLogger(__name__)
 class Builder:
     def __init__(self, config: dict,
                  db: Database,
-                 dir_path: str) -> None:
+                 dir_cfg: dict) -> None:
         log.debug('initializing site builder')
         self.config: dict = config
         self.db: Database = db
-        self.dir_path: str = dir_path
+        self.dir_cfg: dict = deepcopy(dir_cfg)
 
-        if self.dir_path not in self.config['dirs']:
-            log.error('couldn\'t find "dirs.%s" attribute in config file', self.dir_path)
-            sys.exit(1)
-        if os.path.isabs(self.dir_path) and self.dir_path.strip() != '/':
-            log.error('dir path "%s" cannot be absolute, except for the special case "/"', self.dir_path)
+        if os.path.isabs(self.dir_cfg['dir']) and self.dir_cfg['dir'].strip() != '/':
+            log.error('dir path "%s" cannot be absolute', self.dir_cfg['dir'])
             sys.exit(1)
 
-        log.debug('building dir_cfg for "%s" dir_path', self.dir_path)
-        self.dir_cfg: dict = deepcopy(self.config['dirs'][self.dir_path]['cfg'])
 
-        if self.dir_path.strip() == '/':
-            log.debug('dir_path is "/", copying src/dst directly')
+        if self.dir_cfg['dir'].strip() == '/':
+            log.debug('dir path is "/", copying src/dst directly')
             self.dir_cfg['src'] = self.config['path']['src']
             self.dir_cfg['dst'] = self.config['path']['dst']
-            self.dir_cfg['url'] = self.config['url']['main']
+            self.dir_cfg['url'] = self.config['url']['base']
         else:
-            log.debug('dir_path is "%s", generating', self.dir_path)
-            self.dir_cfg['src'] = os.path.join(self.config['path']['src'], self.dir_path)
-            self.dir_cfg['dst'] = os.path.join(self.config['path']['dst'], self.dir_path)
-            self.dir_cfg['url'] = f'{self.config["url"]["main"]}/{self.dir_path}'
+            log.debug('dir_path is "%s", generating', self.dir_cfg['dir'])
+            self.dir_cfg['src'] = os.path.join(self.config['path']['src'], self.dir_cfg['dir'])
+            self.dir_cfg['dst'] = os.path.join(self.config['path']['dst'], self.dir_cfg['dir'])
+            self.dir_cfg['url'] = f'{self.config["url"]["base"]}/{self.dir_cfg["dir"]}'
 
         # the autoescape option could be a security risk if used in a dynamic
         # website, as far as i can tell
@@ -63,12 +58,12 @@ class Builder:
         self.common_vars: dict
 
     def build(self) -> None:
-        log.debug('building site for dir path "%s"', self.dir_path)
+        log.debug('building site for dir path "%s"', self.dir_cfg['dir'])
         if 'exclude_dirs' not in self.dir_cfg:
-            log.debug('"exclude_dirs" field not found in "dirs.%s.cfg"', self.dir_path)
+            log.debug('"exclude_dirs" field for dir "%s" not found', self.dir_cfg['dir'])
             self.dir_cfg['exclude_dirs'] = []
         if not isinstance(self.dir_cfg['exclude_dirs'], list):
-            log.error('"exclude_dirs" field in "dirs.%s.cfg" isn\'t of type "list"', self.dir_path)
+            log.error('"exclude_dirs" field for dir "%s" isn\'t of type "list"', self.dir_cfg['dir'])
             sys.exit(1)
 
         self.dirs = get_dir_structure(self.dir_cfg['src'],
@@ -105,8 +100,8 @@ class Builder:
         self.__render_pages(self.dir_cfg['plt'])
 
         if self.dir_cfg['tags']:
-            log.debug('rendering tags for dir_path "%s"', self.dir_path)
-            create_dir(os.path.join(self.dir_cfg['dst'], 'tag'), True, True)
+            log.debug('rendering tags for dir "%s"', self.dir_cfg['dir'])
+            create_dir(os.path.join(self.dir_cfg['dst'], 'tag'), True)
             if isinstance(self.dir_cfg['tags'], str):
                 self.__render_tags(self.dir_cfg['tags'])
             else:
@@ -127,11 +122,11 @@ class Builder:
                                            **self.common_vars)
 
     def __create_dir_structure(self) -> None:
-        log.debug('creating dir structure for dir_path "%s"', self.dir_path)
-        create_dir(self.dir_cfg['dst'], True, True)
+        log.debug('creating dir structure for dir "%s"', self.dir_cfg['dir'])
+        create_dir(self.dir_cfg['dst'], True)
         for d in self.dirs:
             path: str = os.path.join(self.dir_cfg['dst'], d)
-            create_dir(path, True, True)
+            create_dir(path, True)
 
     def __copy_html_files(self) -> None:
         if not len(self.html_files) > 0:
