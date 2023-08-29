@@ -109,15 +109,12 @@ class MDParser:
             page.parse_metadata()
             self.all_files.append(page)
 
-            if self.dir_config['tags']:
-                if entry[4] is not None:
-                    if set(page.tags) != set(entry[4]):
-                        self.db.update_tags(f, page.tags)
-
-                for t in page.tags:
-                    if t not in self.all_tags:
-                        self.all_tags.append(t)
-                        log.debug('added tag "%s" to all tags', t)
+            # always the most up to date tags
+            self.db.update_tags(f, page.tags)
+            for t in page.tags:
+                if t not in self.all_tags:
+                    self.all_tags.append(t)
+                    log.debug('added tag "%s" to all tags', t)
 
         self.all_files.sort(reverse=True)
         self.all_tags.sort()

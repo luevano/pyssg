@@ -14,15 +14,18 @@ fmt:
   date: "%a, %b %d, %Y @ %H:%M %Z"
   rss_date: "%a, %d %b %Y %H:%M:%S GMT"
   sitemap_date: "%Y-%m-%d"
+  list_date: "%b %d"
+  list_sep_date: "%Y"
 info:
   version: "0.0.0"
 ...
 ---
 dir: "/"
-plt: "page.html"
-tags: False
-tags_prefix: ''
-index: False
-rss: False
-sitemap: False
+plt:
+  page: "page.html"
+  index: "page_index.html"
+  tags: "tag_index.html"
+  rss: "rss.xml"
+  sitemap: "sitemap.xml"
+tags_prefix: '@'
 ...

@@ -95,29 +95,20 @@ class Builder:
                                 all_pages=self.all_files,
                                 all_tags=self.all_tags)
 
-        self.__render_pages(self.dir_cfg['plt'])
+        self.__render_pages(self.dir_cfg['plt']['page'])
 
-        if self.dir_cfg['tags']:
+        if 'tags' in self.dir_cfg['plt']:
             create_dir(os.path.join(self.dir_cfg['dst'], 'tags'), True)
-            if isinstance(self.dir_cfg['tags'], str):
-                self.__render_tags(self.dir_cfg['tags'])
-            else:
-                self.__render_tags('tag.html')
-            log.debug('rendered tags for dir "%s"', self.dir_cfg['dir'])
+            self.__render_tags(self.dir_cfg['plt']['tags'])
 
-        default_plts: dict[str, str] = {'index': 'index.html',
-                                        'rss': 'rss.xml',
-                                        'sitemap': 'sitemap.xml'}
-        for opt in default_plts.keys():
-            if self.dir_cfg[opt]:
-                if isinstance(self.dir_cfg[opt], str):
-                    self.__render_template(self.dir_cfg[opt],
-                                           default_plts[opt],
-                                           **self.common_vars)
-                else:
-                    self.__render_template(default_plts[opt],
-                                           default_plts[opt],
-                                           **self.common_vars)
+        generic: dict[str, str] = {'index': 'index.html',
+                                   'rss': 'rss.xml',
+                                   'sitemap': 'sitemap.xml'}
+        for plt in generic:
+            if  plt in self.dir_cfg['plt']:
+                self.__render_template(self.dir_cfg['plt'][plt],
+                                       generic[plt],
+                                       **self.common_vars)
 
     def __create_dir_structure(self) -> None:
         log.debug('creating dir structure for dir "%s"', self.dir_cfg['dir'])
@@ -153,6 +144,9 @@ class Builder:
 
     def __render_tags(self, template_name: str) -> None:
         log.debug('rendering tags with template "%s"', template_name)
+        tag_prefix: str = ''
+        if self.dir_cfg['tags_prefix']:
+            tag_prefix = self.dir_cfg['tags_prefix']
         tag_vars: dict = deepcopy(self.common_vars)
         tag_pages: list[Page]
         for t in self.all_tags:
@@ -164,7 +158,7 @@ class Builder:
                     log.debug('added page "%s" to tag "%s"', p.name, t)
             tag_vars['tag'] = t
             tag_vars['tag_pages'] = tag_pages
-            t_fname: str = f'tags/{t}.html'
+            t_fname: str = f'tags/{tag_prefix}{t}.html'
             # actually render tag page
             self.__render_template(template_name, t_fname, **tag_vars)
             log.debug('rendered tag "%s"', t)

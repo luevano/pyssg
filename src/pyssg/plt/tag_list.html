@@ -1,7 +1,7 @@
-{%macro print(tags)%}
+{%macro print(tags, prefix)%}
   <p>Tags: 
   {%for t in tags-%}
-    <a href="/tags/{{t}}.html">{{t}}</a>{{", " if not loop.last else ""}}
+    <a href="/tags/{{prefix}}{{t}}.html">{{t}}</a>{{", " if not loop.last else ""}}
   {%-endfor%}
   </p>
 {%endmacro%}

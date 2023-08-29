@@ -5,10 +5,10 @@
 
 {%block body_content%}
   <h1>Index -- {{config['title']}}</h1>
-  {{page.content}}
+  <p>Some text here</p>
 
   {%import "tag_list.html" as tag_list%}
-  {{tag_list.print(all_tags)}}
+  {{tag_list.print(all_tags, config['tags_prefix'])}}
 
   {%import "page_list.html" as page_list%}
   {{page_list.print("Articles", all_pages)}}
