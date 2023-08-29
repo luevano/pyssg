@@ -1,0 +1,15 @@
+{%macro print(name, pages)%}
+  <h2>{{name}}</h2>
+  <ul>
+  {%for p in pages%}
+    {%if loop.previtem%}
+      {%if loop.previtem.date(loop.previtem.cts, 'list_sep_date') != p.date(p.cts, 'list_sep_date')%}
+        <h3>{{p.date(p.cts, 'list_sep_date')}}</h3>
+      {%endif%}
+    {%else%}
+        <h3>{{p.date(p.cts, 'list_sep_date')}}</h3>
+    {%endif%}
+    <li>{{p.date(p.cts, 'list_date')}} - <a href="/{{p.name}}">{{p.title}}</a></li>
+  {%endfor%}
+  </ul>
+{%endmacro%}

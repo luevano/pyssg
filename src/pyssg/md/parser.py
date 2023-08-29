@@ -1,7 +1,5 @@
 import os
-from operator import itemgetter
 from logging import Logger, getLogger
-import sys
 from typing import Any
 
 from markdown import Markdown
@@ -11,7 +9,7 @@ from markdown_checklist.extension import ChecklistExtension
 from markdown.extensions.toc import TocExtension
 
 from pyssg.db.database import Database
-from pyssg.page import Page
+from pyssg.md.page import Page
 from pyssg.utils import get_file_stats
 
 log: Logger = getLogger(__name__)

@@ -1,15 +1,14 @@
 import os
 import sys
 from copy import deepcopy
-from operator import itemgetter
 from logging import Logger, getLogger
 
 from jinja2 import Environment, Template, FileSystemLoader as FSLoader
 
 from pyssg.utils import get_file_list, get_dir_structure, create_dir, copy_file
 from pyssg.db.database import Database
-from pyssg.md_parser import MDParser
-from pyssg.page import Page
+from pyssg.md.parser import MDParser
+from pyssg.md.page import Page
 
 log: Logger = getLogger(__name__)
 
@@ -27,7 +26,6 @@ class Builder:
         if os.path.isabs(self.dir_cfg['dir']) and self.dir_cfg['dir'].strip() != '/':
             log.error('dir path "%s" cannot be absolute', self.dir_cfg['dir'])
             sys.exit(1)
-
 
         if self.dir_cfg['dir'].strip() == '/':
             log.debug('dir path is "/", copying src/dst directly')

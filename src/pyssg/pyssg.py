@@ -54,17 +54,23 @@ def main() -> None:
         log.debug('changed logging level to DEBUG')
 
     if args['init']:
-        idir: str = os.path.normpath(get_expanded_path(str(args['init'])))
         log.info('initializing directory structure and copying templates')
+        idir: str = os.path.normpath(get_expanded_path(str(args['init'])))
+
         create_dir(idir)
         with rpath('pyssg.plt', 'default.yaml') as p:
             copy_file(str(p), os.path.join(idir, 'config.yaml'))
+
         create_dir(os.path.join(idir, 'src'))
         create_dir(os.path.join(idir, 'dst'))
         create_dir(os.path.join(idir, 'plt'))
-        files: list[str] = ['index.html',
+        files: list[str] = ['base.html',
+                            'index.html',
+                            'page_index.html',
                             'page.html',
-                            'tag.html',
+                            'page_list.html',
+                            'tag_index.html',
+                            'tag_list.html',
                             'rss.xml',
                             'sitemap.xml',
                             'entry.md']

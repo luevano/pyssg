@@ -1,0 +1,11 @@
+{%extends "base.html"%}
+{%block head_title%}
+  <title>Posts filtered by {{tag}} -- {{config['title']}}</title>
+{%endblock head_title%}
+
+{%block body_content%}
+  <h1>Posts filtered by {{tag}}</h1>
+
+  {%import "page_list.html" as page_list%}
+  {{page_list.print("Articles", tag_pages)}}
+{%endblock body_content%}

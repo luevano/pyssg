@@ -21,6 +21,7 @@ info:
 dir: "/"
 plt: "page.html"
 tags: False
+tags_prefix: ''
 index: False
 rss: False
 sitemap: False

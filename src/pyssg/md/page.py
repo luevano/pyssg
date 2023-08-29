@@ -52,8 +52,6 @@ class Page:
                       var, or_else)
             return or_else
 
-    # these date/cdate/mdate might be a bit overcomplicated
-
     def date(self, ts: float, format: str) -> str:
         dt: datetime = datetime.fromtimestamp(ts, tz=timezone.utc)
 
