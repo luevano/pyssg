@@ -41,7 +41,7 @@ class Page:
         self.previous: Page | None = None
 
     def __lt__(self, other):
-        return self.ctimestamp < other.ctimestamp
+        return self.cts < other.cts
 
     def __get_meta(self, var: str,
                    or_else: str | list[str] = ['']) -> str | list[str] | Any:
