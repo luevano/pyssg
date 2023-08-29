@@ -54,7 +54,7 @@ class Builder:
 
         # files and pages are synoyms
         self.all_files: list[Page]
-        self.all_tags: list[tuple[str, str]]
+        self.all_tags: list[str]
         self.common_vars: dict
 
     def build(self) -> None:
@@ -100,12 +100,12 @@ class Builder:
         self.__render_pages(self.dir_cfg['plt'])
 
         if self.dir_cfg['tags']:
-            log.debug('rendering tags for dir "%s"', self.dir_cfg['dir'])
-            create_dir(os.path.join(self.dir_cfg['dst'], 'tag'), True)
+            create_dir(os.path.join(self.dir_cfg['dst'], 'tags'), True)
             if isinstance(self.dir_cfg['tags'], str):
                 self.__render_tags(self.dir_cfg['tags'])
             else:
                 self.__render_tags('tag.html')
+            log.debug('rendered tags for dir "%s"', self.dir_cfg['dir'])
 
         default_plts: dict[str, str] = {'index': 'index.html',
                                         'rss': 'rss.xml',
@@ -158,32 +158,27 @@ class Builder:
         tag_vars: dict = deepcopy(self.common_vars)
         tag_pages: list[Page]
         for t in self.all_tags:
-            log.debug('rendering tag "%s"', t[0])
             # clean tag_pages
             tag_pages = []
-            log.debug('adding all pages that contain current tag')
             for p in self.all_files:
-                if p.tags is not None and t[0] in list(map(itemgetter(0),
-                                                           p.tags)):
-                    log.debug('adding page "%s" as it contains tag "%s"',
-                              p.name, t[0])
+                if p.tags is not None and t in p.tags:
                     tag_pages.append(p)
-            log.debug('adding tag and tag_pages to exposed vars for jinja')
+                    log.debug('added page "%s" to tag "%s"', p.name, t)
             tag_vars['tag'] = t
             tag_vars['tag_pages'] = tag_pages
-            t_fname: str = f'tag/@{t[0]}.html'
+            t_fname: str = f'tags/{t}.html'
             # actually render tag page
             self.__render_template(template_name, t_fname, **tag_vars)
+            log.debug('rendered tag "%s"', t)
 
     def __render_template(self, template_name: str,
                           file_name: str,
                           **template_vars) -> None:
-        log.debug('rendering html "%s" with template "%s"',
-                  file_name, template_name)
         template: Template = self.env.get_template(template_name)
         content: str = template.render(**template_vars)
         dst_path: str = os.path.join(self.dir_cfg['dst'], file_name)
 
-        log.debug('writing html file to path "%s"', dst_path)
         with open(dst_path, 'w') as f:
             f.write(content)
+        log.debug('wrote html at "%s"', dst_path)
+

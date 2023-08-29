@@ -75,7 +75,7 @@ class MDParser:
         self.md: Markdown = get_md_obj(self.pymdvar_vars, self.pymdvar_enable_env)
 
         self.all_files: list[Page] = []
-        self.all_tags: list[tuple[str, str]] = []
+        self.all_tags: list[str] = []
 
     def parse_files(self) -> None:
         for i, f in enumerate(self.files):
@@ -98,7 +98,6 @@ class MDParser:
                 else:
                     entry = oentry
             
-            log.debug('parsing md into html')
             # ignoring md.Meta type as it is not yet defined
             #   (because it is from an extension)
             page: Page = Page(f,
@@ -108,35 +107,26 @@ class MDParser:
                               self.md.toc,  # type: ignore
                               self.md.toc_tokens,  # type: ignore
                               self.md.Meta,  # type: ignore
-                              self.config,
-                              self.dir_config)
+                              self.config)
             page.parse_metadata()
-
-            log.debug('adding to file list')
             self.all_files.append(page)
 
             if self.dir_config['tags']:
-                if page.tags is None:
-                    self.db.update_tags(f)
-                else:
-                    tags: tuple = tuple(set(map(itemgetter(0), page.tags)))
-                    if tags != entry[4]:
-                        self.db.update_tags(f, tags)
+                if entry[4] is not None:
+                    if set(page.tags) != set(entry[4]):
+                        self.db.update_tags(f, page.tags)
 
-                log.debug('add all tags to tag list')
                 for t in page.tags:
-                    if t[0] not in list(map(itemgetter(0), self.all_tags)):
+                    if t not in self.all_tags:
                         self.all_tags.append(t)
-                        log.debug('added tag "%s"', t[0])
+                        log.debug('added tag "%s" to all tags', t)
 
-        log.debug('sorting all lists for consistency')
         self.all_files.sort(reverse=True)
-        self.all_tags.sort(key=itemgetter(0))
+        self.all_tags.sort()
 
         pages_amount: int = len(self.all_files)
         # note that prev and next are switched because of the
         # reverse ordering of all_pages
-        log.debug('update next and prev attributes')
         for i, p in enumerate(self.all_files):
             if i != 0:
                 next_page: Page = self.all_files[i - 1]

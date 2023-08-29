@@ -8,9 +8,9 @@
   <body>
     <h1>{{page.title}}</h1>
     <p>By {{page.author}}</p>
-    <p>Created: {{page.cdate('date')}}</p>
-    {%if page.mdatetime is not none%}
-      <p>Modified: {{page.mdate('date')}}</p>
+    <p>Created: {{page.date(page.cts, 'date')}}</p>
+    {%if page.mtimestamp != 0.0%}
+      <p>Modified: {{page.date(page.mts, 'date')}}</p>
     {%endif%}
 
     {{page.content}}
