@@ -8,12 +8,12 @@
 
   <p>By {{', '.join(page.author)}}</p>
   <p>Created: {{page.date(page.cts, 'date')}}</p>
-  {%if page.mtimestamp != 0.0%}
+  {%if page.mts != 0.0%}
     <p>Modified: {{page.date(page.mts, 'date')}}</p>
   {%endif%}
 
   {{page.content}}
 
   {%import "tag_list.html" as tag_list%}
-  {{tag_list.print(page.tags, config['tags_prefix'])}}
+  {{tag_list.print(page.tags, dir_config['tags_prefix'])}}
 {%endblock body_content%}

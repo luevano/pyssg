@@ -132,20 +132,17 @@ class Builder:
             copy_file(src_file, dst_file)
 
     def __render_pages(self, template_name: str) -> None:
-        log.debug('rendering pages with template "%s"', template_name)
         page_vars: dict = deepcopy(self.common_vars)
 
         for p in self.all_files:
             p_fname: str = p.name.replace('.md', '.html')
-            log.debug('adding page "%s" to exposed vars for jinja', p_fname)
             page_vars['page'] = p
             # actually render article
             self.__render_template(template_name, p_fname, **page_vars)
 
     def __render_tags(self, template_name: str) -> None:
-        log.debug('rendering tags with template "%s"', template_name)
         tag_prefix: str = ''
-        if self.dir_cfg['tags_prefix']:
+        if 'tags_prefix' in self.dir_cfg:
             tag_prefix = self.dir_cfg['tags_prefix']
         tag_vars: dict = deepcopy(self.common_vars)
         tag_pages: list[Page]
@@ -161,7 +158,6 @@ class Builder:
             t_fname: str = f'tags/{tag_prefix}{t}.html'
             # actually render tag page
             self.__render_template(template_name, t_fname, **tag_vars)
-            log.debug('rendered tag "%s"', t)
 
     def __render_template(self, template_name: str,
                           file_name: str,
@@ -172,5 +168,5 @@ class Builder:
 
         with open(dst_path, 'w') as f:
             f.write(content)
-        log.debug('wrote html at "%s"', dst_path)
+        log.debug('rendered "%s" with template %s', dst_path, template_name)
 
