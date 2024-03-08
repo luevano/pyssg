@@ -131,3 +131,4 @@ dmypy.json
 # project specific
 .vscode/
 site_example/
+**/live/
